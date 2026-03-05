@@ -61,12 +61,6 @@ app.patch('/api/approve-alumni/:id', async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
-=======
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client/build')));
@@ -75,4 +69,3 @@ if (process.env.NODE_ENV === 'production') {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
->>>>>>> 27a8cc9 (IDK just commit)
