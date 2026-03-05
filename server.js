@@ -60,17 +60,16 @@ app.patch('/api/approve-alumni/:id', async (req, res) => {
     res.status(400).send(error.message);
   }
 });
-
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));
-app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) {
-        return next();
-    }
+
+  // Instead of using a wildcard route that crashes Express 5, 
+  // we use a simple middleware that serves index.html for all non-API GET requests.
+  app.get(/^\/(?!api).*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-} 
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
