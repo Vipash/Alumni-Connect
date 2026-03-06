@@ -1,9 +1,9 @@
-/* Color Palette */
+/* MBM Academic Palette */
 :root {
-  --primary-red: #d90429;
-  --dark-red: #8d0801;
-  --gold: #ffb703;
-  --light-gray: #f8f9fa;
+  --mbm-blue: #262a6b;
+  --mbm-gold: #d4af37;
+  --bg-light: #f4f4f9;
+  --text-dark: #1a1a1a;
   --white: #ffffff;
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -11,20 +11,22 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--light-gray);
+  background-color: var(--bg-light);
+  color: var(--text-dark);
 }
 
 /* Sidebar Styling */
 .sidebar {
   background: var(--white);
-  border-right: 1px solid #eee;
+  border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
 }
 
 h2 {
   font-weight: 800;
-  letter-spacing: -1px;
+  color: var(--mbm-blue);
+  letter-spacing: -0.5px;
   margin-top: 10px;
 }
 
@@ -40,19 +42,19 @@ button {
 }
 
 .nav-btn {
-  background-color: var(--primary-red);
+  background-color: var(--mbm-blue);
   color: white;
   font-size: 1rem;
 }
 
 .nav-btn:hover {
-  background-color: var(--dark-red);
+  background-color: #1a1e4d;
   transform: translateY(-2px);
   box-shadow: var(--shadow);
 }
 
 .submit-btn {
-  background-color: #2b9348; /* Success Green */
+  background-color: var(--mbm-blue);
   color: white;
   margin-top: 10px;
 }
@@ -63,9 +65,14 @@ button {
 }
 
 .approve-btn {
-  background-color: var(--gold);
-  color: #333;
+  background-color: var(--mbm-gold);
+  color: var(--mbm-blue);
+  font-weight: bold;
   width: 100%;
+}
+
+.approve-btn:hover {
+  filter: brightness(1.1);
 }
 
 /* Form Inputs */
@@ -82,17 +89,22 @@ input {
 
 input:focus {
   outline: none;
-  border-color: var(--primary-red);
+  border-color: var(--mbm-blue);
 }
 
 /* Admin Card Styling */
 .admin-card {
-  border: 1px solid #eee;
+  border: 1px solid #ddd;
   padding: 15px;
   border-radius: 12px;
-  background: #fff;
+  background: var(--white);
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   margin-bottom: 15px;
+  color: var(--text-dark); /* Ensures text is visible */
+}
+
+.admin-card strong {
+  color: var(--mbm-blue);
 }
 
 /* Map Popups */
@@ -102,5 +114,5 @@ input:focus {
 }
 
 .leaflet-popup-content b {
-  color: var(--primary-red);
+  color: var(--mbm-blue);
 }
