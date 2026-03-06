@@ -78,14 +78,17 @@ function App() {
             <button className="nav-btn" onClick={() => setUser({ role: 'junior' })}>I am a Junior (Search)</button>
             <button className="nav-btn" onClick={() => setUser({ role: 'alumni' })}>I am an Alumnus (Register)</button>
             <button className="admin-btn-link" style={{ marginTop: '20px', background: 'none', border: 'none', color: 'gray', cursor: 'pointer' }} 
-              onClick={async () => {
-                const pass = prompt("Admin Password:");
-                if (pass === "admin123") {
-                  const res = await fetch('/api/get-pending');
-                  setPendingList(await res.json());
-                  setUser({ role: 'admin' });
-                }
-            }}>Admin Login</button>
+  onClick={async () => {
+    const pass = prompt("Admin Password:");
+    if (pass === "admin123") {
+      const res = await fetch('/api/get-pending');
+      setPendingList(await res.json());
+      setUser({ role: 'admin' });
+    } else if (pass !== null) { 
+      // Only show alert if they actually typed something and hit cancel/wrong
+      alert("Incorrect password. Access denied.");
+    }
+}}>Admin Login</button>
           </div>
         ) : (
           <div>
