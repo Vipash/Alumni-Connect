@@ -15,7 +15,32 @@ body {
   color: var(--text-dark);
 }
 
-/* Sidebar Styling */
+/* Landing Page Wrapper */
+.main-wrapper {
+  height: 100vh;
+  width: 100vw;
+  background: url('/university-background.jpg') center/cover; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-overlay {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 300px;
+}
+
+.floating-card {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Sidebar & Content */
 .sidebar {
   background: var(--white);
   border-right: 1px solid #ddd;
@@ -30,7 +55,7 @@ h2 {
   margin-top: 10px;
 }
 
-/* Button Styling */
+/* Buttons */
 button {
   padding: 12px 20px;
   border-radius: 8px;
@@ -59,11 +84,6 @@ button {
   margin-top: 10px;
 }
 
-.submit-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
 .approve-btn {
   background-color: var(--mbm-gold);
   color: var(--mbm-blue);
@@ -71,11 +91,7 @@ button {
   width: 100%;
 }
 
-.approve-btn:hover {
-  filter: brightness(1.1);
-}
-
-/* Form Inputs */
+/* Inputs & Admin Cards */
 input {
   width: 100%;
   padding: 12px;
@@ -83,36 +99,18 @@ input {
   border: 1.5px solid #ddd;
   border-radius: 8px;
   box-sizing: border-box;
-  font-size: 1rem;
-  transition: border-color 0.3s;
 }
 
-input:focus {
-  outline: none;
-  border-color: var(--mbm-blue);
-}
-
-/* Admin Card Styling */
 .admin-card {
   border: 1px solid #ddd;
   padding: 15px;
   border-radius: 12px;
   background: var(--white);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   margin-bottom: 15px;
-  color: var(--text-dark); /* Ensures text is visible */
+  color: var(--text-dark);
 }
 
-.admin-card strong {
-  color: var(--mbm-blue);
-}
+.admin-card strong { color: var(--mbm-blue); }
 
-/* Map Popups */
-.leaflet-popup-content-wrapper {
-  border-radius: 8px;
-  padding: 5px;
-}
-
-.leaflet-popup-content b {
-  color: var(--mbm-blue);
-}
+.leaflet-popup-content-wrapper { border-radius: 8px; }
+.leaflet-popup-content b { color: var(--mbm-blue); }
