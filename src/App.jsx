@@ -122,11 +122,22 @@ function App() {
               </form>
             )}
           </div>
-          {/* Map remains the same */}
-          <div style={{ flexGrow: 1 }}>...</div>
-        </div>
+        {/* Map Section */}
+          <div style={{ flexGrow: 1, position: 'relative' }}>
+            <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              {user?.role === 'alumni' && <LocationPicker setCoords={setSelectedCoords} />}
+              {selectedCoords && <Marker position={selectedCoords}><Popup>Selected Location</Popup></Marker>}
+              {alumniList.filter(a => a.name.toLowerCase().includes(searchTerm.toLowerCase())).map(a => (
+                <Marker key={a._id} position={[a.location.coordinates[1], a.location.coordinates[0]]}>
+                  <Popup><strong>{a.name}</strong><br/>{a.company}</Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
+        </div> // This closes the app-container
       )}
-    </div>
+    </div> // This closes the main-wrapper
   );
 }
 
