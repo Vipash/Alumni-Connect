@@ -1,21 +1,106 @@
+/* Color Palette */
 :root {
-  --primary-purple: #6a0d6a; /* Matches the deep MBM purple */
-  --accent-magenta: #d90479; /* Matches the vibrant logo edge */
-  --soft-cream: #fffaf0;    /* Background color */
-  --text-dark: #333;
+  --primary-red: #d90429;
+  --dark-red: #8d0801;
+  --gold: #ffb703;
+  --light-gray: #f8f9fa;
+  --white: #ffffff;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 body {
-  background-color: var(--soft-cream);
-  font-family: 'Segoe UI', sans-serif;
   margin: 0;
-}
-#root {
-  width: 100%;
-  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--light-gray);
 }
 
-.leaflet-container {
+/* Sidebar Styling */
+.sidebar {
+  background: var(--white);
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-top: 10px;
+}
+
+/* Button Styling */
+button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.nav-btn {
+  background-color: var(--primary-red);
+  color: white;
+  font-size: 1rem;
+}
+
+.nav-btn:hover {
+  background-color: var(--dark-red);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.submit-btn {
+  background-color: #2b9348; /* Success Green */
+  color: white;
+  margin-top: 10px;
+}
+
+.submit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.approve-btn {
+  background-color: var(--gold);
+  color: #333;
   width: 100%;
-  height: 100%;
+}
+
+/* Form Inputs */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary-red);
+}
+
+/* Admin Card Styling */
+.admin-card {
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 15px;
+}
+
+/* Map Popups */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.leaflet-popup-content b {
+  color: var(--primary-red);
 }
