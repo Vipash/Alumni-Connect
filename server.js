@@ -60,6 +60,14 @@ app.patch('/api/approve-alumni/:id', async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+app.delete('/api/delete-alumni/:id', async (req, res) => {
+  try {
+    await Alumni.findByIdAndDelete(req.params.id);
+    res.send("Alumnus Deleted Successfully!");
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));
