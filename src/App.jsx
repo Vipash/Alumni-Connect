@@ -4,7 +4,7 @@ import LocationPicker from './LocationPicker';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
-import admindashboard from './admindashboard';
+import AdminDashboard from './AdminDashboard';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -101,7 +101,7 @@ function App() { // <--- Added the missing opening brace here
 
            {(view === 'reg-alumni' || view === 'reg-student') && (
   <form onSubmit={handleSubmit}>
-    <button className="back-btn" onClick={() => setView('home')}>← Back</button>
+    <button type="button" className="back-btn" onClick={() => setView('home')}>← Back</button>
     <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
 
     {/* Name */}
@@ -132,21 +132,22 @@ function App() { // <--- Added the missing opening brace here
         
         <label>Location</label>
         <button type="button" onClick={() => setView('picker')}>
-          {selectedCoords ? "Location Picked ✅" : "Click to Pin Location on Map"}
-        </button>
+  {selectedCoords ? "Location Picked ✅" : "Click to Pin Location on Map"}
+</button>
       </>
     )}
     
     <button type="submit" className="submit-btn">Complete Registration</button>
   </form>
 )}
-{view === 'admin-dash' && (
-  <div className="modal-overlay">
-    <div className="modal-box">
-      <admindashboard setView={setView} />
-    </div>
-  </div>
-)}
+{/* Admin Dashboard (Separate Modal) */}
+      {view === 'admin-dash' && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <AdminDashboard setView={setView} />
+          </div>
+        </div>
+      )}
           </div>
         </div>
       )}

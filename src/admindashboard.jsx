@@ -4,11 +4,17 @@ function AdminDashboard({ setView }) {
   const [pendingUsers, setPendingUsers] = useState([]);
 
   // Fetch pending alumni
-  const fetchPending = () => {
-    fetch('/api/admin/pending/alumni')
-      .then(res => res.json())
-      .then(data => setPendingUsers(data))
-      .catch(err => console.error("Error fetching pending:", err));
+ const fetchPending = async () => {
+    try {
+      const res = await fetch('/api/admin/pending/alumni');
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const data = await res.json();
+      console.log("Fetched pending users:", data); // Check console for this!
+      setPendingUsers(data);
+    } catch (err) {
+      console.error("Fetch failed:", err);
+      alert("Failed to load users: " + err.message);
+    }
   };
 
   useEffect(() => {
