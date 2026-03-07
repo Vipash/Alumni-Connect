@@ -80,6 +80,15 @@ body {
 h1 { color: var(--mbm-blue); margin-bottom: 20px; }
 h3 { color: var(--mbm-blue); margin: 20px 0 10px; }
 
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--mbm-blue);
+  margin: 15px 0 5px 0;
+  text-align: left;
+}
+
 input, select {
   width: 100%;
   padding: 12px;
