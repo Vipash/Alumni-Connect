@@ -40,7 +40,9 @@ function App() {
   };
 
   return (
-    <div className="app-root">
+  <div className="app-root">
+    {/* Background Image only shows on home */}
+    {view === 'home' && <div className="landing-bg"></div>}
       {/* 1. MAP LAYER */}
     <div className={`map-layer ${view === 'picker' ? 'active' : ''}`}>
   <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
@@ -64,10 +66,16 @@ function App() {
                 <h1>MBM Alumni Connect</h1>
                 <h3>Student</h3>
                 <button onClick={() => setView('login-student')}>Sign In</button>
-                <button onClick={() => setView('reg-student')}>Register</button>
+               <button onClick={() => { 
+  setFormData({...formData, role: 'student'}); 
+  setView('reg-student'); 
+}}>Register as Student</button>
                 <h3>Alumnus</h3>
                 <button onClick={() => setView('login-alumni')}>Sign In</button>
-                <button onClick={() => setView('reg-alumni')}>Register</button>
+                <button onClick={() => { 
+  setFormData({...formData, role: 'alumni'}); 
+  setView('reg-alumni'); 
+}}>Register as Alumnus</button>
                 <button className="admin-btn" onClick={handleAdminLogin}>Admin Sign In</button>
               </>
             )}
