@@ -4,7 +4,7 @@ import LocationPicker from './LocationPicker';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
-import AdminDashboard from './AdminDashboard';
+import admindashboard from './admindashboard';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -143,7 +143,7 @@ function App() { // <--- Added the missing opening brace here
 {view === 'admin-dash' && (
   <div className="modal-overlay">
     <div className="modal-box">
-      <AdminDashboard setView={setView} />
+      <admindashboard setView={setView} />
     </div>
   </div>
 )}
