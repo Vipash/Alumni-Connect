@@ -41,21 +41,34 @@ function App() {
     } else if (pass !== null) { alert("Incorrect password."); }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (formData.role === 'alumni' && !selectedCoords) return alert("Please select a location on the map!");
-    
-    await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...formData,
-        location: selectedCoords ? { type: "Point", coordinates: [selectedCoords[1], selectedCoords[0]] } : null
-      })
-    });
-    alert("Registration submitted! Please wait for admin verification.");
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Debug: See exactly what we are sending
+  console.log("Sending Data:", JSON.stringify({
+    ...formData,
+    location: selectedCoords ? { type: "Point", coordinates: [selectedCoords[1], selectedCoords[0]] } : null
+  }, null, 2));
+
+  if (formData.role === 'alumni' && !selectedCoords) return alert("Pick a location!");
+  
+  const response = await fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...formData,
+      location: selectedCoords ? { type: "Point", coordinates: [selectedCoords[1], selectedCoords[0]] } : null
+    })
+  });
+
+  const result = await response.text();
+  if (response.ok) {
+    alert("Success!");
     setView('landing');
-  };
+  } else {
+    alert("Error: " + result); // This will tell you exactly what the server hates
+  }
+};
 
   return (
     <div className="main-wrapper">
