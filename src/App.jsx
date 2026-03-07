@@ -85,14 +85,14 @@ function App() {
               <form onSubmit={handleSubmit}>
                 <button className="back-btn" onClick={() => setView('home')}>← Back</button>
                 <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
-                <input placeholder="Name" required onChange={e => setFormData({...formData, name: e.target.value})} />
-                <input placeholder="Email" type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
-                <input placeholder="Password" type="password" required onChange={e => setFormData({...formData, password: e.target.value})} />
-                <input placeholder="Branch" required onChange={e => setFormData({...formData, branch: e.target.value})} />
+                <input placeholder="Name" value={formData.name} required onChange={e => setFormData({...formData, name: e.target.value})} />
+                <input placeholder="Email" value={formData.name} type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
+                <input placeholder="Password" value={formData.name} type="password" required onChange={e => setFormData({...formData, password: e.target.value})} />
+                <input placeholder="Branch" value={formData.name} required onChange={e => setFormData({...formData, branch: e.target.value})} />
                 
                 {view === 'reg-alumni' && (
                   <>
-                    <input placeholder="Company" required onChange={e => setFormData({...formData, company: e.target.value})} />
+                    <input placeholder="Company" value={formData.name} required onChange={e => setFormData({...formData, company: e.target.value})} />
                     <button type="button" onClick={() => setView('picker')}>Pick Location</button>
                   </>
                 )}
