@@ -154,7 +154,38 @@ button {
   width: 100%;
   margin-bottom: 10px;
 }
+/* Target the modal box ONLY when the admin dashboard is inside it */
+.modal-box:has(.admin-modal-content) {
+  width: 95%;            /* Use most of the screen width */
+  max-width: 1000px;     /* But don't let it get ridiculously wide on huge monitors */
+  padding: 20px;
+}
 
+/* Make the table container scrollable horizontally if the screen is tiny */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;      /* Horizontal scroll for mobile */
+  margin-top: 20px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+/* Make the table look professional */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;      /* Ensures the table doesn't squish too much */
+}
+
+th, td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+tr:hover {
+  background-color: #f9f9f9; /* Subtle highlight on hover */
+}
 .nav-btn { background-color: var(--mbm-blue); color: white; }
 .admin-btn { background: transparent; color: var(--mbm-blue); border: 2px solid var(--mbm-blue); }
 .submit-btn { background-color: var(--mbm-gold); color: white; }

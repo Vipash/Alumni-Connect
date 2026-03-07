@@ -36,6 +36,8 @@ function AdminDashboard({ setView }) {
   };
 
   return (
+    <div className="admin-modal-content"> 
+    <h2>Admin: Pending Alumni</h2>
     <div className="admin-container">
       <h2>Admin: Pending Alumni</h2>
       <button onClick={() => setView('home')}>Back to Home</button>
@@ -70,6 +72,7 @@ function AdminDashboard({ setView }) {
         </table>
       </div>
     </div>
+  </div>
   );
 }
 
