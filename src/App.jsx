@@ -23,20 +23,42 @@ function App() { // <--- Added the missing opening brace here
 
   useEffect(() => { fetch('/api/get-alumni').then(res => res.json()).then(setAlumniList); }, []);
 
-  const handleSubmit = async (e) => { // <--- Cleaned up duplicate definition
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting this payload:", JSON.stringify(formData));
+
+    // Prepare data: convert year to number and clean up empty strings
+    const payload = {
+      ...formData,
+      passoutYear: parseInt(formData.passoutYear, 10),
+      // If your backend schema makes these fields required, 
+      // ensure they are not sent as "" (empty string)
+      rollNumber: formData.rollNumber || undefined,
+      bio: formData.bio || "No bio provided",
+      mobile: formData.mobile || "0000000000",
+      location: selectedCoords ? { type: "Point", coordinates: [selectedCoords[1], selectedCoords[0]] } : null 
+    };
+
+    console.log("Sending payload:", payload);
 
     const response = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-          ...formData, 
-          location: selectedCoords ? { type: "Point", coordinates: [selectedCoords[1], selectedCoords[0]] } : null 
-      })
+      body: JSON.stringify(payload)
     });
-    if (response.ok) { alert("Registration submitted!"); setView('home'); }
-    else { const res = await response.text(); alert("Error: " + res); }
+
+    if (response.ok) { 
+      alert("Registration submitted!"); 
+      setView('home'); 
+      // Reset form after success
+      setFormData({ 
+        name: '', email: '', role: '', branch: '', passoutYear: '', 
+        rollNumber: '', degree: '', company: '', bio: '', mobile: '', password: '' 
+      });
+      setSelectedCoords(null);
+    } else { 
+      const res = await response.text(); 
+      alert("Error: " + res); 
+    }
   };
 
   const handleAdminLogin = async () => {
