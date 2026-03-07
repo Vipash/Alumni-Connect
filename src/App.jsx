@@ -98,7 +98,12 @@ function App() {
                 <input placeholder="Email" type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
                 <input placeholder="Branch" required onChange={e => setFormData({...formData, branch: e.target.value})} />
                 <input placeholder="Passout/Expected Year" type="number" required onChange={e => setFormData({...formData, passoutYear: e.target.value})} />
-                
+                <input 
+  placeholder="Password" 
+  type="password" 
+  required 
+  onChange={e => setFormData({...formData, password: e.target.value})} 
+/>
                 {formData.role === 'student' && (
                   <>
                     <input placeholder="Roll Number" required onChange={e => setFormData({...formData, rollNumber: e.target.value})} />
@@ -120,24 +125,28 @@ function App() {
           </div>
 
           {/* Locked Map Logic */}
-          <div style={{ flexGrow: 1, position: 'relative' }}>
-            {user?.isVerified || user?.role === 'admin' ? (
-              <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {user?.role === 'alumni' && <LocationPicker setCoords={setSelectedCoords} />}
-                {alumniList.map(a => (
-                  <Marker key={a._id} position={[a.location.coordinates[1], a.location.coordinates[0]]}>
-                    <Popup>{a.name} - {a.company}</Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
-            ) : (
-              <div style={{ padding: '50px', textAlign: 'center' }}>
-                <h2>Account Pending Verification 🔒</h2>
-                <p>An admin will review your registration shortly.</p>
-              </div>
-            )}
-          </div>
+          {/* Locked Map Logic - Updated to allow registrants to see the map to pick a location */}
+<div style={{ flexGrow: 1, position: 'relative' }}>
+  {user?.isVerified || user?.role === 'admin' || user?.role === 'register' ? (
+    <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      
+      {/* Show picker ONLY if user is in register mode as alumni */}
+      {user?.role === 'register' && formData.role === 'alumni' && <LocationPicker setCoords={setSelectedCoords} />}
+      
+      {/* Show markers ONLY if user is verified or admin */}
+      {(user?.isVerified || user?.role === 'admin') && alumniList.map(a => (
+        <Marker key={a._id} position={[a.location.coordinates[1], a.location.coordinates[0]]}>
+          <Popup>{a.name} - {a.company}</Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  ) : (
+    <div style={{ padding: '50px', textAlign: 'center' }}>
+      <h2>Account Pending Verification 🔒</h2>
+    </div>
+  )}
+</div>
         </div>
       )}
     </div>

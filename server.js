@@ -4,7 +4,7 @@ const cors = require('cors');
 const User = require('./alumni'); // We'll keep the filename but it acts as User now
 const Log = require('./Log');    // New Log model
 const path = require('path');
-
+const bcrypt = require('bcrypt'); // Make sure this is at the top of server.js
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -31,24 +31,24 @@ app.get('/api/get-alumni', async (req, res) => {
 // 2. Universal Register Route (Handles both Student and Alumni)
 app.post('/api/register', async (req, res) => {
   try {
-    const userData = {
-      ...req.body,
-      isVerified: false // Always false initially
-    };
+    const { password, ...userData } = req.body;
     
-    // Ensure coordinates are numbers if provided (Alumni)
-    if (userData.location && userData.location.coordinates) {
-      userData.location.coordinates = [
-        parseFloat(userData.location.coordinates[0]),
-        parseFloat(userData.location.coordinates[1])
-      ];
-    }
-
-    const newUser = new User(userData);
+    // 1. Hash the password (10 rounds of salt)
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+    // 2. Create the user with the hashed password
+    const newUser = new User({
+      ...userData,
+      password: hashedPassword,
+      isVerified: false
+    });
+    
     await newUser.save();
-    res.status(201).send("Registration submitted for approval!");
+    res.status(201).send("Registered successfully! Awaiting verification.");
   } catch (error) {
-    res.status(400).send(error.message);
+    console.error("Registration Error:", error);
+    res.status(400).send("Error: " + error.message);
   }
 });
 
