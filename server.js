@@ -51,7 +51,32 @@ app.post('/api/register', async (req, res) => {
     res.status(400).send("Error: " + error.message);
   }
 });
+// 1. Get all pending users
+// 1. Get all users waiting for verification (Use isVerified instead of status)
+app.get('/api/admin/users', async (req, res) => {
+  try {
+    const users = await User.find({ isVerified: false });
+    res.json(users);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
+// 2. Approve/Reject
+app.post('/api/admin/:action/:id', async (req, res) => {
+  const { action, id } = req.params;
+  try {
+    if (action === 'approve') {
+      // Use your existing verify route logic
+      await User.findByIdAndUpdate(id, { isVerified: true });
+    } else {
+      await User.findByIdAndDelete(id);
+    }
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
 // 3. Admin: Get Pending List (Filtered by Role)
 app.get('/api/admin/pending/:role', async (req, res) => {
   try {

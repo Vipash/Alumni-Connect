@@ -72,8 +72,53 @@ body {
   border-radius: 20px;
   width: 400px;
   max-width: 90%;
+  max-height: 85vh; /* Don't let it touch screen borders */
+  overflow-y: auto; /* Adds scrollbar if content is too long */
   box-shadow: var(--shadow);
   text-align: center;
+  
+  /* Optional: Smooth scrolling for mobile */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Make sure the form inside takes full width */
+.modal-box form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+/* Ensure the button is always at the bottom of the form */
+.submit-btn {
+  margin-top: 20px;
+  position: sticky; /* Keeps it visible as you scroll */
+  bottom: 0;
+  background-color: var(--mbm-gold);
+}
+
+.admin-container {
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.table-wrapper {
+  max-height: 60vh;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
 /* Typography & Inputs */
