@@ -98,25 +98,47 @@ function App() { // <--- Added the missing opening brace here
               </>
             )}
 
-            {(view === 'reg-alumni' || view === 'reg-student') && (
-              <form onSubmit={handleSubmit}>
-                <button className="back-btn" onClick={() => setView('home')}>← Back</button>
-                <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
-                <input placeholder="Name" value={formData.name} required onChange={e => setFormData({...formData, name: e.target.value})} />
-                <input placeholder="Email" value={formData.email} type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
-                <input placeholder="Password" value={formData.password} type="password" required onChange={e => setFormData({...formData, password: e.target.value})} />
-                <input placeholder="Branch" value={formData.branch} required onChange={e => setFormData({...formData, branch: e.target.value})} />
-                <input placeholder="Passout Year" type="number" value={formData.passoutYear} required onChange={e => setFormData({...formData, passoutYear: e.target.value})} />
-                
-                {view === 'reg-alumni' && (
-                  <>
-                    <input placeholder="Company" value={formData.company} required onChange={e => setFormData({...formData, company: e.target.value})} />
-                    <button type="button" onClick={() => setView('picker')}>Pick Location</button>
-                  </>
-                )}
-                <button type="submit" className="submit-btn">Register</button>
-              </form>
-            )}
+           {(view === 'reg-alumni' || view === 'reg-student') && (
+  <form onSubmit={handleSubmit}>
+    <button className="back-btn" onClick={() => setView('home')}>← Back</button>
+    <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
+
+    {/* Name */}
+    <label>Full Name</label>
+    <input placeholder="Enter your full name" value={formData.name} required onChange={e => setFormData({...formData, name: e.target.value})} />
+
+    {/* Email */}
+    <label>Email Address</label>
+    <input placeholder="example@mbm.edu" value={formData.email} type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
+
+    {/* Password */}
+    <label>Password</label>
+    <input placeholder="Create a secure password" value={formData.password} type="password" required onChange={e => setFormData({...formData, password: e.target.value})} />
+
+    {/* Branch */}
+    <label>Branch</label>
+    <input placeholder="e.g. Computer Science" value={formData.branch} required onChange={e => setFormData({...formData, branch: e.target.value})} />
+
+    {/* Passout Year (FIXED: Added this missing field) */}
+    <label>Passout / Expected Year</label>
+    <input placeholder="e.g. 2026" type="number" value={formData.passoutYear} required onChange={e => setFormData({...formData, passoutYear: e.target.value})} />
+    
+    {view === 'reg-alumni' && (
+      <>
+        {/* Company */}
+        <label>Current Company</label>
+        <input placeholder="Where do you work?" value={formData.company} required onChange={e => setFormData({...formData, company: e.target.value})} />
+        
+        <label>Location</label>
+        <button type="button" onClick={() => setView('picker')}>
+          {selectedCoords ? "Location Picked ✅" : "Click to Pin Location on Map"}
+        </button>
+      </>
+    )}
+    
+    <button type="submit" className="submit-btn">Complete Registration</button>
+  </form>
+)}
             {view === 'admin-dash' && <h2>Admin Dashboard Active</h2>}
           </div>
         </div>
