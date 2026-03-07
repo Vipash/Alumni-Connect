@@ -1,17 +1,49 @@
-// ... (Keep your imports at the top)
+import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import LocationPicker from './LocationPicker';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import './App.css';
+
+// Fix for Leaflet Icons in Production
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+let DefaultIcon = L.icon({ iconUrl: icon, shadowUrl: iconShadow, iconSize: [25, 41], iconAnchor: [12, 41] });
+L.Marker.prototype.options.icon = DefaultIcon;
 
 function App() {
   const [view, setView] = useState('landing');
-  const [user, setUser] = useState(null); // This will now hold the full user object
+  const [user, setUser] = useState(null); 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [alumniList, setAlumniList] = useState([]);
+  const [pendingList, setPendingList] = useState([]);
   const [formData, setFormData] = useState({ 
     name: '', email: '', role: '', branch: '', passoutYear: '', 
     rollNumber: '', degree: '', company: '', bio: '', mobile: '' 
   });
-  // ... (keep other states: alumniList, selectedCoords, etc)
+  const [selectedCoords, setSelectedCoords] = useState(null);
+
+  const fetchAlumni = async () => {
+    try {
+      const response = await fetch('/api/get-alumni');
+      const data = await response.json();
+      setAlumniList(data);
+    } catch (error) { console.error("Error:", error); }
+  };
+
+  useEffect(() => { fetchAlumni(); }, []);
+
+  const handleAdminLogin = async () => {
+    const pass = prompt("Admin Password:");
+    if (pass === "admin123") {
+      setUser({ role: 'admin' });
+      setView('app');
+    } else if (pass !== null) { alert("Incorrect password."); }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.role === 'alumni' && !selectedCoords) return alert("Pick location!");
+    if (formData.role === 'alumni' && !selectedCoords) return alert("Please select a location on the map!");
     
     await fetch('/api/register', {
       method: 'POST',
@@ -36,9 +68,9 @@ function App() {
           </div>
         </div>
       ) : (
-        <div className="app-container" style={{ display: 'flex', height: '100vh' }}>
+        <div className="app-container" style={{ display: 'flex', height: '100vh', width: '100vw' }}>
           <div className="sidebar" style={{ width: '350px', padding: '20px', overflowY: 'auto' }}>
-            <button onClick={() => { setView('landing'); }}>← Back</button>
+            <button onClick={() => { setView('landing'); setUser(null); }}>← Back to Home</button>
 
             {/* Registration Form */}
             {user?.role === 'register' && (
@@ -52,6 +84,7 @@ function App() {
                 <input placeholder="Name" required onChange={e => setFormData({...formData, name: e.target.value})} />
                 <input placeholder="Email" type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
                 <input placeholder="Branch" required onChange={e => setFormData({...formData, branch: e.target.value})} />
+                <input placeholder="Passout/Expected Year" type="number" required onChange={e => setFormData({...formData, passoutYear: e.target.value})} />
                 
                 {formData.role === 'student' && (
                   <>
@@ -69,22 +102,27 @@ function App() {
               </form>
             )}
 
-            {/* Admin Dashboard */}
-            {user?.role === 'admin' && (
-               /* Add tabs here for Pending Students, Pending Alumni, and Security Logs */
-               <div>...</div>
-            )}
+            {/* Admin Dashboard Placeholder */}
+            {user?.role === 'admin' && <h3>Admin Dashboard Active</h3>}
           </div>
 
           {/* Locked Map Logic */}
-          <div style={{ flexGrow: 1 }}>
+          <div style={{ flexGrow: 1, position: 'relative' }}>
             {user?.isVerified || user?.role === 'admin' ? (
               <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {/* ... existing Markers ... */}
+                {user?.role === 'alumni' && <LocationPicker setCoords={setSelectedCoords} />}
+                {alumniList.map(a => (
+                  <Marker key={a._id} position={[a.location.coordinates[1], a.location.coordinates[0]]}>
+                    <Popup>{a.name} - {a.company}</Popup>
+                  </Marker>
+                ))}
               </MapContainer>
             ) : (
-              <div className="locked-screen"><h2>Account Pending Verification 🔒</h2></div>
+              <div style={{ padding: '50px', textAlign: 'center' }}>
+                <h2>Account Pending Verification 🔒</h2>
+                <p>An admin will review your registration shortly.</p>
+              </div>
             )}
           </div>
         </div>
