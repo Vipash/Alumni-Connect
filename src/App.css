@@ -21,16 +21,21 @@ body {
   position: relative;
   width: 100vw;
   height: 100vh;
+  background: url('/university-background.jpg') center/cover;
 }
 
 /* 2. Map Layer: Background, full screen */
 .map-layer {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1; 
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.5s ease;
+}
+
+.map-layer.active {
+  opacity: 1; /* Revealed when picking location */
 }
 
 /* 3. Modal Overlay: The "Centered Box" system */
@@ -45,6 +50,17 @@ body {
   justify-content: center;
   z-index: 100; /* Floats above map */
   background: rgba(38, 42, 107, 0.85); /* MBM Blue with transparency */
+}
+
+.picker-info-box {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
 }
 
 .modal-box {

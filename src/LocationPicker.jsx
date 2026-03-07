@@ -1,13 +1,24 @@
-import { useMapEvents } from 'react-leaflet';
+import { useMapEvents, Marker } from 'react-leaflet';
+import { useState } from 'react';
 
-function LocationPicker({ setCoords }) {
+export default function LocationPicker({ setCoords, onConfirm }) {
+  const [marker, setMarker] = useState(null);
+
   useMapEvents({
     click(e) {
-      // e.latlng contains the latitude and longitude of where you clicked
-      setCoords([e.latlng.lat, e.latlng.lng]);
+      setMarker(e.latlng);
     },
   });
-  return null; // This component doesn't "render" anything visual, it just listens for clicks
-}
 
-export default LocationPicker;
+  return marker ? (
+    <>
+      <Marker position={marker} />
+      <div className="picker-info-box">
+        <p>Lat: {marker.lat.toFixed(4)}, Lng: {marker.lng.toFixed(4)}</p>
+        <button onClick={() => { setCoords([marker.lat, marker.lng]); onConfirm(); }}>
+          Confirm Location
+        </button>
+      </div>
+    </>
+  ) : null;
+}

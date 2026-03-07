@@ -42,13 +42,18 @@ function App() {
   return (
     <div className="app-root">
       {/* 1. MAP LAYER */}
-      <div className="map-layer">
-        <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {view === 'picker' && <LocationPicker setCoords={(c) => { setSelectedCoords(c); setView('reg-alumni'); }} />}
-          {user?.role === 'admin' && alumniList.map(a => <Marker key={a._id} position={[a.location.coordinates[1], a.location.coordinates[0]]} />)}
-        </MapContainer>
-      </div>
+    <div className={`map-layer ${view === 'picker' ? 'active' : ''}`}>
+  <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
+    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    
+    {view === 'picker' && (
+      <LocationPicker 
+        setCoords={setSelectedCoords} 
+        onConfirm={() => setView('reg-alumni')} 
+      />
+    )}
+  </MapContainer>
+</div>
 
       {/* 2. MODAL LAYER */}
       {view !== 'picker' && (
