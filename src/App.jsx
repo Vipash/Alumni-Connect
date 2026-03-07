@@ -24,12 +24,20 @@ function App() {
   useEffect(() => { fetch('/api/get-alumni').then(res => res.json()).then(setAlumniList); }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...formData, location: selectedCoords ? { type: "Point", coordinates: [selectedCoords[1], selectedCoords[0]] } : null })
-    });
+    const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Debug: See EXACTLY what is being sent to the server
+  console.log("Submitting this payload:", JSON.stringify(formData));
+
+  const response = await fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        ...formData, 
+        location: selectedCoords ? { type: "Point", coordinates: [selectedCoords[1], selectedCoords[0]] } : null 
+    })
+  });
     if (response.ok) { alert("Registration submitted!"); setView('home'); }
     else { const res = await response.text(); alert("Error: " + res); }
   };
