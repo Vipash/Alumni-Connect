@@ -109,56 +109,48 @@ const handleLogin = async (e) => {
 
       {view !== 'picker' && (
         <div className="modal-overlay">
-          <div className="modal-box">
-            {view === 'home' && (
-              
-              <>
-              {/* --- LOGIN VIEW --- */}
-{(view === 'login-student' || view === 'login-alumni') && (
-  <div className="modal-box">
-    {loginStatus === null ? (
-      <form onSubmit={(e) => handleLogin(e)}>
-        <button type="button" className="back-btn" onClick={() => { setView('home'); }}>← Back</button>
-        <h2>{view === 'login-student' ? 'Student' : 'Alumni'} Sign In</h2>
-        
-        <label>Email</label>
-        <input name="email" type="email" required />
-        
-        <label>Password</label>
-        <input name="password" type="password" required />
-        
-        <button type="submit" className="submit-btn">Sign In</button>
-      </form>
-    ) : (
-      <div className="status-message">
-        <h2>
-          {loginStatus === 'pending' ? 'Verification Pending' : `Welcome, ${loggedInUser.name}!`}
-        </h2>
-        <p>
-          {loginStatus === 'pending' 
-            ? "Your account is awaiting approval from the admin. Please check back later."
-            : "You have been verified. Accessing portal..."}
-        </p>
-        <button className="back-btn" onClick={() => { setLoginStatus(null); setView('home'); }}>Back to Home</button>
-      </div>
-    )}
-  </div>
-)}
-                <h1>MBM Alumni Connect</h1>
-                <h3>Student</h3>
-                <button onClick={() => setView('login-student')}>Sign In</button>
-                <button onClick={() => { setFormData({...formData, role: 'student'}); setView('reg-student'); }}>Register as Student</button>
-                <h3>Alumnus</h3>
-                <button onClick={() => setView('login-alumni')}>Sign In</button>
-                <button onClick={() => { setFormData({...formData, role: 'alumni'}); setView('reg-alumni'); }}>Register as Alumnus</button>
-                <button className="admin-btn" onClick={handleAdminLogin}>Admin Sign In</button>
-              </>
-            )}
+        <div className="modal-box">
+  {/* 1. HOME VIEW */}
+  {view === 'home' && (
+    <>
+      <h1>MBM Alumni Connect</h1>
+      <h3>Student</h3>
+      <button onClick={() => setView('login-student')}>Sign In</button>
+      <button onClick={() => { setFormData({...formData, role: 'student'}); setView('reg-student'); }}>Register as Student</button>
+      <h3>Alumnus</h3>
+      <button onClick={() => setView('login-alumni')}>Sign In</button>
+      <button onClick={() => { setFormData({...formData, role: 'alumni'}); setView('reg-alumni'); }}>Register as Alumnus</button>
+      <button className="admin-btn" onClick={handleAdminLogin}>Admin Sign In</button>
+    </>
+  )}
 
-           {(view === 'reg-alumni' || view === 'reg-student') && (
-  <form onSubmit={handleSubmit} className="registration-form">
-    <button type="button" className="back-btn" onClick={() => setView('home')}>← Back</button>
-    <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
+  {/* 2. LOGIN VIEW */}
+  {(view === 'login-student' || view === 'login-alumni') && (
+    <div className="login-container">
+      {loginStatus === null ? (
+        <form onSubmit={handleLogin}>
+          <button type="button" className="back-btn" onClick={() => setView('home')}>← Back</button>
+          <h2>{view === 'login-student' ? 'Student' : 'Alumni'} Sign In</h2>
+          <label>Email</label>
+          <input name="email" type="email" required />
+          <label>Password</label>
+          <input name="password" type="password" required />
+          <button type="submit" className="submit-btn">Sign In</button>
+        </form>
+      ) : (
+        <div className="status-message">
+          <h2>{loginStatus === 'pending' ? 'Verification Pending' : `Welcome, ${loggedInUser.name}!`}</h2>
+          <button className="back-btn" onClick={() => { setLoginStatus(null); setView('home'); }}>Back to Home</button>
+        </div>
+      )}
+    </div>
+  )}
+  
+{/* 3. REGISTRATION VIEW */}
+  {(view === 'reg-alumni' || view === 'reg-student') && (
+    <form onSubmit={handleSubmit} className="registration-form">
+      <button type="button" className="back-btn" onClick={() => setView('home')}>← Back</button>
+      <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
 
     {/* --- SECTION 1: PERSONAL INFORMATION --- */}
     <h3>Personal Information</h3>
