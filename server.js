@@ -126,6 +126,17 @@ app.get('/api/admin/logs', async (req, res) => {
   }
 });
 
+// try and catch shit
+app.get('/api/get-alumni', async (req, res) => {
+  try {
+    const alumni = await User.find({ role: 'alumni' });
+    res.json(alumni);
+  } catch (err) {
+    console.error("Database error in /api/get-alumni:", err);
+    res.status(500).json({ error: "Failed to fetch alumni" });
+  }
+});
+
 // 5. SECURE: Request Contact Info & Log Action
 app.post('/api/view-contact', async (req, res) => {
   const { viewerId, alumniId } = req.body;
