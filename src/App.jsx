@@ -120,6 +120,14 @@ function App() { // <--- Added the missing opening brace here
     <label>Branch</label>
     <input placeholder="e.g. Computer Science" value={formData.branch} required onChange={e => setFormData({...formData, branch: e.target.value})} />
 
+    <label>Roll Number</label>
+    <input 
+    placeholder="e.g. 22CS001" 
+    value={formData.rollNumber} 
+    required={view === 'reg-student'} // Only required for students
+    onChange={e => setFormData({...formData, rollNumber: e.target.value})} 
+    />
+    
     {/* Passout Year */}
     <label>Passout Year</label>
     <input placeholder="e.g. 2026" type="number" value={formData.passoutYear} required onChange={e => setFormData({...formData, passoutYear: e.target.value})} />

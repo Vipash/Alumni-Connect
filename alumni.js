@@ -1,30 +1,31 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const UserSchema = new mongoose.Schema({
-  // Basic Auth & Profile
+const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }, // We will hash this later
+  password: { type: String, required: true },
   role: { type: String, enum: ['student', 'alumni', 'admin'], required: true },
-  isVerified: { type: Boolean, default: false },
-
-  // Profile Details
   branch: { type: String, required: true },
-  passoutYear: { type: Number, required: true }, // For students, this is expected year
+  passoutYear: { type: Number, required: true },
   
-  // Role-Specific Fields
-  rollNumber: String,   // Student only
-  degree: String,       // Student only
-  company: String,      // Alumni only
-  bio: String,          // Alumni only
-  mobile: String,       // Hidden from public
+  // Fields that might be specific to Students or Alumni
+  rollNumber: { type: String }, // Required for Students
+  company: { type: String },    // Required for Alumni
+  bio: { type: String, default: "" },
+  mobile: { type: String, default: "" },
   
-  // Location (Primarily for Alumni)
+  // Location for Alumni map
   location: {
-    type: { type: String, default: "Point" },
-    coordinates: { type: [Number], index: "2dsphere" } // [lng, lat]
+    type: { type: String, enum: ['Point'], default: 'Point' },
+    coordinates: { type: [Number] } // [Longitude, Latitude]
   },
-  createdAt: { type: Date, default: Date.now }
-});
+  
+  // Security/Status fields
+  isVerified: { type: Boolean, default: false }
+}, { timestamps: true });
 
-module.exports = mongoose.model('User', UserSchema);
+// Add a 2dsphere index for your Map location searches
+userSchema.index({ location: '2dsphere' });
+
+const User = mongoose.model('User', userSchema);
+export default User;

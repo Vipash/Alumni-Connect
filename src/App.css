@@ -197,6 +197,10 @@ button {
   max-width: 1000px;     /* But don't let it get ridiculously wide on huge monitors */
   padding: 20px;
 }
+.modal-box {
+  max-height: 85vh; /* Don't be taller than 85% of the screen */
+  overflow-y: auto; /* Enable scroll if the form is too long */
+}
 
 /* Make the table container scrollable horizontally if the screen is tiny */
 .table-wrapper {
@@ -254,8 +258,9 @@ button:hover {
 }
 
 .status-filters button:hover {
-  border-color: #004a99;
-  background: #69a4e3;
+  border-color: #ffffff;
+  background: #5050b4;
+  color: #ffffff;
 }
 
 .status-filters button.selected {
