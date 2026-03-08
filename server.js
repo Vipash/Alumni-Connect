@@ -1,12 +1,14 @@
-import User from './models/User.js';
-
+// --- IMPORTS ---
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const User = require('./alumni'); // We'll keep the filename but it acts as User now
-const Log = require('./Log');    // New Log model
+const bcrypt = require('bcrypt');
 const path = require('path');
-const bcrypt = require('bcrypt'); // Make sure this is at the top of server.js
+
+// Models (Assuming alumni.js is your User model and Log.js exists)
+const User = require('./alumni'); 
+const Log = require('./Log');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -17,57 +19,18 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected Successfully!'))
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-// --- NEW/UPDATED API ROUTES ---
-// 1. Get ONLY verified Alumni for the map (Hides sensitive info)
-app.get('/api/get-alumni', async (req, res) => {
-  try {
-    // Exclude mobile and email from the initial map fetch
-    const verifiedAlumni = await User.find({ role: 'alumni', isVerified: true }, '-mobile -email');
-    res.json(verifiedAlumni);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-// Add this to server.js
-app.get('/api/admin/approved/student', async (req, res) => {
-  try {
-    const students = await User.find({ role: 'student', isVerified: true });
-    res.json(students);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-// Add these near your other /api/admin routes
+// --- API ROUTES ---
 
-// Route to get Approved Students
-app.get('/api/admin/approved/student', async (req, res) => {
-  try {
-    const students = await User.find({ role: 'student', isVerified: true });
-    res.json(students);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-
-// Route to get Pending Students (matches your existing alumni pending logic)
-app.get('/api/admin/pending/student', async (req, res) => {
-  try {
-    const pending = await User.find({ role: 'student', isVerified: false });
-    res.json(pending);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-// 2. Universal Register Route (Handles both Student and Alumni)
+// Registration (Consolidated & Fixed)
 app.post('/api/register', async (req, res) => {
   try {
     const { password, ...userData } = req.body;
-    
-    // 1. Hash the password (10 rounds of salt)
+    const existingUser = await User.findOne({ email: userData.email });
+    if (existingUser) return res.status(400).send("User already exists");
+
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
-    // 2. Create the user with the hashed password
     const newUser = new User({
       ...userData,
       password: hashedPassword,
@@ -75,155 +38,87 @@ app.post('/api/register', async (req, res) => {
     });
     
     await newUser.save();
-    res.status(201).send("Registered successfully! Awaiting verification.");
+    res.status(201).send("Registered successfully!");
   } catch (error) {
     console.error("Registration Error:", error);
-    res.status(400).send("Error: " + error.message);
+    res.status(400).send("Registration failed: " + error.message);
   }
 });
 
-app.post('/api/register', async (req, res) => {
-  try {
-    // Check if the email already exists to prevent crashes
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) return res.status(400).send("User already exists");
-
-    // Create the new user
-    const newUser = new User(req.body); 
-    await newUser.save();
-    res.status(201).send("Registered successfully!");
-  } catch (err) {
-    console.error(err);
-    res.status(400).send("Registration failed: " + err.message);
-  }
-});
-
-// 1. Get all pending users
-// 1. Get all users waiting for verification (Use isVerified instead of status)
-app.get('/api/admin/users', async (req, res) => {
-  try {
-    const users = await User.find({ isVerified: false });
-    res.json(users);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-// 2. Approve/Reject
-app.post('/api/admin/:action/:id', async (req, res) => {
-  const { action, id } = req.params;
-  try {
-    if (action === 'approve') {
-      // Use your existing verify route logic
-      await User.findByIdAndUpdate(id, { isVerified: true });
-    } else {
-      await User.findByIdAndDelete(id);
-    }
-    res.sendStatus(200);
-  } catch (error) {
-    res.status(400).send(error.message);
-  }
-});
-// 3. Admin: Get Pending List (Filtered by Role)
-app.get('/api/admin/pending/:role', async (req, res) => {
-  try {
-    const pending = await User.find({ role: req.params.role, isVerified: false });
-    res.json(pending);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-// 4. Admin: Get Security Logs
-app.get('/api/admin/logs', async (req, res) => {
-  try {
-    const logs = await Log.find().sort({ timestamp: -1 });
-    res.json(logs);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-// try and catch shit
-app.get('/api/get-alumni', async (req, res) => {
-  try {
-    const alumni = await User.find({ role: 'alumni' });
-    res.json(alumni);
-  } catch (err) {
-    console.error("Database error in /api/get-alumni:", err);
-    res.status(500).json({ error: "Failed to fetch alumni" });
-  }
-});
-
-// 5. SECURE: Request Contact Info & Log Action
-app.post('/api/view-contact', async (req, res) => {
-  const { viewerId, alumniId } = req.body;
-  try {
-    const viewer = await User.findById(viewerId);
-    const alumni = await User.findById(alumniId);
-
-    if (!viewer || !viewer.isVerified) {
-      return res.status(403).send("Only verified users can view contact details.");
-    }
-
-    // Create Security Log
-    const newLog = new Log({
-      viewerId: viewer._id,
-      viewerName: viewer.name,
-      alumniId: alumni._id,
-      alumniName: alumni.name
-    });
-    await newLog.save();
-
-    // Return sensitive info
-    res.json({ mobile: alumni.mobile, email: alumni.email });
-  } catch (error) {
-    res.status(500).send("Error processing request.");
-  }
-});
-
+// Login
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
-  
   try {
     const user = await User.findOne({ email });
-    
-    // Check if user exists
     if (!user) return res.status(401).send("Invalid email or password");
 
-    // Check if password matches (Assuming you use bcrypt)
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).send("Invalid email or password");
 
-    // Return the user's basic info and verification status
-    res.json({ 
-      name: user.name, 
-      isVerified: user.isVerified, 
-      role: user.role 
-    });
+    res.json({ name: user.name, isVerified: user.isVerified, role: user.role });
   } catch (err) {
     res.status(500).send("Server error");
   }
 });
 
-// 6. Generic Update/Verify Route
+// Make sure this is in your server.js if you want users to "unlock" contact info
+app.post('/api/view-contact', async (req, res) => {
+  const { viewerId, alumniId } = req.body;
+  try {
+    const alumni = await User.findById(alumniId);
+    if (!alumni) return res.status(404).send("Alumni not found");
+
+    // Logic: Log the action (Optional: Add the log record here)
+    res.json({ mobile: alumni.mobile, email: alumni.email });
+  } catch (error) {
+    res.status(500).send("Error fetching details.");
+  }
+});
+
+// Admin Routes
+app.get('/api/admin/pending/:role', async (req, res) => {
+  try {
+    const pending = await User.find({ role: req.params.role, isVerified: false });
+    res.json(pending);
+  } catch (error) { res.status(500).send(error.message); }
+});
+
+app.get('/api/admin/approved/student', async (req, res) => {
+  try {
+    const students = await User.find({ role: 'student', isVerified: true });
+    res.json(students);
+  } catch (err) { res.status(500).send(err.message); }
+});
+
+// Alumni Fetch (Public Map View)
+app.get('/api/get-alumni', async (req, res) => {
+  try {
+    const alumni = await User.find({ role: 'alumni', isVerified: true }, '-mobile -email');
+    res.json(alumni);
+  } catch (err) { res.status(500).send("Failed to fetch alumni"); }
+});
+
+// Verification/Deletion
 app.patch('/api/verify-user/:id', async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.params.id, { isVerified: true });
     res.send("User Verified!");
-  } catch (error) {
-    res.status(400).send(error.message);
-  }
+  } catch (err) { res.status(400).send(err.message); }
 });
 
-// 7. Generic Delete Route
 app.delete('/api/delete-user/:id', async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
-    res.send("User Deleted Successfully!");
-  } catch (error) {
-    res.status(400).send(error.message);
-  }
+    res.send("User Deleted!");
+  } catch (err) { res.status(400).send(err.message); }
+});
+
+// Security Logs
+app.get('/api/admin/logs', async (req, res) => {
+  try {
+    const logs = await Log.find().sort({ timestamp: -1 });
+    res.json(logs);
+  } catch (err) { res.status(500).send(err.message); }
 });
 
 // --- PRODUCTION SERVING ---

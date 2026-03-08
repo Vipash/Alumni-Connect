@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -8,24 +8,23 @@ const userSchema = new mongoose.Schema({
   branch: { type: String, required: true },
   passoutYear: { type: Number, required: true },
   
-  // Fields that might be specific to Students or Alumni
-  rollNumber: { type: String }, // Required for Students
-  company: { type: String },    // Required for Alumni
+  // Fields for Students/Alumni
+  rollNumber: { type: String }, 
+  company: { type: String },    
   bio: { type: String, default: "" },
   mobile: { type: String, default: "" },
+  displayName: { type: String, default: "" }, // Added this because we added it to your form!
   
   // Location for Alumni map
   location: {
     type: { type: String, enum: ['Point'], default: 'Point' },
-    coordinates: { type: [Number] } // [Longitude, Latitude]
+    coordinates: { type: [Number] } 
   },
   
-  // Security/Status fields
   isVerified: { type: Boolean, default: false }
 }, { timestamps: true });
 
-// Add a 2dsphere index for your Map location searches
 userSchema.index({ location: '2dsphere' });
 
-const User = mongoose.model('User', userSchema);
-export default User;
+// Use module.exports for compatibility with require()
+module.exports = mongoose.model('User', userSchema);
