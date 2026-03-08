@@ -2,38 +2,38 @@ import { useState, useEffect } from 'react';
 
 function AdminDashboard({ setView }) {
   const [activeTab, setActiveTab] = useState('alumni'); // 'alumni', 'students', 'logs'
-  const [data, setData] = useState({
-    pendingAlumni: [],
-    approvedAlumni: [],
-    pendingStudents: [],
-    approvedStudents: [],
-    logs: []
-  });
+  const [statusFilter, setStatusFilter] = useState('pending'); // 'pending', 'verified'
+  const [listData, setListData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
+  // Helper to determine the correct API URL based on Tab and Filter
+  const getApiUrl = () => {
+    if (activeTab === 'logs') return '/api/admin/logs';
+    
+    // Logic for Alumni vs Students
+    const role = activeTab === 'alumni' ? 'alumni' : 'student';
+    if (statusFilter === 'pending') return `/api/admin/pending/${role}`;
+    return activeTab === 'alumni' ? '/api/get-alumni' : '/api/admin/approved/student';
+  };
+
+  const fetchCurrentList = async () => {
+    setLoading(true);
     try {
-      // Fetching multiple endpoints at once
-      const [pAlumni, aAlumni, pStudents, aStudents, logs] = await Promise.all([
-        fetch('/api/admin/pending/alumni').then(res => res.json()),
-        fetch('/api/get-alumni').then(res => res.json()), // Your existing map route
-        fetch('/api/admin/pending/student').then(res => res.json()),
-        fetch('/api/admin/approved/student').then(res => res.json()), // You'll need this route
-        fetch('/api/admin/logs').then(res => res.json())
-      ]);
-
-      setData({
-        pendingAlumni: pAlumni,
-        approvedAlumni: aAlumni,
-        pendingStudents: pStudents,
-        approvedStudents: aStudents,
-        logs: logs
-      });
+      const res = await fetch(getApiUrl());
+      const data = await res.json();
+      setListData(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Data fetch error:", err);
+      console.error("Fetch error:", err);
+      setListData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  // Refresh whenever the tab or the status filter changes
+  useEffect(() => {
+    fetchCurrentList();
+  }, [activeTab, statusFilter]);
 
   const handleAction = async (id, action) => {
     const url = action === 'approve' ? `/api/verify-user/${id}` : `/api/delete-user/${id}`;
@@ -41,40 +41,9 @@ function AdminDashboard({ setView }) {
     const response = await fetch(url, { method });
     if (response.ok) {
       alert(`User ${action}d!`);
-      fetchData();
+      fetchCurrentList();
     }
   };
-
-  const Table = ({ title, list, isPending }) => (
-    <div className="admin-section">
-      <h3>{title} ({list.length})</h3>
-      <div className="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Branch</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map(u => (
-              <tr key={u._id}>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td>{u.branch}</td>
-                <td>
-                  {isPending && <button className="approve-btn" onClick={() => handleAction(u._id, 'approve')}>Approve</button>}
-                  <button className="delete-btn" onClick={() => handleAction(u._id, 'reject')}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
 
   return (
     <div className="admin-modal-content">
@@ -83,50 +52,68 @@ function AdminDashboard({ setView }) {
         <button type="button" className="back-btn" onClick={() => setView('home')}>Close Dashboard</button>
       </div>
 
+      {/* Primary Tabs (Roles) */}
       <div className="admin-tabs">
-        <button className={activeTab === 'alumni' ? 'active' : ''} onClick={() => setActiveTab('alumni')}>Alumni</button>
-        <button className={activeTab === 'students' ? 'active' : ''} onClick={() => setActiveTab('students')}>Students</button>
+        <button className={activeTab === 'alumni' ? 'active' : ''} onClick={() => { setActiveTab('alumni'); setStatusFilter('pending'); }}>Alumni</button>
+        <button className={activeTab === 'students' ? 'active' : ''} onClick={() => { setActiveTab('students'); setStatusFilter('pending'); }}>Students</button>
         <button className={activeTab === 'logs' ? 'active' : ''} onClick={() => setActiveTab('logs')}>Security Logs</button>
       </div>
 
+      {/* Sub-Filters (Status) - Hidden if viewing Logs */}
+      {activeTab !== 'logs' && (
+        <div className="status-filters">
+          <button className={statusFilter === 'pending' ? 'selected' : ''} onClick={() => setStatusFilter('pending')}>
+            Pending List
+          </button>
+          <button className={statusFilter === 'verified' ? 'selected' : ''} onClick={() => setStatusFilter('verified')}>
+            Registered List
+          </button>
+        </div>
+      )}
+
       <div className="tab-content">
-        {activeTab === 'alumni' && (
-          <>
-            <Table title="Pending Alumni" list={data.pendingAlumni} isPending={true} />
-            <Table title="Verified Alumni" list={data.approvedAlumni} isPending={false} />
-          </>
-        )}
-
-        {activeTab === 'students' && (
-          <>
-            <Table title="Pending Students" list={data.pendingStudents} isPending={true} />
-            <Table title="Verified Students" list={data.approvedStudents} isPending={false} />
-          </>
-        )}
-
-        {activeTab === 'logs' && (
-          <div className="admin-section">
-            <h3>Contact View History</h3>
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Viewer</th>
-                    <th>Viewed Alumni</th>
-                    <th>Date/Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.logs.map(log => (
-                    <tr key={log._id}>
-                      <td>{log.viewerName}</td>
-                      <td>{log.alumniName}</td>
-                      <td>{new Date(log.timestamp).toLocaleString()}</td>
+        {loading ? (
+          <p className="loading-text">Loading data...</p>
+        ) : (
+          <div className="table-wrapper">
+            <table>
+              <thead>
+                {activeTab === 'logs' ? (
+                  <tr><th>Viewer</th><th>Viewed Alumni</th><th>Timestamp</th></tr>
+                ) : (
+                  <tr><th>Name</th><th>Email</th><th>Branch</th><th>Actions</th></tr>
+                )}
+              </thead>
+              <tbody>
+                {listData.length > 0 ? (
+                  listData.map((item) => (
+                    <tr key={item._id}>
+                      {activeTab === 'logs' ? (
+                        <>
+                          <td>{item.viewerName}</td>
+                          <td>{item.alumniName}</td>
+                          <td>{new Date(item.timestamp).toLocaleString()}</td>
+                        </>
+                      ) : (
+                        <>
+                          <td>{item.name}</td>
+                          <td>{item.email}</td>
+                          <td>{item.branch}</td>
+                          <td>
+                            {statusFilter === 'pending' && (
+                              <button className="approve-btn" onClick={() => handleAction(item._id, 'approve')}>Approve</button>
+                            )}
+                            <button className="delete-btn" onClick={() => handleAction(item._id, 'reject')}>Delete</button>
+                          </td>
+                        </>
+                      )}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr><td colSpan="4" style={{textAlign: 'center', padding: '20px'}}>No records found.</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

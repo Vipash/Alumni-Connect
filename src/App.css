@@ -103,6 +103,43 @@ body {
   margin: 0 auto;
 }
 
+.admin-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.admin-tabs button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+}
+
+.admin-tabs button.active {
+  color: #004a99; /* MBM Blue */
+  border-bottom: 3px solid #004a99;
+}
+
+.admin-section {
+  margin-top: 30px;
+  background: #fff;
+}
+
+.approve-btn { background-color: #28a745; color: white; margin-right: 5px; }
+.delete-btn { background-color: #dc3545; color: white; }
+
+/* Keep the scrollable area height manageable */
+.tab-content {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
 .table-wrapper {
   max-height: 60vh;
   overflow-y: auto;
@@ -197,3 +234,37 @@ button:hover {
 
 /* Misc */
 .back-btn { background: #eee; color: #555; width: auto; margin-bottom: 20px; }
+/* Styling for the Sub-Filter buttons */
+.status-filters {
+  display: flex;
+  gap: 15px;
+  margin: 10px 0 20px 0;
+  justify-content: flex-start;
+}
+
+.status-filters button {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.status-filters button:hover {
+  border-color: #004a99;
+}
+
+.status-filters button.selected {
+  background: #004a99; /* MBM Blue */
+  color: white;
+  border-color: #004a99;
+}
+
+/* Ensure the table container handles the dynamic content height */
+.tab-content {
+  min-height: 200px;
+  max-height: 65vh;
+  overflow-y: auto;
+}
