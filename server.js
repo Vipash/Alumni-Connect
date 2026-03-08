@@ -27,7 +27,15 @@ app.get('/api/get-alumni', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
+// Add this to server.js
+app.get('/api/admin/approved/student', async (req, res) => {
+  try {
+    const students = await User.find({ role: 'student', isVerified: true });
+    res.json(students);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 // 2. Universal Register Route (Handles both Student and Alumni)
 app.post('/api/register', async (req, res) => {
   try {
