@@ -81,6 +81,11 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+.registration-form {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Make sure the form inside takes full width */
 .modal-box form {
   display: flex;
@@ -90,10 +95,21 @@ body {
 
 /* Ensure the button is always at the bottom of the form */
 .submit-btn {
-  margin-top: 20px;
-  position: sticky; /* Keeps it visible as you scroll */
-  bottom: 0;
-  background-color: var(--mbm-gold);
+  margin-top: 30px;
+  width: 100%;
+  padding: 15px;
+  background-color: #004a99;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.privacy-note {
+  font-size: 0.75rem;
+  color: #555;
+  font-style: italic;
+  margin-bottom: 15px;
 }
 
 .admin-container {
@@ -198,8 +214,9 @@ button {
   padding: 20px;
 }
 .modal-box {
-  max-height: 85vh; /* Don't be taller than 85% of the screen */
-  overflow-y: auto; /* Enable scroll if the form is too long */
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 20px;
 }
 
 /* Make the table container scrollable horizontally if the screen is tiny */

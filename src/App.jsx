@@ -100,25 +100,25 @@ function App() { // <--- Added the missing opening brace here
             )}
 
            {(view === 'reg-alumni' || view === 'reg-student') && (
-  <form onSubmit={handleSubmit}>
+  <form onSubmit={handleSubmit} className="registration-form">
     <button type="button" className="back-btn" onClick={() => setView('home')}>← Back</button>
     <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
 
-    {/* --- SECTION 1: PROFILE DETAILS --- */}
-    <h3>Profile Information</h3>
+    {/* --- SECTION 1: PERSONAL INFORMATION --- */}
+    <h3>Personal Information</h3>
     <label>Full Name</label>
     <input placeholder="Enter your full name" value={formData.name} required onChange={e => setFormData({...formData, name: e.target.value})} />
 
     <label>Branch</label>
     <input placeholder="e.g. Computer Science" value={formData.branch} required onChange={e => setFormData({...formData, branch: e.target.value})} />
 
-    <label>Passout / Expected Year</label>
+    <label>Passout Year</label>
     <input placeholder="e.g. 2026" type="number" value={formData.passoutYear} required onChange={e => setFormData({...formData, passoutYear: e.target.value})} />
 
     {view === 'reg-student' && (
       <>
         <label>Roll Number</label>
-        <input placeholder="e.g. 22CS001" value={formData.rollNumber} required onChange={e => setFormData({...formData, rollNumber: e.target.value})} />
+        <input placeholder="e.g. 23UCSE4050" value={formData.rollNumber} required onChange={e => setFormData({...formData, rollNumber: e.target.value})} />
       </>
     )}
 
@@ -133,26 +133,33 @@ function App() { // <--- Added the missing opening brace here
       </>
     )}
 
-    <hr style={{ margin: '25px 0', border: '0', borderTop: '2px solid #eee' }} />
+    <hr />
 
-    {/* --- SECTION 2: CONTACT & PRIVACY --- */}
+    {/* --- SECTION 2: CONTACT DETAILS --- */}
     <h3>Contact Details</h3>
-    <p style={{ fontSize: '0.75rem', color: '#555', marginBottom: '15px', fontStyle: 'italic' }}>
-      * Contact details are private and only viewable by verified users.
-    </p>
-
+    <p className="privacy-note">* Contact details are private and only viewable by verified users.</p>
+    
     <label>Email Address</label>
     <input placeholder="example@mbm.edu" value={formData.email} type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
 
     <label>Mobile Number</label>
-    <input placeholder="10-digit mobile number" type="tel" pattern="[0-9]{10}" required value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} />
+    <input placeholder="e.g. 8824299517" type="tel" pattern="[0-9]{10}" required value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} />
+
+    <hr />
+
+    {/* --- SECTION 3: ACCOUNT INFORMATION --- */}
+    <h3>Account Information</h3>
+    <label>Display Name / Nickname</label>
+    <input placeholder="e.g. Maverick" value={formData.displayName} required onChange={e => setFormData({...formData, displayName: e.target.value})} />
 
     <label>Password</label>
-    <input placeholder="Create a secure password" value={formData.password} type="password" required onChange={e => setFormData({...formData, password: e.target.value})} />
-    
+    <input placeholder="Create a secure password" type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+
+    {/* The button is now at the very bottom, inside the flow of the form */}
     <button type="submit" className="submit-btn">Complete Registration</button>
   </form>
 )}
+
 {/* Admin Dashboard (Separate Modal) */}
       {view === 'admin-dash' && (
         <div className="modal-overlay">
