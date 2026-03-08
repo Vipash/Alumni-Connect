@@ -1,3 +1,5 @@
+import User from './models/User.js';
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -16,7 +18,6 @@ mongoose.connect(MONGO_URI)
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // --- NEW/UPDATED API ROUTES ---
-
 // 1. Get ONLY verified Alumni for the map (Hides sensitive info)
 app.get('/api/get-alumni', async (req, res) => {
   try {
@@ -80,6 +81,23 @@ app.post('/api/register', async (req, res) => {
     res.status(400).send("Error: " + error.message);
   }
 });
+
+app.post('/api/register', async (req, res) => {
+  try {
+    // Check if the email already exists to prevent crashes
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) return res.status(400).send("User already exists");
+
+    // Create the new user
+    const newUser = new User(req.body); 
+    await newUser.save();
+    res.status(201).send("Registered successfully!");
+  } catch (err) {
+    console.error(err);
+    res.status(400).send("Registration failed: " + err.message);
+  }
+});
+
 // 1. Get all pending users
 // 1. Get all users waiting for verification (Use isVerified instead of status)
 app.get('/api/admin/users', async (req, res) => {
