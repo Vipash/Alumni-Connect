@@ -36,6 +36,27 @@ app.get('/api/admin/approved/student', async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+// Add these near your other /api/admin routes
+
+// Route to get Approved Students
+app.get('/api/admin/approved/student', async (req, res) => {
+  try {
+    const students = await User.find({ role: 'student', isVerified: true });
+    res.json(students);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Route to get Pending Students (matches your existing alumni pending logic)
+app.get('/api/admin/pending/student', async (req, res) => {
+  try {
+    const pending = await User.find({ role: 'student', isVerified: false });
+    res.json(pending);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 // 2. Universal Register Route (Handles both Student and Alumni)
 app.post('/api/register', async (req, res) => {
   try {
@@ -129,6 +150,30 @@ app.post('/api/view-contact', async (req, res) => {
     res.json({ mobile: alumni.mobile, email: alumni.email });
   } catch (error) {
     res.status(500).send("Error processing request.");
+  }
+});
+
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  try {
+    const user = await User.findOne({ email });
+    
+    // Check if user exists
+    if (!user) return res.status(401).send("Invalid email or password");
+
+    // Check if password matches (Assuming you use bcrypt)
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).send("Invalid email or password");
+
+    // Return the user's basic info and verification status
+    res.json({ 
+      name: user.name, 
+      isVerified: user.isVerified, 
+      role: user.role 
+    });
+  } catch (err) {
+    res.status(500).send("Server error");
   }
 });
 

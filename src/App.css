@@ -81,6 +81,21 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+.status-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.status-message h2 {
+  color: #004a99;
+  margin-bottom: 15px;
+}
+
+.status-message p {
+  margin-bottom: 25px;
+  color: #444;
+}
+
 .registration-form {
   display: flex;
   flex-direction: column;

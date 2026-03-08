@@ -17,6 +17,8 @@ function App() { // <--- Added the missing opening brace here
   const [user, setUser] = useState(null);
   const [alumniList, setAlumniList] = useState([]);
   const [selectedCoords, setSelectedCoords] = useState(null);
+  const [loginStatus, setLoginStatus] = useState(null); // null, 'pending', 'approved'
+  const [loggedInUser, setLoggedInUser] = useState(null); // Stores { name: '...' }
   const [formData, setFormData] = useState({ 
     name: '', email: '', role: '', branch: '', passoutYear: '', 
     rollNumber: '', degree: '', company: '', bio: '', mobile: '', password: '' 
@@ -62,6 +64,28 @@ function App() { // <--- Added the missing opening brace here
     }
   };
 
+const handleLogin = async (e) => {
+  e.preventDefault();
+  const email = e.target.email.value;
+  const password = e.target.password.value;
+
+  const res = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    setLoggedInUser(data);
+    setLoginStatus(data.isVerified ? 'approved' : 'pending');
+  } else {
+    // Better user feedback
+    const errorText = await res.text();
+    alert(errorText || "Login failed. Check your credentials.");
+  }
+};
+
   const handleAdminLogin = async () => {
     const pass = prompt("Admin Password:");
     if (pass === "admin123") { setUser({ role: 'admin' }); setView('admin-dash'); }
@@ -87,7 +111,39 @@ function App() { // <--- Added the missing opening brace here
         <div className="modal-overlay">
           <div className="modal-box">
             {view === 'home' && (
+              
               <>
+              {/* --- LOGIN VIEW --- */}
+{(view === 'login-student' || view === 'login-alumni') && (
+  <div className="modal-box">
+    {loginStatus === null ? (
+      <form onSubmit={(e) => handleLogin(e)}>
+        <button type="button" className="back-btn" onClick={() => { setView('home'); }}>← Back</button>
+        <h2>{view === 'login-student' ? 'Student' : 'Alumni'} Sign In</h2>
+        
+        <label>Email</label>
+        <input name="email" type="email" required />
+        
+        <label>Password</label>
+        <input name="password" type="password" required />
+        
+        <button type="submit" className="submit-btn">Sign In</button>
+      </form>
+    ) : (
+      <div className="status-message">
+        <h2>
+          {loginStatus === 'pending' ? 'Verification Pending' : `Welcome, ${loggedInUser.name}!`}
+        </h2>
+        <p>
+          {loginStatus === 'pending' 
+            ? "Your account is awaiting approval from the admin. Please check back later."
+            : "You have been verified. Accessing portal..."}
+        </p>
+        <button className="back-btn" onClick={() => { setLoginStatus(null); setView('home'); }}>Back to Home</button>
+      </div>
+    )}
+  </div>
+)}
                 <h1>MBM Alumni Connect</h1>
                 <h3>Student</h3>
                 <button onClick={() => setView('login-student')}>Sign In</button>
@@ -149,8 +205,8 @@ function App() { // <--- Added the missing opening brace here
 
     {/* --- SECTION 3: ACCOUNT INFORMATION --- */}
     <h3>Account Information</h3>
-    <label>Display Name / Nickname</label>
-    <input placeholder="e.g. Maverick" value={formData.displayName} required onChange={e => setFormData({...formData, displayName: e.target.value})} />
+    <label>Display Name</label>
+    <input placeholder="e.g. Vipss" value={formData.displayName} required onChange={e => setFormData({...formData, displayName: e.target.value})} />
 
     <label>Password</label>
     <input placeholder="Create a secure password" type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
