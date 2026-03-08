@@ -245,8 +245,9 @@ button:hover {
 .status-filters button {
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px solid #ddd;
-  background: white;
+  border: 1px solid #004A99;
+  background: #ffffff;
+  color: #004a99;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s ease;
@@ -254,6 +255,7 @@ button:hover {
 
 .status-filters button:hover {
   border-color: #004a99;
+  background: #69a4e3;
 }
 
 .status-filters button.selected {
