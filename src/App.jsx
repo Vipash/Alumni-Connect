@@ -104,46 +104,51 @@ function App() { // <--- Added the missing opening brace here
     <button type="button" className="back-btn" onClick={() => setView('home')}>← Back</button>
     <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
 
-    {/* Name */}
+    {/* --- SECTION 1: PROFILE DETAILS --- */}
+    <h3>Profile Information</h3>
     <label>Full Name</label>
     <input placeholder="Enter your full name" value={formData.name} required onChange={e => setFormData({...formData, name: e.target.value})} />
 
-    {/* Email */}
-    <label>Email Address</label>
-    <input placeholder="example@mbm.edu" value={formData.email} type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
-
-    {/* Password */}
-    <label>Password</label>
-    <input placeholder="Create a secure password" value={formData.password} type="password" required onChange={e => setFormData({...formData, password: e.target.value})} />
-
-    {/* Branch */}
     <label>Branch</label>
     <input placeholder="e.g. Computer Science" value={formData.branch} required onChange={e => setFormData({...formData, branch: e.target.value})} />
 
-    <label>Roll Number</label>
-    <input 
-    placeholder="e.g. 22CS001" 
-    value={formData.rollNumber} 
-    required={view === 'reg-student'} // Only required for students
-    onChange={e => setFormData({...formData, rollNumber: e.target.value})} 
-    />
-    
-    {/* Passout Year */}
-    <label>Passout Year</label>
+    <label>Passout / Expected Year</label>
     <input placeholder="e.g. 2026" type="number" value={formData.passoutYear} required onChange={e => setFormData({...formData, passoutYear: e.target.value})} />
-    
-    {view === 'reg-alumni' && (
+
+    {view === 'reg-student' && (
       <>
-        {/* Company */}
-        <label>Current Company</label>
-        <input placeholder="Where do you work?" value={formData.company} required onChange={e => setFormData({...formData, company: e.target.value})} />
-        
-        <label>Location</label>
-        <button type="button" onClick={() => setView('picker')}>
-  {selectedCoords ? "Location Picked ✅" : "Click to Pin Location on Map"}
-</button>
+        <label>Roll Number</label>
+        <input placeholder="e.g. 22CS001" value={formData.rollNumber} required onChange={e => setFormData({...formData, rollNumber: e.target.value})} />
       </>
     )}
+
+    {view === 'reg-alumni' && (
+      <>
+        <label>Current Company</label>
+        <input placeholder="Where do you work?" value={formData.company} required onChange={e => setFormData({...formData, company: e.target.value})} />
+        <label>Location</label>
+        <button type="button" className="location-btn" onClick={() => setView('picker')}>
+          {selectedCoords ? "Location Picked ✅" : "Click to Pin Location on Map"}
+        </button>
+      </>
+    )}
+
+    <hr style={{ margin: '25px 0', border: '0', borderTop: '2px solid #eee' }} />
+
+    {/* --- SECTION 2: CONTACT & PRIVACY --- */}
+    <h3>Contact Details</h3>
+    <p style={{ fontSize: '0.75rem', color: '#555', marginBottom: '15px', fontStyle: 'italic' }}>
+      * Contact details are private and only viewable by verified users.
+    </p>
+
+    <label>Email Address</label>
+    <input placeholder="example@mbm.edu" value={formData.email} type="email" required onChange={e => setFormData({...formData, email: e.target.value})} />
+
+    <label>Mobile Number</label>
+    <input placeholder="10-digit mobile number" type="tel" pattern="[0-9]{10}" required value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} />
+
+    <label>Password</label>
+    <input placeholder="Create a secure password" value={formData.password} type="password" required onChange={e => setFormData({...formData, password: e.target.value})} />
     
     <button type="submit" className="submit-btn">Complete Registration</button>
   </form>
