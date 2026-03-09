@@ -307,3 +307,67 @@ button:hover {
   max-height: 65vh;
   overflow-y: auto;
 }
+
+.workspace-layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: #001f3f; /* Dark Navy */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+  margin-bottom: 40px;
+  border-bottom: 1px solid #ffffff33;
+  padding-bottom: 20px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.sidebar-nav button {
+  background: none;
+  border: none;
+  color: #bdc3c7;
+  text-align: left;
+  padding: 12px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 5px;
+}
+
+.sidebar-nav button.active, .sidebar-nav button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.dashboard-content {
+  flex: 1;
+  background-color: #f8f9fa;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.logout-btn {
+  margin-top: auto;
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
