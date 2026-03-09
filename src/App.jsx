@@ -67,20 +67,29 @@ function App() {
   };
 
 const renderTabContent = () => {
+  let content; 
   switch (activeTab) {
     case 'profile':
-      return <Profile user={loggedInUser} />; // Pass the user data as a prop
+      content = <Profile user={loggedInUser} />;
+      break;
     case 'map':
-      return <MapSearchSection />;
+      content = <MapSearchSection />;
+      break;
     case 'chats':
-      return <ChatSection />;
+      content = <ChatSection />;
+      break;
     case 'inbox':
-      return <InboxSection />;
+      content = <InboxSection />;
+      break;
     case 'announcements':
-      return <AnnouncementsSection />;
+      content = <AnnouncementsSection />;
+      break;
     default:
-      return <h2>Select a section</h2>;
+      content = <h2>Select a section</h2>;
   }
+
+  // Wrapping everything in the class that your CSS expects
+  return <div className="tab-pane">{content}</div>;
 };
   
   return (
@@ -104,7 +113,6 @@ const renderTabContent = () => {
           </aside>
           <main className="dashboard-content">
             {renderTabContent()}
-            <div className="tab-pane"><h2>{activeTab.toUpperCase()} Section</h2></div>
           </main>
         </div>
       ) : view === 'admin-dash' ? (
