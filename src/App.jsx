@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import AdminDashboard from './AdminDashboard';
+import Profile from './Profile';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -65,6 +66,23 @@ function App() {
     if (pass === "admin123") setView('admin-dash');
   };
 
+const renderTabContent = () => {
+  switch (activeTab) {
+    case 'profile':
+      return <Profile user={loggedInUser} />; // Pass the user data as a prop
+    case 'map':
+      return <MapSearchSection />;
+    case 'chats':
+      return <ChatSection />;
+    case 'inbox':
+      return <InboxSection />;
+    case 'announcements':
+      return <AnnouncementsSection />;
+    default:
+      return <h2>Select a section</h2>;
+  }
+};
+  
   return (
     <div className="app-root">
       {/* 1. DASHBOARD VIEW */}
@@ -85,6 +103,7 @@ function App() {
             <button className="logout-btn" onClick={() => window.location.reload()}>Logout</button>
           </aside>
           <main className="dashboard-content">
+            {renderTabContent()}
             <div className="tab-pane"><h2>{activeTab.toUpperCase()} Section</h2></div>
           </main>
         </div>
