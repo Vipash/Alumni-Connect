@@ -371,3 +371,7 @@ button:hover {
   border-radius: 5px;
   cursor: pointer;
 }
+
+.profile-card { background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
+.profile-row { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+.profile-row strong { color: #333; margin-right: 10px; }
