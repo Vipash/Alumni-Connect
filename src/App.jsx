@@ -65,7 +65,7 @@ function App() {
     if (pass === "admin123") setView('admin-dash');
   };
 
-return (
+  return (
     <div className="app-root">
       {/* 1. DASHBOARD VIEW */}
       {loginStatus === 'approved' ? (
@@ -89,14 +89,13 @@ return (
           </main>
         </div>
       ) : view === 'admin-dash' ? (
-        /* 2. ADMIN VIEW */
         <div className="modal-overlay">
           <div className="modal-box admin-modal">
             <AdminDashboard setView={setView} />
           </div>
         </div>
       ) : (
-        /* 3. VISITOR VIEW (Landing/Login/Register) */
+        /* 3. VISITOR VIEW */
         <>
           {view === 'home' && <div className="landing-bg"></div>}
           
@@ -113,9 +112,14 @@ return (
                 {view === 'home' && (
                   <>
                     <h1>MBM Alumni Connect</h1>
+                    <h3>Student</h3>
                     <button onClick={() => setView('login-student')}>Sign In</button>
                     <button onClick={() => { setFormData({...formData, role: 'student'}); setView('reg-student'); }}>Register as Student</button>
-                    <button onClick={handleAdminLogin}>Admin Sign In</button>
+                    <h3>Alumnus</h3>
+                    <button onClick={() => setView('login-alumni')}>Sign In</button>
+                    <button onClick={() => { setFormData({...formData, role: 'alumni'}); setView('reg-alumni'); }}>Register as Alumnus</button>
+                    <hr />
+                    <button className="admin-btn" onClick={handleAdminLogin}>Admin Sign In</button>
                   </>
                 )}
                 {(view === 'login-student' || view === 'login-alumni') && (
