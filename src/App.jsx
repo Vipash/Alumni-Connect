@@ -135,6 +135,7 @@ function App() {
                 )}
                 {(view === 'reg-alumni' || view === 'reg-student') && (
                   <form onSubmit={handleSubmit} className="registration-form">
+                    <button type="button" onClick={() => setView('home')}>← Back</button>
                     <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
 
     {/* --- SECTION 1: PERSONAL INFORMATION --- */}
