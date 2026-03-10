@@ -7,6 +7,7 @@ import './App.css';
 import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';
+import ChatSection from './ChatSection';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -77,7 +78,7 @@ const renderTabContent = () => {
   return <MapSearchSection />;
       break;
     case 'chats':
-      content = <ChatSection />;
+  return <ChatSection />;
       break;
     case 'inbox':
       content = <InboxSection />;
