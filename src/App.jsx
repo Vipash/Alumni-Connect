@@ -8,6 +8,8 @@ import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';
 import ChatSection from './ChatSection';
+import AnnouncementsSection from './AnnouncementsSection';
+import InboxSection from './InboxSection';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -75,13 +77,13 @@ const renderTabContent = () => {
       content = <Profile user={loggedInUser} />;
       break;
     case 'map':
-  return <MapSearchSection />;
+      content = <MapSearchSection />;
       break;
     case 'chats':
-  return <ChatSection />;
+      content = <ChatSection />;
       break;
     case 'inbox':
-      content = <InboxSection />;
+      content = <InboxSection />; // Ensure this component exists!
       break;
     case 'announcements':
       content = <AnnouncementsSection />;
@@ -90,7 +92,6 @@ const renderTabContent = () => {
       content = <h2>Select a section</h2>;
   }
 
-  // Wrapping everything in the class that your CSS expects
   return <div className="tab-pane">{content}</div>;
 };
   
