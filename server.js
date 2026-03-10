@@ -5,7 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const path = require('path');
 
-// Models (Assuming alumni.js is your User model and Log.js exists)
+// Models
 const User = require('./alumni'); 
 const Log = require('./Log');
 
@@ -21,7 +21,7 @@ mongoose.connect(MONGO_URI)
 
 // --- API ROUTES ---
 
-// Registration (Consolidated & Fixed)
+// Registration
 app.post('/api/register', async (req, res) => {
   try {
     const { password, ...userData } = req.body;
@@ -45,7 +45,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Login
+// Login - FIXED DATA LEAK & SYNTAX
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -55,20 +55,21 @@ app.post('/api/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).send("Invalid email or password");
 
-const { password, ...userProfile } = user._doc;
-res.json(userProfile);  } catch (err) {
+    // We use 'rest' to gather everything EXCEPT the password to send to the frontend
+    const { password: _, ...userProfile } = user._doc;
+    res.json(userProfile); 
+    
+  } catch (err) {
+    console.error("Login Error:", err);
     res.status(500).send("Server error");
   }
 });
 
-// Make sure this is in your server.js if you want users to "unlock" contact info
 app.post('/api/view-contact', async (req, res) => {
   const { viewerId, alumniId } = req.body;
   try {
     const alumni = await User.findById(alumniId);
     if (!alumni) return res.status(404).send("Alumni not found");
-
-    // Logic: Log the action (Optional: Add the log record here)
     res.json({ mobile: alumni.mobile, email: alumni.email });
   } catch (error) {
     res.status(500).send("Error fetching details.");
@@ -90,10 +91,10 @@ app.get('/api/admin/approved/student', async (req, res) => {
   } catch (err) { res.status(500).send(err.message); }
 });
 
-// Alumni Fetch (Public Map View)
+// Alumni Fetch - OPENED FOR ADMIN/MAP
 app.get('/api/get-alumni', async (req, res) => {
   try {
-    const alumni = await User.find({ role: 'alumni', isVerified: true }, '-mobile -email');
+    const alumni = await User.find({ role: 'alumni', isVerified: true });
     res.json(alumni);
   } catch (err) { res.status(500).send("Failed to fetch alumni"); }
 });
