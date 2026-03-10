@@ -44,6 +44,25 @@ function AdminDashboard({ setView }) {
       fetchCurrentList();
     }
   };
+  
+const postAnnouncement = async (e) => {
+  e.preventDefault();
+  const formData = { title: e.target.title.value, subject: e.target.subject.value, content: e.target.content.value };
+  await fetch('/api/admin/announcement', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  });
+  alert("Posted!");
+};
+
+// Add this to your render() inside AdminDashboard
+<form onSubmit={postAnnouncement} className="admin-form">
+  <input name="title" placeholder="Title" required />
+  <input name="subject" placeholder="Subject" required />
+  <textarea name="content" placeholder="Full message..." required />
+  <button type="submit">Publish Announcement</button>
+</form>
 
   return (
     <div className="admin-modal-content">

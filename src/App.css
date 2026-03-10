@@ -382,6 +382,10 @@ button:hover {
   cursor: pointer;
 }
 
+.announcement-item { border-bottom: 1px solid #ddd; padding: 15px; cursor: pointer; }
+.announcement-header { display: flex; justify-content: space-between; align-items: center; }
+.announcement-body { padding: 15px; background: #f4f4f4; margin-top: 10px; border-radius: 5px; }
+
 .profile-card { background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
 .profile-row { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
 .profile-row strong { color: #333; margin-right: 10px; }
