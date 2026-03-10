@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
 
 function AdminDashboard({ setView }) {
-  const [activeTab, setActiveTab] = useState('alumni'); // 'alumni', 'students', 'logs'
-  const [statusFilter, setStatusFilter] = useState('pending'); // 'pending', 'verified'
+  const [activeTab, setActiveTab] = useState('alumni'); 
+  const [statusFilter, setStatusFilter] = useState('pending'); 
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Helper to determine the correct API URL based on Tab and Filter
   const getApiUrl = () => {
     if (activeTab === 'logs') return '/api/admin/logs';
-    
-    // Logic for Alumni vs Students
     const role = activeTab === 'alumni' ? 'alumni' : 'student';
     if (statusFilter === 'pending') return `/api/admin/pending/${role}`;
     return activeTab === 'alumni' ? '/api/get-alumni' : '/api/admin/approved/student';
@@ -30,17 +27,20 @@ function AdminDashboard({ setView }) {
     }
   };
 
-  // Refresh whenever the tab or the status filter changes
   useEffect(() => {
     fetchCurrentList();
   }, [activeTab, statusFilter]);
 
   const handleAction = async (id, action) => {
+    const confirmMsg = action === 'approve' ? "Approve this user?" : "Permanently delete this user?";
+    if(!window.confirm(confirmMsg)) return;
+
     const url = action === 'approve' ? `/api/verify-user/${id}` : `/api/delete-user/${id}`;
     const method = action === 'approve' ? 'PATCH' : 'DELETE';
+    
     const response = await fetch(url, { method });
     if (response.ok) {
-      alert(`User ${action}d!`);
+      alert(`User ${action === 'approve' ? 'approved' : 'deleted'}!`);
       fetchCurrentList();
     }
   };
@@ -52,28 +52,22 @@ function AdminDashboard({ setView }) {
         <button type="button" className="back-btn" onClick={() => setView('home')}>Close Dashboard</button>
       </div>
 
-      {/* Primary Tabs (Roles) */}
       <div className="admin-tabs">
         <button className={activeTab === 'alumni' ? 'active' : ''} onClick={() => { setActiveTab('alumni'); setStatusFilter('pending'); }}>Alumni</button>
         <button className={activeTab === 'students' ? 'active' : ''} onClick={() => { setActiveTab('students'); setStatusFilter('pending'); }}>Students</button>
         <button className={activeTab === 'logs' ? 'active' : ''} onClick={() => setActiveTab('logs')}>Security Logs</button>
       </div>
 
-      {/* Sub-Filters (Status) - Hidden if viewing Logs */}
       {activeTab !== 'logs' && (
         <div className="status-filters">
-          <button className={statusFilter === 'pending' ? 'selected' : ''} onClick={() => setStatusFilter('pending')}>
-            Pending List
-          </button>
-          <button className={statusFilter === 'verified' ? 'selected' : ''} onClick={() => setStatusFilter('verified')}>
-            Registered List
-          </button>
+          <button className={statusFilter === 'pending' ? 'selected' : ''} onClick={() => setStatusFilter('pending')}>Pending Approval</button>
+          <button className={statusFilter === 'verified' ? 'selected' : ''} onClick={() => setStatusFilter('verified')}>Verified Users</button>
         </div>
       )}
 
       <div className="tab-content">
         {loading ? (
-          <p className="loading-text">Loading data...</p>
+          <p className="loading-text">Fetching latest records...</p>
         ) : (
           <div className="table-wrapper">
             <table>
@@ -81,7 +75,13 @@ function AdminDashboard({ setView }) {
                 {activeTab === 'logs' ? (
                   <tr><th>Viewer</th><th>Viewed Alumni</th><th>Timestamp</th></tr>
                 ) : (
-                  <tr><th>Name</th><th>Email</th><th>Branch</th><th>Actions</th></tr>
+                  <tr>
+                    <th>Name / Display Name</th>
+                    <th>Contact Info</th>
+                    <th>Branch / Year</th>
+                    <th>{activeTab === 'alumni' ? 'Company' : 'Roll Number'}</th>
+                    <th>Actions</th>
+                  </tr>
                 )}
               </thead>
               <tbody>
@@ -96,21 +96,30 @@ function AdminDashboard({ setView }) {
                         </>
                       ) : (
                         <>
-                          <td>{item.name}</td>
-                          <td>{item.email}</td>
-                          <td>{item.branch}</td>
                           <td>
-                            {statusFilter === 'pending' && (
-                              <button className="approve-btn" onClick={() => handleAction(item._id, 'approve')}>Approve</button>
-                            )}
-                            <button className="delete-btn" onClick={() => handleAction(item._id, 'reject')}>Delete</button>
+                            <strong>{item.name}</strong><br/>
+                            <small style={{color: '#666'}}>@{item.displayName || 'no-handle'}</small>
+                          </td>
+                          <td>
+                            {item.email || <span style={{color:'red'}}>Missing Email</span>}<br/>
+                            <small>{item.mobile || 'No Phone'}</small>
+                          </td>
+                          <td>{item.branch}<br/>Class of {item.passoutYear}</td>
+                          <td>{activeTab === 'alumni' ? (item.company || 'N/A') : (item.rollNumber || 'N/A')}</td>
+                          <td>
+                            <div className="admin-action-btns">
+                              {statusFilter === 'pending' && (
+                                <button className="approve-btn" onClick={() => handleAction(item._id, 'approve')}>Approve</button>
+                              )}
+                              <button className="delete-btn" onClick={() => handleAction(item._id, 'reject')}>Delete</button>
+                            </div>
                           </td>
                         </>
                       )}
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan="4" style={{textAlign: 'center', padding: '20px'}}>No records found.</td></tr>
+                  <tr><td colSpan="5" style={{textAlign: 'center', padding: '40px'}}>No records found in this category.</td></tr>
                 )}
               </tbody>
             </table>

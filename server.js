@@ -55,8 +55,8 @@ app.post('/api/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).send("Invalid email or password");
 
-    res.json({ name: user.name, isVerified: user.isVerified, role: user.role });
-  } catch (err) {
+const { password, ...userProfile } = user._doc;
+res.json(userProfile);  } catch (err) {
     res.status(500).send("Server error");
   }
 });
