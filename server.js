@@ -138,6 +138,13 @@ app.get('/api/admin/logs', async (req, res) => {
   } catch (err) { res.status(500).send(err.message); }
 });
 
+app.delete('/api/admin/announcement/:id', async (req, res) => {
+  try {
+    await Announcement.findByIdAndDelete(req.params.id);
+    res.send("Announcement Deleted");
+  } catch (err) { res.status(400).send(err.message); }
+});
+
 // --- PRODUCTION SERVING ---
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));

@@ -14,6 +14,9 @@ function AdminDashboard({ setView }) {
   };
 
   const fetchCurrentList = async () => {
+    // We don't need to fetch user lists if we are on the announcements tab
+    if (activeTab === 'announcements') return;
+    
     setLoading(true);
     try {
       const res = await fetch(getApiUrl());
@@ -26,30 +29,6 @@ function AdminDashboard({ setView }) {
       setLoading(false);
     }
   };
-
-const handlePostAnnouncement = async (e) => {
-  e.preventDefault();
-  const title = e.target.title.value;
-  const subject = e.target.subject.value;
-  const content = e.target.content.value;
-
-  try {
-    const response = await fetch('/api/admin/announcement', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, subject, content })
-    });
-
-    if (response.ok) {
-      alert("Announcement posted successfully!");
-      e.target.reset(); // Clear the form
-    } else {
-      alert("Failed to post announcement.");
-    }
-  } catch (err) {
-    console.error("Error posting announcement:", err);
-  }
-};
 
   useEffect(() => {
     fetchCurrentList();
@@ -68,25 +47,32 @@ const handlePostAnnouncement = async (e) => {
       fetchCurrentList();
     }
   };
-  
-const postAnnouncement = async (e) => {
-  e.preventDefault();
-  const formData = { title: e.target.title.value, subject: e.target.subject.value, content: e.target.content.value };
-  await fetch('/api/admin/announcement', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData)
-  });
-  alert("Posted!");
-};
 
-// Add this to your render() inside AdminDashboard
-<form onSubmit={postAnnouncement} className="admin-form">
-  <input name="title" placeholder="Title" required />
-  <input name="subject" placeholder="Subject" required />
-  <textarea name="content" placeholder="Full message..." required />
-  <button type="submit">Publish Announcement</button>
-</form>
+  const handlePostAnnouncement = async (e) => {
+    e.preventDefault();
+    const formData = { 
+      title: e.target.title.value, 
+      subject: e.target.subject.value, 
+      content: e.target.content.value 
+    };
+
+    try {
+      const response = await fetch('/api/admin/announcement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert("Announcement posted successfully!");
+        e.target.reset();
+      } else {
+        alert("Failed to post.");
+      }
+    } catch (err) {
+      console.error("Post error:", err);
+    }
+  };
 
   return (
     <div className="admin-modal-content">
@@ -98,28 +84,30 @@ const postAnnouncement = async (e) => {
       <div className="admin-tabs">
         <button className={activeTab === 'alumni' ? 'active' : ''} onClick={() => { setActiveTab('alumni'); setStatusFilter('pending'); }}>Alumni</button>
         <button className={activeTab === 'students' ? 'active' : ''} onClick={() => { setActiveTab('students'); setStatusFilter('pending'); }}>Students</button>
+        <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
         <button className={activeTab === 'logs' ? 'active' : ''} onClick={() => setActiveTab('logs')}>Security Logs</button>
       </div>
 
-      {activeTab !== 'logs' && (
+      {/* Hide status filters if in Announcements or Logs */}
+      {['alumni', 'students'].includes(activeTab) && (
         <div className="status-filters">
           <button className={statusFilter === 'pending' ? 'selected' : ''} onClick={() => setStatusFilter('pending')}>Pending Approval</button>
           <button className={statusFilter === 'verified' ? 'selected' : ''} onClick={() => setStatusFilter('verified')}>Verified Users</button>
         </div>
       )}
 
-<div className="admin-announcement-form">
-  <h3>Post New Announcement</h3>
-  <form onSubmit={handlePostAnnouncement}>
-    <input name="title" placeholder="Announcement Title (e.g., Alumni Meet 2024)" required />
-    <input name="subject" placeholder="Subject (e.g., Event Registration)" required />
-    <textarea name="content" placeholder="Write the full announcement content here..." required />
-    <button type="submit" className="approve-btn">Publish to All Users</button>
-  </form>
-</div>
-
       <div className="tab-content">
-        {loading ? (
+        {activeTab === 'announcements' ? (
+          <div className="admin-announcement-form">
+            <h3>Post New Announcement</h3>
+            <form onSubmit={handlePostAnnouncement}>
+              <input name="title" placeholder="Announcement Title" required />
+              <input name="subject" placeholder="Subject" required />
+              <textarea name="content" placeholder="Write full content here..." required />
+              <button type="submit" className="approve-btn">Publish Announcement</button>
+            </form>
+          </div>
+        ) : loading ? (
           <p className="loading-text">Fetching latest records...</p>
         ) : (
           <div className="table-wrapper">
@@ -149,15 +137,9 @@ const postAnnouncement = async (e) => {
                         </>
                       ) : (
                         <>
-                          <td>
-                            <strong>{item.name}</strong><br/>
-                            <small style={{color: '#666'}}>@{item.displayName || 'no-handle'}</small>
-                          </td>
-                          <td>
-                            {item.email || <span style={{color:'red'}}>Missing Email</span>}<br/>
-                            <small>{item.mobile || 'No Phone'}</small>
-                          </td>
-                          <td>{item.branch}<br/>Class of {item.passoutYear}</td>
+                          <td><strong>{item.name}</strong><br/><small>@{item.displayName}</small></td>
+                          <td>{item.email}<br/><small>{item.mobile}</small></td>
+                          <td>{item.branch}<br/>{item.passoutYear}</td>
                           <td>{activeTab === 'alumni' ? (item.company || 'N/A') : (item.rollNumber || 'N/A')}</td>
                           <td>
                             <div className="admin-action-btns">
@@ -172,7 +154,7 @@ const postAnnouncement = async (e) => {
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan="5" style={{textAlign: 'center', padding: '40px'}}>No records found in this category.</td></tr>
+                  <tr><td colSpan="5" style={{textAlign: 'center', padding: '40px'}}>No records found.</td></tr>
                 )}
               </tbody>
             </table>
