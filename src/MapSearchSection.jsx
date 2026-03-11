@@ -1,63 +1,43 @@
-import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { useState, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
-// Custom Icon for the Search Marker
-const searchIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
+// Utility for Zooming
+function FlyToMarker({ position }) {
+  const map = useMap();
+  useEffect(() => { if (position) map.flyTo(position, 13); }, [position]);
+  return null;
+}
 
 function MapSearchSection() {
   const [alumni, setAlumni] = useState([]);
   const [companySearch, setCompanySearch] = useState('');
-  const [searchPos, setSearchPos] = useState(null); // The red marker
-  const [isPicking, setIsPicking] = useState(false);
+  const [cityQuery, setCityQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [searchPos, setSearchPos] = useState(null);
   const [closest, setClosest] = useState(null);
+  const [filtered, setFiltered] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Helper: Map click listener
-  function MapEvents() {
-    useMapEvents({
-      click(e) {
-        if (isPicking) {
-          setSearchPos(e.latlng);
-          findClosest(e.latlng.lat, e.latlng.lng);
-          setIsPicking(false);
-        }
-      },
-    });
-    return null;
-  }
-
+  // 1. Fetch data
   useEffect(() => {
-    fetch('/api/get-alumni')
-      .then(res => res.json())
-      .then(data => setAlumni(data.filter(a => a.location?.coordinates)));
+    fetch('/api/get-alumni').then(res => res.json()).then(setAlumni);
   }, []);
 
-  const findClosest = (lat, lng) => {
-    let nearest = null;
-    let minD = Infinity;
-    alumni.forEach(a => {
-      const coords = a.location.coordinates;
-     // Haversine function (same as before)
-const getDistance = (lat1, lon1, lat2, lon2) => {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-};
-    });
-    setClosest(nearest);
+  // 2. Company Search logic
+  const handleCompanySearch = () => {
+    const matches = alumni.filter(a => a.company?.toLowerCase().includes(companySearch.toLowerCase()));
+    setFiltered(matches);
+    setCurrentIndex(0);
+    if (matches.length > 0) setSearchPos([matches[0].location.coordinates[1], matches[0].location.coordinates[0]]);
   };
 
-  const useCurrentLocation = () => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      setSearchPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-      findClosest(pos.coords.latitude, pos.coords.longitude);
-    });
+  // 3. City Search (Nominatim)
+  const fetchSuggestions = async (q) => {
+    setCityQuery(q);
+    if (q.length < 3) return;
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
+    setSuggestions(await res.json());
   };
 
   return (
@@ -65,10 +45,10 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
       <div className="map-fancy-container">
         <MapContainer center={[26.2389, 73.0243]} zoom={5} style={{ height: '400px', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <MapEvents />
-          {searchPos && <Marker position={searchPos} icon={searchIcon} />}
+          {searchPos && <FlyToMarker position={searchPos} />}
           
-          {alumni.filter(a => a.company?.toLowerCase().includes(companySearch.toLowerCase())).map(user => (
+          {/* Markers */}
+          {alumni.map(user => (
             <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
               <Popup><strong>{user.name}</strong><br/>{user.company}</Popup>
             </Marker>
@@ -76,20 +56,37 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
         </MapContainer>
       </div>
 
+      {/* SEARCH PANEL */}
       <div className="search-panel">
+        {/* Company Search */}
         <div className="input-group">
           <input placeholder="Search Company..." onChange={e => setCompanySearch(e.target.value)} />
-          <button className="search-btn">🔍</button>
-        </div>
-        
-        <div className="location-controls">
-          <button onClick={() => setIsPicking(!isPicking)} style={{ backgroundColor: isPicking ? '#e67e22' : '#2ecc71' }}>
-            {isPicking ? 'Click map to place marker...' : '📍 Pick Location'}
-          </button>
-          <button onClick={useCurrentLocation}>🎯 Use My Location</button>
+          <button onClick={handleCompanySearch}>Search Company</button>
+          {filtered.length > 1 && (
+            <button onClick={() => { 
+                const next = (currentIndex + 1) % filtered.length; 
+                setCurrentIndex(next); 
+                setSearchPos([filtered[next].location.coordinates[1], filtered[next].location.coordinates[0]]); 
+            }}>Next Match ({currentIndex + 1}/{filtered.length})</button>
+          )}
         </div>
 
-        {closest && <div className="result-card">Nearest: <strong>{closest.name}</strong> ({closest.dist} km away)</div>}
+        {/* Location Controls */}
+        <div className="input-group">
+          <input value={cityQuery} placeholder="City Name..." onChange={e => fetchSuggestions(e.target.value)} />
+          <button onClick={() => { /* logic to use current location */ }}>Use Current Loc</button>
+          <button onClick={() => { /* toggle pick marker mode */ }}>Pick on Map</button>
+        </div>
+
+        {/* City Suggestions */}
+        {suggestions.length > 0 && (
+          <ul className="suggestions-list">
+            {suggestions.map(s => <li key={s.place_id} onClick={() => { 
+                setSearchPos([parseFloat(s.lat), parseFloat(s.lon)]); 
+                setSuggestions([]); 
+            }}>{s.display_name}</li>)}
+          </ul>
+        )}
       </div>
     </div>
   );

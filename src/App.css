@@ -467,6 +467,23 @@ button:hover {
   cursor: pointer;
 }
 
+.input-group { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 10px; 
+}
+.input-group input { 
+  flex: 1; 
+  padding: 8px; 
+  border-radius: 4px; 
+  border: 1px solid #ccc; 
+}
+.map-fancy-container {
+  border: 5px solid #34495e;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .suggestions-list li:hover { background: #e9ecef; }
 
 .announcement-item { border-bottom: 1px solid #ddd; padding: 15px; cursor: pointer; }
