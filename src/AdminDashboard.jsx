@@ -27,6 +27,30 @@ function AdminDashboard({ setView }) {
     }
   };
 
+const handlePostAnnouncement = async (e) => {
+  e.preventDefault();
+  const title = e.target.title.value;
+  const subject = e.target.subject.value;
+  const content = e.target.content.value;
+
+  try {
+    const response = await fetch('/api/admin/announcement', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, subject, content })
+    });
+
+    if (response.ok) {
+      alert("Announcement posted successfully!");
+      e.target.reset(); // Clear the form
+    } else {
+      alert("Failed to post announcement.");
+    }
+  } catch (err) {
+    console.error("Error posting announcement:", err);
+  }
+};
+
   useEffect(() => {
     fetchCurrentList();
   }, [activeTab, statusFilter]);
@@ -83,6 +107,16 @@ const postAnnouncement = async (e) => {
           <button className={statusFilter === 'verified' ? 'selected' : ''} onClick={() => setStatusFilter('verified')}>Verified Users</button>
         </div>
       )}
+
+<div className="admin-announcement-form">
+  <h3>Post New Announcement</h3>
+  <form onSubmit={handlePostAnnouncement}>
+    <input name="title" placeholder="Announcement Title (e.g., Alumni Meet 2024)" required />
+    <input name="subject" placeholder="Subject (e.g., Event Registration)" required />
+    <textarea name="content" placeholder="Write the full announcement content here..." required />
+    <button type="submit" className="approve-btn">Publish to All Users</button>
+  </form>
+</div>
 
       <div className="tab-content">
         {loading ? (
