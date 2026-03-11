@@ -501,6 +501,36 @@ button:hover {
   overflow: hidden;
 }
 
+.location-search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 1000;
+  border: 1px solid #ddd;
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.nearby-list {
+  margin-top: 20px;
+  padding: 15px;
+  border-top: 2px solid #eee;
+}
+
+.nearby-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
 .suggestions-list {
   list-style: none;
   background: white;

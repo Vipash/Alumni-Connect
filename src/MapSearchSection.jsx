@@ -19,6 +19,17 @@ function MapSearchSection() {
   const [filtered, setFiltered] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 const [isPicking, setIsPicking] = useState(false);
+const useCurrentLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const { latitude, longitude } = pos.coords;
+      setSearchPos([latitude, longitude]);
+      findClosest(latitude, longitude);
+    });
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+};
 
   const getDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // km
@@ -31,18 +42,15 @@ const [isPicking, setIsPicking] = useState(false);
 };
 
 const findClosest = (lat, lng) => {
-  let nearest = null;
-  let minD = Infinity;
-  alumni.forEach(a => {
-    if (a.location?.coordinates) {
-      const d = getDistance(lat, lng, a.location.coordinates[1], a.location.coordinates[0]);
-      if (d < minD) {
-        minD = d;
-        nearest = { ...a, dist: d.toFixed(1) };
-      }
-    }
-  });
-  setClosest(nearest);
+  const withDistances = alumni
+    .filter(a => a.location?.coordinates)
+    .map(a => ({
+      ...a,
+      dist: getDistance(lat, lng, a.location.coordinates[1], a.location.coordinates[0])
+    }))
+    .sort((a, b) => a.dist - b.dist);
+
+  setClosest(withDistances.slice(0, 3));
 };
 
 function MapClickHandler({ isPicking, onPick }) {
@@ -99,62 +107,54 @@ function MapClickHandler({ isPicking, onPick }) {
 
       {/* SEARCH PANEL */}
       <div className="search-panel">
-        {/* Company Search */}
-        <div className="input-group">
-          <input placeholder="Search Company..." onChange={e => setCompanySearch(e.target.value)} />
-          <button onClick={handleCompanySearch}>Search Company</button>
-          {filtered.length > 1 && (
-            <button onClick={() => { 
-                const next = (currentIndex + 1) % filtered.length; 
-                setCurrentIndex(next); 
-                setSearchPos([filtered[next].location.coordinates[1], filtered[next].location.coordinates[0]]); 
-            }}>Next Match ({currentIndex + 1}/{filtered.length})</button>
-          )}
-        </div>
-
-        {/* Location Controls */}
-<div className="input-group">
-  <input value={cityQuery} placeholder="City Name..." onChange={e => fetchSuggestions(e.target.value)} />
-  
-  <button onClick={() => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const { latitude, longitude } = pos.coords;
-      setSearchPos([latitude, longitude]);
-      findClosest(latitude, longitude);
-    });
-  }}>📍 My Loc</button>
-
-<button onClick={() => { 
-  setIsPicking(true); 
-  alert("Click anywhere on the map to set your search point!"); 
-}}>📍 Pick on Map</button>
-</div>
-
-{/* Result Display */}
-{closest && (
-  <div className="result-card" style={{ marginTop: '10px', padding: '10px', background: '#e8f4fd' }}>
-    Nearest Alumnus: <strong>{closest.name}</strong> ({closest.dist} km away at {closest.company})
+  {/* 1. Company Search */}
+  <div className="input-group">
+    <input placeholder="Search Company..." onChange={e => setCompanySearch(e.target.value)} />
+    <button onClick={handleCompanySearch}>Search</button>
   </div>
-)}
 
-        {/* City Suggestions */}
-        {suggestions.length > 0 && (
-  <ul className="suggestions-list">
-    {suggestions.map(s => (
-      <li key={s.place_id} onClick={() => { 
-        const lat = parseFloat(s.lat);
-        const lon = parseFloat(s.lon);
-        setSearchPos([lat, lon]); 
-        findClosest(lat, lon); 
-        setSuggestions([]); 
-        setCityQuery(s.display_name); // Update the input field text
-      }}>
-        {s.display_name}
-      </li>
-    ))}
-  </ul>
-)}
-      </div>
+  {/* 2. City Search + Suggestions */}
+  <div className="location-search-wrapper" style={{ position: 'relative' }}>
+    <input 
+      value={cityQuery} 
+      placeholder="Type City Name..." 
+      onChange={e => fetchSuggestions(e.target.value)} 
+    />
+    {suggestions.length > 0 && (
+      <ul className="suggestions-list">
+        {suggestions.map(s => (
+          <li key={s.place_id} onClick={() => { 
+            const lat = parseFloat(s.lat);
+            const lon = parseFloat(s.lon);
+            setSearchPos([lat, lon]); 
+            findClosest(lat, lon); 
+            setSuggestions([]); 
+            setCityQuery(s.display_name);
+          }}>{s.display_name}</li>
+        ))}
+      </ul>
+    )}
+  </div>
+
+  {/* 3. Location Buttons */}
+  <div className="input-group">
+    <button onClick={useCurrentLocation}>📍 My Location</button>
+    <button onClick={() => setIsPicking(true)}>📍 Pick on Map</button>
+  </div>
+
+  {/* 4. Nearby Alumni List */}
+  {closest && closest.length > 0 && (
+    <div className="nearby-list">
+      <h4>Nearby Alumni List (Top 3)</h4>
+      {closest.map((item, index) => (
+        <div key={index} className="nearby-item">
+          <strong>{item.name}</strong> - {item.company} 
+          <span style={{float: 'right'}}>{item.dist.toFixed(1)} km</span>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
     </div>
   );
 }
