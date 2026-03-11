@@ -438,6 +438,37 @@ button:hover {
   min-height: 150px;
 }
 
+.map-fancy-container {
+  border: 5px solid #2c3e50;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
+}
+
+.search-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.suggestions-list {
+  background: white;
+  list-style: none;
+  padding: 0;
+  border: 1px solid #ccc;
+}
+
+.suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover { background: #e9ecef; }
+
 .announcement-item { border-bottom: 1px solid #ddd; padding: 15px; cursor: pointer; }
 .announcement-header { display: flex; justify-content: space-between; align-items: center; }
 .announcement-body { padding: 15px; background: #f4f4f4; margin-top: 10px; border-radius: 5px; }
