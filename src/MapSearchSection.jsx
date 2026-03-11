@@ -18,6 +18,43 @@ function MapSearchSection() {
   const [closest, setClosest] = useState(null);
   const [filtered, setFiltered] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+const [isPicking, setIsPicking] = useState(false);
+
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+const findClosest = (lat, lng) => {
+  let nearest = null;
+  let minD = Infinity;
+  alumni.forEach(a => {
+    if (a.location?.coordinates) {
+      const d = getDistance(lat, lng, a.location.coordinates[1], a.location.coordinates[0]);
+      if (d < minD) {
+        minD = d;
+        nearest = { ...a, dist: d.toFixed(1) };
+      }
+    }
+  });
+  setClosest(nearest);
+};
+
+function MapClickHandler({ isPicking, onPick }) {
+  useMapEvents({
+    click(e) {
+      if (isPicking) {
+        onPick(e.latlng);
+      }
+    },
+  });
+  return null;
+}
 
   // 1. Fetch data
   useEffect(() => {
@@ -46,7 +83,11 @@ function MapSearchSection() {
         <MapContainer center={[26.2389, 73.0243]} zoom={5} style={{ height: '400px', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {searchPos && <FlyToMarker position={searchPos} />}
-          
+          <MapClickHandler isPicking={isPicking} onPick={(ll) => {
+    setSearchPos([ll.lat, ll.lng]);
+    findClosest(ll.lat, ll.lng);
+    setIsPicking(false);
+  }} />
           {/* Markers */}
           {alumni.map(user => (
             <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
@@ -72,21 +113,47 @@ function MapSearchSection() {
         </div>
 
         {/* Location Controls */}
-        <div className="input-group">
-          <input value={cityQuery} placeholder="City Name..." onChange={e => fetchSuggestions(e.target.value)} />
-          <button onClick={() => { /* logic to use current location */ }}>Use Current Loc</button>
-          <button onClick={() => { /* toggle pick marker mode */ }}>Pick on Map</button>
-        </div>
+<div className="input-group">
+  <input value={cityQuery} placeholder="City Name..." onChange={e => fetchSuggestions(e.target.value)} />
+  
+  <button onClick={() => {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const { latitude, longitude } = pos.coords;
+      setSearchPos([latitude, longitude]);
+      findClosest(latitude, longitude);
+    });
+  }}>📍 My Loc</button>
+
+<button onClick={() => { 
+  setIsPicking(true); 
+  alert("Click anywhere on the map to set your search point!"); 
+}}>📍 Pick on Map</button>
+</div>
+
+{/* Result Display */}
+{closest && (
+  <div className="result-card" style={{ marginTop: '10px', padding: '10px', background: '#e8f4fd' }}>
+    Nearest Alumnus: <strong>{closest.name}</strong> ({closest.dist} km away at {closest.company})
+  </div>
+)}
 
         {/* City Suggestions */}
         {suggestions.length > 0 && (
-          <ul className="suggestions-list">
-            {suggestions.map(s => <li key={s.place_id} onClick={() => { 
-                setSearchPos([parseFloat(s.lat), parseFloat(s.lon)]); 
-                setSuggestions([]); 
-            }}>{s.display_name}</li>)}
-          </ul>
-        )}
+  <ul className="suggestions-list">
+    {suggestions.map(s => (
+      <li key={s.place_id} onClick={() => { 
+        const lat = parseFloat(s.lat);
+        const lon = parseFloat(s.lon);
+        setSearchPos([lat, lon]); 
+        findClosest(lat, lon); 
+        setSuggestions([]); 
+        setCityQuery(s.display_name); // Update the input field text
+      }}>
+        {s.display_name}
+      </li>
+    ))}
+  </ul>
+)}
       </div>
     </div>
   );
