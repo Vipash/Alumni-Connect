@@ -8,6 +8,14 @@ function FlyToMarker({ position }) {
   useEffect(() => { if (position) map.flyTo(position, 13); }, [position]);
   return null;
 }
+const searchIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 function MapSearchSection() {
   const [alumni, setAlumni] = useState([]);
@@ -97,6 +105,11 @@ function MapClickHandler({ isPicking, onPick }) {
     setIsPicking(false);
   }} />
           {/* Markers */}
+          {searchPos && (
+  <Marker position={searchPos} icon={searchIcon}>
+    <Popup>Search Location</Popup>
+  </Marker>
+)}
           {alumni.map(user => (
             <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
               <Popup><strong>{user.name}</strong><br/>{user.company}</Popup>
@@ -115,11 +128,19 @@ function MapClickHandler({ isPicking, onPick }) {
 
   {/* 2. City Search + Suggestions */}
   <div className="location-search-wrapper" style={{ position: 'relative' }}>
-    <input 
-      value={cityQuery} 
-      placeholder="Type City Name..." 
-      onChange={e => fetchSuggestions(e.target.value)} 
-    />
+   <input 
+  value={cityQuery} 
+  placeholder="Type City Name..." 
+  onChange={(e) => {
+    const val = e.target.value;
+    setCityQuery(val);
+    if (val.length < 3) {
+      setSuggestions([]); // Closes dropdown if user clears/types < 3 chars
+    } else {
+      fetchSuggestions(val);
+    }
+  }} 
+/>
     {suggestions.length > 0 && (
       <ul className="suggestions-list">
         {suggestions.map(s => (
@@ -139,7 +160,19 @@ function MapClickHandler({ isPicking, onPick }) {
   {/* 3. Location Buttons */}
   <div className="input-group">
     <button onClick={useCurrentLocation}>📍 My Location</button>
-    <button onClick={() => setIsPicking(true)}>📍 Pick on Map</button>
+    <button 
+  onClick={() => setIsPicking(true)} 
+  style={{ 
+    backgroundColor: isPicking ? '#e67e22' : '#2ecc71',
+    color: 'white',
+    border: 'none',
+    padding: '10px 15px',
+    borderRadius: '5px',
+    cursor: 'pointer'
+  }}
+>
+  {isPicking ? 'Click map to place...' : '📍 Pick on Map'}
+</button>
   </div>
 
   {/* 4. Nearby Alumni List */}
