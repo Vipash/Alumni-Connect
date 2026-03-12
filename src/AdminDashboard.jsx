@@ -6,37 +6,50 @@ function AdminDashboard({ setView }) {
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const getApiUrl = () => {
+ const getApiUrl = () => {
     if (activeTab === 'logs') return '/api/admin/logs';
+    if (activeTab === 'announcements') return '/api/announcements'; // This is the fix
+
     const role = activeTab === 'alumni' ? 'alumni' : 'student';
-    if (statusFilter === 'pending') return `/api/admin/pending/${role}`;
-    return activeTab === 'alumni' ? '/api/get-alumni' : '/api/admin/approved/student';
+    // Only return 'pending' or 'verified' for users, otherwise default to pending
+    const filter = ['pending', 'verified'].includes(statusFilter) ? statusFilter : 'pending';
+    return `/api/admin/${filter}/${role}`;
   };
 
   const fetchCurrentList = async () => {
-    // We don't need to fetch user lists if we are on the announcements tab
-    if (activeTab === 'announcements') return;
-    
-    setLoading(true);
-    try {
-      const res = await fetch(getApiUrl());
-      const data = await res.json();
-      setListData(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setListData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const res = await fetch(getApiUrl());
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    setListData(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setListData([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchCurrentList();
   }, [activeTab, statusFilter]);
 
   const handleAction = async (id, action) => {
+    // 1. Handle Announcement Deletion
+    if (action === 'delete-announcement') {
+      if (!window.confirm("Delete this announcement?")) return;
+      const res = await fetch(`/api/admin/announcement/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        alert("Announcement deleted!");
+        fetchCurrentList(); // Refresh the list
+      }
+      return; // Exit early
+    }
+
+    // 2. Existing User Approval/Deletion logic
     const confirmMsg = action === 'approve' ? "Approve this user?" : "Permanently delete this user?";
-    if(!window.confirm(confirmMsg)) return;
+    if (!window.confirm(confirmMsg)) return;
 
     const url = action === 'approve' ? `/api/verify-user/${id}` : `/api/delete-user/${id}`;
     const method = action === 'approve' ? 'PATCH' : 'DELETE';
@@ -108,11 +121,14 @@ function AdminDashboard({ setView }) {
         Post New
       </button>
       <button 
-        className={statusFilter === 'history' ? 'active-sub-tab' : ''} 
-        onClick={() => { setStatusFilter('history'); fetchCurrentList(); }}
-      >
-        Announcement History
-      </button>
+  className={statusFilter === 'history' ? 'active-sub-tab' : ''} 
+  onClick={() => { 
+    setStatusFilter('history'); 
+    fetchCurrentList(); // Force a refresh when clicking this tab
+  }}
+>
+  Announcement History
+</button>
     </div>
 
     {/* 2. Tab Content */}
