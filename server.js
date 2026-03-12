@@ -20,9 +20,6 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected Successfully!'))
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-// --- API ROUTES ---
-const Announcement = require('./Announcement');
-
 // Get all announcements
 app.get('/api/announcements', async (req, res) => {
   const { role } = req.query; // e.g., /api/announcements?role=alumni
