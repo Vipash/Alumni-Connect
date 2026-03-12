@@ -97,6 +97,36 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+app.patch('/api/profile/update', async (req, res) => {
+  try {
+    const { userId, bio, linkedin, resumeUrl, profilePhoto } = req.body;
+    
+    // Find the user by ID and update only the fields provided
+    const updatedUser = await User.findByIdAndUpdate(
+      userId, 
+      { 
+        $set: { 
+          bio, 
+          linkedin, 
+          resumeUrl, 
+          profilePhoto 
+        } 
+      },
+      { new: true } // This ensures you get the updated document back
+    );
+    
+    if (!updatedUser) return res.status(404).send("User not found");
+
+    // Important: Don't send the password back!
+    const { password: _, ...userProfile } = updatedUser._doc;
+    res.json(userProfile);
+    
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).send("Update failed");
+  }
+});
+
 app.post('/api/view-contact', async (req, res) => {
   const { viewerId, alumniId } = req.body;
   try {

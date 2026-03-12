@@ -2,11 +2,11 @@ import { useState } from 'react';
 
 function EditProfile({ user, onCancel, onUpdate }) {
   const [formData, setFormData] = useState({
+    displayName: user.displayName || user.name || '',
     bio: user.bio || '',
     linkedin: user.linkedin || '',
     resumeUrl: user.resumeUrl || '',
-    profilePhoto: user.profilePhoto || '',
-    displayName: user.displayName || user.name
+    profilePhoto: user.profilePhoto || ''
   });
 
   const handleChange = (e) => {
@@ -22,26 +22,35 @@ function EditProfile({ user, onCancel, onUpdate }) {
         body: JSON.stringify({ userId: user._id, ...formData })
       });
 
+      const data = await response.json(); // Get server response
+
       if (response.ok) {
-        const updatedUser = await response.json();
-        onUpdate(updatedUser); // This updates the state in the parent
+        onUpdate(data); 
       } else {
-        alert("Failed to update profile.");
+        alert("Failed to save: " + (data.message || "Unknown error"));
       }
     } catch (err) {
       console.error("Update error:", err);
+      alert("Network error. Check console.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="profile-container edit-profile-form">
+    <form onSubmit={handleSubmit} className="profile-container">
       <h3>Edit Profile</h3>
       
       <label>Display Name</label>
       <input name="displayName" value={formData.displayName} onChange={handleChange} />
 
       <label>Bio</label>
-      <textarea name="bio" value={formData.bio} onChange={handleChange} rows="3" />
+      {/* Changed to textarea for a larger box */}
+      <textarea 
+        name="bio" 
+        value={formData.bio} 
+        onChange={handleChange} 
+        rows="5" 
+        style={{ width: '100%', display: 'block', marginBottom: '10px' }}
+      />
 
       <label>LinkedIn URL</label>
       <input name="linkedin" value={formData.linkedin} onChange={handleChange} />
@@ -53,8 +62,8 @@ function EditProfile({ user, onCancel, onUpdate }) {
       <input name="profilePhoto" value={formData.profilePhoto} onChange={handleChange} />
 
       <div className="form-actions">
-        <button type="submit" className="save-btn">Save Changes</button>
-        <button type="button" className="cancel-btn" onClick={onCancel}>Cancel</button>
+        <button type="submit">Save Changes</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   );
