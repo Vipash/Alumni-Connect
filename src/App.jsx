@@ -74,8 +74,8 @@ const renderTabContent = () => {
   let content; 
   switch (activeTab) {
     case 'profile':
-      content = <Profile user={loggedInUser} />;
-      break;
+  content = <Profile user={loggedInUser} setUser={setLoggedInUser} />;
+  break;
     case 'map':
       content = <MapSearchSection />;
       break;

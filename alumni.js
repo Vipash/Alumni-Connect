@@ -11,9 +11,14 @@ const userSchema = new mongoose.Schema({
   // Fields for Students/Alumni
   rollNumber: { type: String }, 
   company: { type: String },    
-  bio: { type: String, default: "" },
   mobile: { type: String, default: "" },
-  displayName: { type: String, default: "" }, // Added this because we added it to your form!
+  displayName: { type: String, default: "" },
+  
+  // Profile Additions
+  bio: { type: String, default: "" },
+  linkedin: { type: String, default: "" },
+  resumeUrl: { type: String, default: "" },
+  profilePhoto: { type: String, default: "" },
   
   // Location for Alumni map
   location: {
@@ -26,5 +31,4 @@ const userSchema = new mongoose.Schema({
 
 userSchema.index({ location: '2dsphere' });
 
-// Use module.exports for compatibility with require()
 module.exports = mongoose.model('User', userSchema);
