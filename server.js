@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const path = require('path');
+const Announcement = require('./Announcement');
 
 // Models
 const User = require('./alumni'); 
@@ -28,8 +29,14 @@ app.get('/api/announcements', async (req, res) => {
   
   let query = {};
   if (role) {
-    // Finds announcements meant for 'all' OR for the specific role
-    query = { targetAudience: { $in: ['all', role] } };
+    // If targetAudience is missing, treat as 'all' OR filter by role
+    query = { 
+      $or: [
+        { targetAudience: 'all' },
+        { targetAudience: role },
+        { targetAudience: { $exists: false } } // Include old posts
+      ] 
+    };
   }
   
   const announcements = await Announcement.find(query).sort({ date: -1 });

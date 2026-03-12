@@ -61,13 +61,15 @@ function AdminDashboard({ setView }) {
     }
   };
 
+const [audience, setAudience] = useState('all');
   const handlePostAnnouncement = async (e) => {
-    e.preventDefault();
-    const formData = { 
-      title: e.target.title.value, 
-      subject: e.target.subject.value, 
-      content: e.target.content.value 
-    };
+  e.preventDefault();
+  const formData = { 
+    title: e.target.title.value, 
+    subject: e.target.subject.value, 
+    content: e.target.content.value,
+    targetAudience: audience // Add this field
+  };
 
     try {
       const response = await fetch('/api/admin/announcement', {
@@ -77,15 +79,16 @@ function AdminDashboard({ setView }) {
       });
 
       if (response.ok) {
-        alert("Announcement posted successfully!");
-        e.target.reset();
-      } else {
-        alert("Failed to post.");
-      }
-    } catch (err) {
-      console.error("Post error:", err);
+      alert("Announcement posted successfully!");
+      e.target.reset();
+      setAudience('all'); // Reset audience to default
+    } else {
+      alert("Failed to post.");
     }
-  };
+  } catch (err) {
+    console.error("Post error:", err);
+  }
+};
 
   return (
     <div className="admin-modal-content">
@@ -134,12 +137,20 @@ function AdminDashboard({ setView }) {
     {/* 2. Tab Content */}
     {statusFilter === 'post' ? (
       <form onSubmit={handlePostAnnouncement} className="admin-announcement-form">
-        <h3>Create New Announcement</h3>
-        <input name="title" placeholder="Announcement Title" required />
-        <input name="subject" placeholder="Subject" required />
-        <textarea name="content" placeholder="Write full content here..." rows="5" required />
-        <button type="submit" className="approve-btn">Publish to All Users</button>
-      </form>
+    <h3>Create New Announcement</h3>
+    <input name="title" placeholder="Announcement Title" required />
+    <input name="subject" placeholder="Subject" required />
+    <textarea name="content" placeholder="Write full content here..." rows="5" required />
+    
+    <label>Target Audience:</label>
+    <select value={audience} onChange={(e) => setAudience(e.target.value)}>
+      <option value="all">Everyone</option>
+      <option value="students">Students Only</option>
+      <option value="alumni">Alumni Only</option>
+    </select>
+    
+    <button type="submit" className="approve-btn">Publish to All Users</button>
+  </form>
     ) : (
       <div className="announcement-history-table">
         <h3>Previous Announcements</h3>
