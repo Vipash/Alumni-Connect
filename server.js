@@ -24,14 +24,26 @@ const Announcement = require('./Announcement');
 
 // Get all announcements
 app.get('/api/announcements', async (req, res) => {
-  const announcements = await Announcement.find().sort({ date: -1 });
+  const { role } = req.query; // e.g., /api/announcements?role=alumni
+  
+  let query = {};
+  if (role) {
+    // Finds announcements meant for 'all' OR for the specific role
+    query = { targetAudience: { $in: ['all', role] } };
+  }
+  
+  const announcements = await Announcement.find(query).sort({ date: -1 });
   res.json(announcements);
 });
 
 // Post new announcement (Admin only)
 app.post('/api/admin/announcement', async (req, res) => {
   try {
-    const newAnn = new Announcement(req.body);
+    const { title, subject, content, targetAudience } = req.body;
+    const newAnn = new Announcement({ 
+      title, subject, content, 
+      targetAudience: targetAudience || 'all' 
+    });
     await newAnn.save();
     res.status(201).send("Posted!");
   } catch (err) { res.status(500).send(err.message); }

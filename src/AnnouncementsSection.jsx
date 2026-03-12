@@ -4,24 +4,26 @@ function AnnouncementsSection() {
   const [list, setList] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const user = JSON.parse(localStorage.getItem('user')); 
+const userRole = user ? user.role : 'all';
 
   useEffect(() => {
-    fetch('/api/announcements')
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch");
-        return res.json();
-      })
-      .then(data => {
-        setList(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Announcements error:", err);
-        setList([]);
-        setLoading(false);
-      });
-  }, []);
+  // Pass the role as a query parameter
+  fetch(`/api/announcements?role=${userRole}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    })
+    .then(data => {
+      setList(Array.isArray(data) ? data : []);
+      setLoading(false);
+    })
+    .catch(err => {
+      console.error("Announcements error:", err);
+      setList([]);
+      setLoading(false);
+    });
+}, [userRole]);
 
   if (loading) return <div className="tab-pane"><p>Loading announcements...</p></div>;
 
