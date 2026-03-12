@@ -554,6 +554,40 @@ button:hover {
 
 .suggestions-list li:hover { background: #e9ecef; }
 
+.sub-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.sub-tabs button {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666;
+  border-bottom: 2px solid transparent;
+}
+
+.sub-tabs button.active-sub-tab {
+  color: #3498db;
+  border-bottom: 2px solid #3498db;
+}
+
+.post-announcement-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 600px;
+}
+
+.post-announcement-form input, .post-announcement-form textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .announcement-item { border-bottom: 1px solid #ddd; padding: 15px; cursor: pointer; }
 .announcement-header { display: flex; justify-content: space-between; align-items: center; }
 .announcement-body { padding: 15px; background: #f4f4f4; margin-top: 10px; border-radius: 5px; }
