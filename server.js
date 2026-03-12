@@ -108,19 +108,18 @@ app.post('/api/view-contact', async (req, res) => {
   }
 });
 
-// Admin Routes
-app.get('/api/admin/pending/:role', async (req, res) => {
+app.get('/api/admin/:filter/:role', async (req, res) => {
   try {
-    const pending = await User.find({ role: req.params.role, isVerified: false });
-    res.json(pending);
-  } catch (error) { res.status(500).send(error.message); }
-});
-
-app.get('/api/admin/approved/student', async (req, res) => {
-  try {
-    const students = await User.find({ role: 'student', isVerified: true });
-    res.json(students);
-  } catch (err) { res.status(500).send(err.message); }
+    const { filter, role } = req.params;
+    
+    // Convert 'verified' to true, 'pending' to false
+    const isVerified = filter === 'verified';
+    
+    const users = await User.find({ role: role, isVerified: isVerified });
+    res.json(users);
+  } catch (err) { 
+    res.status(500).send(err.message); 
+  }
 });
 
 // Alumni Fetch - OPENED FOR ADMIN/MAP
