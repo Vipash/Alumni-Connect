@@ -98,18 +98,65 @@ function AdminDashboard({ setView }) {
 
       <div className="tab-content">
         {activeTab === 'announcements' ? (
-          <div className="admin-announcement-form">
-            <h3>Post New Announcement</h3>
-            <form onSubmit={handlePostAnnouncement}>
-              <input name="title" placeholder="Announcement Title" required />
-              <input name="subject" placeholder="Subject" required />
-              <textarea name="content" placeholder="Write full content here..." required />
-              <button type="submit" className="approve-btn">Publish Announcement</button>
-            </form>
-          </div>
-        ) : loading ? (
-          <p className="loading-text">Fetching latest records...</p>
-        ) : (
+  <div className="admin-announcement-container">
+    {/* 1. Sub-Tabs Navigation */}
+    <div className="sub-tabs">
+      <button 
+        className={['post', ''].includes(statusFilter) ? 'active-sub-tab' : ''} 
+        onClick={() => setStatusFilter('post')}
+      >
+        Post New
+      </button>
+      <button 
+        className={statusFilter === 'history' ? 'active-sub-tab' : ''} 
+        onClick={() => { setStatusFilter('history'); fetchCurrentList(); }}
+      >
+        Announcement History
+      </button>
+    </div>
+
+    {/* 2. Tab Content */}
+    {statusFilter === 'post' ? (
+      <form onSubmit={handlePostAnnouncement} className="admin-announcement-form">
+        <h3>Create New Announcement</h3>
+        <input name="title" placeholder="Announcement Title" required />
+        <input name="subject" placeholder="Subject" required />
+        <textarea name="content" placeholder="Write full content here..." rows="5" required />
+        <button type="submit" className="approve-btn">Publish to All Users</button>
+      </form>
+    ) : (
+      <div className="announcement-history-table">
+        <h3>Previous Announcements</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Title</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {listData.length > 0 ? (
+              listData.map((item) => (
+                <tr key={item._id}>
+                  <td>{new Date(item.date).toLocaleDateString()}</td>
+                  <td>{item.title}</td>
+                  <td>
+                    <button className="delete-btn" onClick={() => handleAction(item._id, 'delete-announcement')}>Delete</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr><td colSpan="3">No history found.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+) : loading ? (
+  <p className="loading-text">Fetching latest records...</p>
+) : (
           <div className="table-wrapper">
             <table>
               <thead>
