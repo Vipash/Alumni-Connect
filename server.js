@@ -99,7 +99,7 @@ app.post('/api/login', async (req, res) => {
 
 app.patch('/api/profile/update', async (req, res) => {
   try {
-    const { userId, bio, linkedin, resumeUrl, profilePhoto } = req.body;
+    const { userId, bio, linkedin, resumeUrl, profilePhoto, displayName } = req.body;
     
     // Find the user by ID and update only the fields provided
     const updatedUser = await User.findByIdAndUpdate(
@@ -109,7 +109,8 @@ app.patch('/api/profile/update', async (req, res) => {
           bio, 
           linkedin, 
           resumeUrl, 
-          profilePhoto 
+          profilePhoto,
+          displayName 
         } 
       },
       { new: true } // This ensures you get the updated document back
