@@ -34,24 +34,29 @@ function Profile({ user, setUser }) {
                 LinkedIn 🔗
               </a>
             )}
-            {user.resumeUrl && (
+           {user.resumeUrl && (
   <div className="info-item">
     <label>Resume</label>
     <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+      {/* VIEW BUTTON: Direct link, no transformation */}
       <a 
-        href={user.resumeUrl.startsWith('http') ? user.resumeUrl : `https://${user.resumeUrl}`} 
+        href={user.resumeUrl} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="social-icon"
-        style={{ background: '#68c6f9' }}
+        style={{ background: '#0077b5', color: 'white', padding: '5px 10px', borderRadius: '4px', textDecoration: 'none' }}
       >
         View PDF 👁️
       </a>
+      
+      {/* DOWNLOAD BUTTON: Using a more robust replace logic */}
       <a 
-        href={user.resumeUrl.replace('upload/', 'upload/fl_attachment/')} 
-        download
+        href={user.resumeUrl.includes('/upload/') 
+          ? user.resumeUrl.replace('/upload/', '/upload/fl_attachment/') 
+          : user.resumeUrl} 
+        download="Resume.pdf"
         className="social-icon"
-        style={{ background: '#67f19c' }}
+        style={{ background: '#28a745', color: 'white', padding: '5px 10px', borderRadius: '4px', textDecoration: 'none' }}
       >
         Download ⬇️
       </a>
