@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import EditProfile from './EditProfile';
-import './Profile.css'; // We'll add some styles below
 
 function Profile({ user, setUser }) {
   const [isEditing, setIsEditing] = useState(false);
