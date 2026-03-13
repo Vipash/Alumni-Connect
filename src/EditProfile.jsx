@@ -105,10 +105,24 @@ function EditProfile({ user, onCancel, onUpdate }) {
 {formData.resumeUrl && <span style={{color: 'green', fontSize: '12px'}}>✅ File uploaded</span>}
 
 <label>Profile Photo</label>
-<input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'profilePhoto')} />
-{formData.profilePhoto && <span style={{color: 'green', fontSize: '12px'}}>✅ Photo uploaded</span>}
-
-      <div className="form-actions">
+<div className="upload-preview-container">
+  {formData.profilePhoto && (
+    <img 
+      src={formData.profilePhoto} 
+      alt="Preview" 
+      style={{ width: '60px', height: '60px', borderRadius: '50%', marginBottom: '10px', objectFit: 'cover' }} 
+    />
+  )}
+  <input 
+    type="file" 
+    accept="image/*" 
+    onChange={(e) => handleFileUpload(e, 'profilePhoto')} 
+  />
+  <p style={{ fontSize: '12px', color: '#666' }}>
+    {formData.profilePhoto ? "Click above to change current photo" : "No photo uploaded yet"}
+  </p>
+</div>
+<div className="form-actions" style={{ marginTop: '20px' }}>
         <button type="submit">Save Changes</button>
         <button type="button" onClick={onCancel}>Cancel</button>
       </div>

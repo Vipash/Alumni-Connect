@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import EditProfile from './EditProfile';
 
+
 function Profile({ user, setUser }) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -33,24 +34,23 @@ function Profile({ user, setUser }) {
               </a>
             )}
             {user.resumeUrl && (
-  <div className="info-group">
+  <div className="info-item">
     <label>Resume</label>
-    <div style={{ display: 'flex', gap: '10px' }}>
-      {/* View Button */}
+    <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
       <a 
         href={user.resumeUrl} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="btn-view"
+        className="social-icon"
+        style={{ background: '#0077b5' }}
       >
         View PDF 👁️
       </a>
-      
-      {/* Download Button - Forced via Cloudinary flag */}
       <a 
-        href={user.resumeUrl.replace('/upload/', '/upload/fl_attachment/')} 
-        download="Resume.pdf"
-        className="btn-download"
+        href={user.resumeUrl.replace('upload/', 'upload/fl_attachment/')} 
+        download
+        className="social-icon"
+        style={{ background: '#28a745' }}
       >
         Download ⬇️
       </a>
