@@ -10,6 +10,7 @@ function Profile({ user, setUser }) {
   if (isEditing) {
     return <EditProfile user={user} onCancel={() => setIsEditing(false)} onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} />;
   }
+  console.log("DEBUG: Current User Photo URL:", user.profilePhoto);
 
   return (
     <div className="profile-card">
@@ -38,11 +39,11 @@ function Profile({ user, setUser }) {
     <label>Resume</label>
     <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
       <a 
-        href={user.resumeUrl} 
+        href={user.resumeUrl.startsWith('http') ? user.resumeUrl : `https://${user.resumeUrl}`} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="social-icon"
-        style={{ background: '#0077b5' }}
+        style={{ background: '#68c6f9' }}
       >
         View PDF 👁️
       </a>
@@ -50,7 +51,7 @@ function Profile({ user, setUser }) {
         href={user.resumeUrl.replace('upload/', 'upload/fl_attachment/')} 
         download
         className="social-icon"
-        style={{ background: '#28a745' }}
+        style={{ background: '#67f19c' }}
       >
         Download ⬇️
       </a>

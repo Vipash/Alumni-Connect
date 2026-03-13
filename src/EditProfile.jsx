@@ -44,6 +44,11 @@ function EditProfile({ user, onCancel, onUpdate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const finalData = { 
+    ...formData, 
+    userId: user._id 
+  };
+  console.log("SUBMITTING THIS TO SERVER:", finalData);
     try {
       const response = await fetch(`/api/profile/update`, {
         method: 'PATCH',
