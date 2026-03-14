@@ -120,14 +120,14 @@ const renderTabContent = () => {
         </div>
       ) : view === 'admin-dash' ? (
         <div className="modal-overlay">
-          <div className="modal-box admin-modal">
-            <AdminDashboard setView={setView} />
+          <div className="admin-fullscreen-wrapper">
+          <AdminDashboard setView={setView} />
           </div>
         </div>
       ) : (
         /* 3. VISITOR VIEW */
         <>
-          {view === 'home' && <div className="landing-bg"></div>}
+          {view === 'home' && <div className="auth-page-wrapper"></div>}
           
           <div className={`map-layer ${view === 'picker' ? 'active' : ''}`}>
             <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
@@ -141,6 +141,12 @@ const renderTabContent = () => {
               <div className="modal-box">
                 {view === 'home' && (
                   <>
+                  <div className="logo-section" style={{ textAlign: 'center', marginBottom: '20px' }}>
+                  <img 
+                  src="/MBM_Logo.png"
+                  alt="MBM Logo" 
+                  style={{ width: '100px', height: 'auto', marginBottom: '10px' }} />
+                  </div>
                     <h1>MBM Alumni Connect</h1>
                     <h3>Student</h3>
                     <button onClick={() => setView('login-student')}>Sign In</button>
