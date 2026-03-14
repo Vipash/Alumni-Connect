@@ -139,14 +139,14 @@ const renderTabContent = () => {
           {view !== 'picker' && (
             <div className="modal-overlay">
               <div className="modal-box">
-                {view === 'home' && (
-                  <>
-                  <div className="logo-section" style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <div className="logo-section" style={{ textAlign: 'center', marginBottom: '20px' }}>
                   <img 
                   src="/MBM_Logo.png"
                   alt="MBM Logo" 
-                  style={{ width: '100px', height: 'auto', marginBottom: '10px' }} />
+                  style={{ width: '200px', height: 'auto', marginBottom: '5px' }} />
                   </div>
+                  {view === 'home' && (
+                  <>
                     <h1>MBM Alumni Connect</h1>
                     <h3>Student</h3>
                     <button onClick={() => setView('login-student')}>Sign In</button>
