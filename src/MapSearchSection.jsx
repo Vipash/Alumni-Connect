@@ -96,100 +96,92 @@ function MapClickHandler({ isPicking, onPick }) {
   return (
     <div className="map-page-wrapper">
       <div className="map-fancy-container">
+        {/* ... MapContainer remains exactly the same ... */}
         <MapContainer center={[26.2389, 73.0243]} zoom={5} style={{ height: '400px', width: '100%' }}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {searchPos && <FlyToMarker position={searchPos} />}
-          <MapClickHandler isPicking={isPicking} onPick={(ll) => {
-    setSearchPos([ll.lat, ll.lng]);
-    findClosest(ll.lat, ll.lng);
-    setIsPicking(false);
-  }} />
-          {/* Markers */}
-          {searchPos && (
-  <Marker position={searchPos} icon={searchIcon}>
-    <Popup>Search Location</Popup>
-  </Marker>
-)}
-          {alumni.map(user => (
-            <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
-              <Popup><strong>{user.name}</strong><br/>{user.company}</Popup>
-            </Marker>
-          ))}
+           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+           {searchPos && <FlyToMarker position={searchPos} />}
+           <MapClickHandler isPicking={isPicking} onPick={(ll) => {
+             setSearchPos([ll.lat, ll.lng]);
+             findClosest(ll.lat, ll.lng);
+             setIsPicking(false);
+           }} />
+           {searchPos && <Marker position={searchPos} icon={searchIcon}><Popup>Search Location</Popup></Marker>}
+           {alumni.map(user => (
+             <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
+               <Popup><strong>{user.name}</strong><br/>{user.company}</Popup>
+             </Marker>
+           ))}
         </MapContainer>
       </div>
 
       {/* SEARCH PANEL */}
       <div className="search-panel">
-  {/* 1. Company Search */}
-  <div className="input-group">
-    <label>Company Search</label>
-    <input placeholder="Input Company Name... eg. GulGul" onChange={e => setCompanySearch(e.target.value)} />
-    <button onClick={handleCompanySearch}>Search</button>
-  </div>
-
-  {/* 2. City Search + Suggestions */}
-  <div className="location-search-wrapper" style={{ position: 'relative' }}>
-    <label>Location Search</label>
-   <input 
-  value={cityQuery} 
-  placeholder="Type City Name... eg. Narayanpur Tatwara" 
-  onChange={(e) => {
-    const val = e.target.value;
-    setCityQuery(val);
-    if (val.length < 3) {
-      setSuggestions([]);
-    } else {
-      fetchSuggestions(val);
-    }
-  }} 
-/>
-    {suggestions.length > 0 && (
-      <ul className="suggestions-list">
-        {suggestions.map(s => (
-          <li key={s.place_id} onClick={() => { 
-            const lat = parseFloat(s.lat);
-            const lon = parseFloat(s.lon);
-            setSearchPos([lat, lon]); 
-            findClosest(lat, lon); 
-            setSuggestions([]); 
-            setCityQuery(s.display_name);
-          }}>{s.display_name}</li>
-        ))}
-      </ul>
-    )}
-  </div>
-
-  {/* 3. Location Buttons */}
-  <div className="input-group">
-    <button onClick={useCurrentLocation}>📍 Use My Current Location</button>
-    <button 
-  onClick={() => setIsPicking(true)} 
-  style={{ 
-    backgroundColor: isPicking ? '#e67e22' : '#2ecc71',
-    color: 'white',
-    border: 'none',
-    padding: '10px 15px',
-    borderRadius: '5px',
-    cursor: 'pointer'
-  }}
->
-  {isPicking ? 'Click map to place...' : '📍 Pick on Map'}
-</button>
-  </div>
-
-  {/* 4. Nearby Alumni List */}
-  {closest && closest.length > 0 && (
-    <div className="nearby-list">
-      <h4>Nearby Alumni List (Top 3)</h4>
-      {closest.map((item, index) => (
-        <div key={index} className="nearby-item">
-          <strong>{item.name}</strong> - {item.company} 
-          <span style={{float: 'right'}}>{item.dist.toFixed(1)} km</span>
+        
+        {/* 1. Company Search: Label ON TOP */}
+        <div className="company-search-container">
+          <label>Company Search</label>
+          <input 
+            placeholder="Input Company Name... eg. GulGul" 
+            onChange={e => setCompanySearch(e.target.value)} 
+          />
+          <button className="nav-btn" onClick={handleCompanySearch}>Search Company</button>
         </div>
-      ))}
-    </div>
-  )}
-</div>
+
+        {/* 2. City Search */}
+        <div className="location-search-container">
+          <label>Location Search</label>
+          <div className="location-search-wrapper">
+            <input 
+              value={cityQuery} 
+              placeholder="Type City Name... eg. Narayanpur Tatwara" 
+              onChange={(e) => {
+                const val = e.target.value;
+                setCityQuery(val);
+                if (val.length >= 3) fetchSuggestions(val);
+                else setSuggestions([]);
+              }} 
+            />
+            {suggestions.length > 0 && (
+              <ul className="suggestions-list">
+                {suggestions.map(s => (
+                  <li key={s.place_id} onClick={() => { 
+                    const lat = parseFloat(s.lat);
+                    const lon = parseFloat(s.lon);
+                    setSearchPos([lat, lon]); 
+                    findClosest(lat, lon); 
+                    setSuggestions([]); 
+                    setCityQuery(s.display_name);
+                  }}>{s.display_name}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* 3. Location Buttons: 50/50 Split */}
+          <div className="button-row">
+            <button className="nav-btn" onClick={useCurrentLocation}>📍 Current Location</button>
+            <button 
+              className={isPicking ? 'admin-btn' : 'nav-btn'}
+              onClick={() => setIsPicking(!isPicking)} 
+            >
+              {isPicking ? 'Click map to place...' : '📍 Pick on Map'}
+            </button>
+          </div>
+        </div>
+
+        {/* 4. Nearby Alumni List */}
+        {closest && closest.length > 0 && (
+          <div className="nearby-list">
+            <h4>Nearby Alumni List (Top 3)</h4>
+            {closest.map((item, index) => (
+              <div key={index} className="nearby-item">
+                <strong>{item.name}</strong> - {item.company} 
+                <span style={{float: 'right'}}>{item.dist.toFixed(1)} km</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

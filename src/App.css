@@ -19,7 +19,7 @@ body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
 }
 .workspace-layout { display: flex; width: 100vw; height: 100vh; overflow: hidden; }
 .sidebar { width: 280px; background-color: #262a6b; color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
-.dashboard-content { flex: 1; background-color: #7fbdff; padding: 40px; overflow-y: auto; }
+.dashboard-content { flex: 1; background-color: #a5d1ff; padding: 40px; overflow-y: auto; }
 
 /* --- 3. MODALS & OVERLAYS --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; z-index: 100; background: rgba(38, 42, 107, 0.2); }
@@ -35,7 +35,7 @@ table { width: 100%; border-collapse: collapse; min-width: 600px; }
 th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f0f0f0; }
 tr:hover { background-color: #f9f9f9; }
 
-.profile-card { background: rgb(252, 161, 231); border-radius: 12px; box-shadow: 0 8px 30px rgba(38,42,107,0.15); max-width: 800px; margin: 20px auto; overflow: hidden; padding: 20px; }
+.profile-card { background: rgb(135, 215, 255); border-radius: 12px; box-shadow: 0 8px 30px rgba(38,42,107,0.15); max-width: 800px; margin: 20px auto; overflow: hidden; padding: 20px; }
 .admin-announcement-form { margin-top: 30px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
 /* --- 5. UI ELEMENTS --- */
@@ -64,15 +64,20 @@ input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; borde
 .info-item span { font-weight: 600; color: #333; }
 
 /* --- 8. MAP & SEARCH LAYOUT --- */
-.search-panel { display: flex; flex-direction: column; gap: 15px; padding: 20px; background: white; border-radius: 12px; border: 2px solid #e1e1e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.search-panel { display: flex; flex-direction: column; gap: 20px; padding: 20px; background: white; border-radius: 12px; border: 2px solid #e1e1e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
+.company-search-container { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.location-search-container { display: flex; flex-direction: column; gap: 10px; }
 .input-group { display: flex; gap: 10px; align-items: center; width: 100%; }
 .input-group button { margin: 0; width: auto; flex-shrink: 0; }
+.button-row { display: flex; gap: 10px; width: 100%; }
+.button-row button { flex: 1; margin: 0; }
 
 /* Announcements */
-.announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #3180ff; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
+.announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
 .announcement-item:hover { background: #f9f9f9; border-left: 4px solid var(--mbm-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 .announcement-body { padding: 15px; background: #91aeff; margin-top: 10px; border-radius: 5px; }
 .announcement-item.active { transform: scale(1.02); border: 1px solid var(--mbm-blue); border-radius: 8px;background: white;}
+
 /* Status Filters (The little pills) */
 .status-filters { display: flex; gap: 10px; margin: 10px 0 20px 0; }
 .status-filters button { padding: 8px 16px; border-radius: 20px; border: 1px solid #004a99; background: #fff; color: #004a99; width: auto; font-size: 0.85rem; }
