@@ -156,7 +156,7 @@ body {
 .auth-page-wrapper {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/university-bg.jpg');
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/university-background.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
