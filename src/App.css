@@ -13,23 +13,26 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg-light);
   color: var(--text-dark);
-  overflow: hidden; /* Prevents scrollbar on full-screen map */
 }
 
-/* 1. App Root: Holds everything */
 .app-root {
   position: relative;
   width: 100vw;
   height: 100vh;
 }
-.landing-bg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: url('/university-background.jpg') center/cover;
-  z-index: 0;
+
+.auth-page-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/university-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-/* 2. Map Layer: Background, full screen */
+
 .map-layer {
   position: absolute;
   top: 0; left: 0;
@@ -51,8 +54,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100; /* Floats above map */
-  background: rgba(38, 42, 107, 0.3); /* MBM Blue with transparency */
+  z-index: 100;
+  background: rgba(38, 42, 107, 0.3);
 }
 
 .picker-info-box {
@@ -150,19 +153,6 @@ body {
   padding: 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
-}
-
-/* Keep the background image here so it never "shifts" to white */
-.auth-page-wrapper {
-  min-height: 100vh;
-  width: 100%;
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/university-background.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Admin Dashboard Expansion */
