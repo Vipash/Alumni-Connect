@@ -2,7 +2,7 @@
 :root {
   --mbm-blue: #262a6b;
   --mbm-gold: #d4af37;
-  --bg-light: #f4f4f9;
+  --bg-light: #bccaff;
   --white: #ffffff;
   --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
@@ -18,12 +18,12 @@ body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
   display: flex; justify-content: center; align-items: center;
 }
 .workspace-layout { display: flex; width: 100vw; height: 100vh; overflow: hidden; }
-.sidebar { width: 280px; background-color: #001f3f; color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
-.dashboard-content { flex: 1; background-color: #f8f9fa; padding: 40px; overflow-y: auto; }
+.sidebar { width: 280px; background-color: #262a6b; color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+.dashboard-content { flex: 1; background-color: #7fbdff; padding: 40px; overflow-y: auto; }
 
 /* --- 3. MODALS & OVERLAYS --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; z-index: 100; background: rgba(38, 42, 107, 0.2); }
-.modal-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; }
+.modal-box { background: rgba(255, 255, 255, 0.80); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; border: 1px solid rgba(87, 15, 255, 0.3); }
 .modal-box:has(.admin-modal-content) { max-width: 1000px; }
 
 /* --- 4. COMPONENTS --- */
@@ -35,7 +35,7 @@ table { width: 100%; border-collapse: collapse; min-width: 600px; }
 th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f0f0f0; }
 tr:hover { background-color: #f9f9f9; }
 
-.profile-card { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 800px; margin: 20px auto; overflow: hidden; padding: 20px; }
+.profile-card { background: rgb(252, 161, 231); border-radius: 12px; box-shadow: 0 8px 30px rgba(38,42,107,0.15); max-width: 800px; margin: 20px auto; overflow: hidden; padding: 20px; }
 .admin-announcement-form { margin-top: 30px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
 /* --- 5. UI ELEMENTS --- */
@@ -43,6 +43,7 @@ button { padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; 
 button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1.5px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 .submit-btn { background-color: var(--mbm-gold); color: white; }
+.admin-btn { border: 2px solid var(--mbm-blue); background: transparent; color: var(--mbm-blue); }
 .nav-btn { background-color: var(--mbm-blue); color: white; }
 
 /* Sidebar Navigation */
@@ -52,8 +53,8 @@ input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; borde
 /* Admin Dashboard Tables */
 .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
 .admin-table th, .admin-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-.approve-btn { background-color: #28a745; color: white; padding: 8px 12px; margin-right: 5px; }
-.delete-btn { background-color: #dc3545; color: white; padding: 8px 12px; }
+.approve-btn { background-color: #66cf7f; color: white; padding: 8px 12px; margin-right: 5px; }
+.delete-btn { background-color: #ff3f52; color: white; padding: 8px 12px; }
 
 /* Profile Page */
 .profile-header { display: flex; padding: 30px; background: #f8f9fa; align-items: center; gap: 25px; border-bottom: 1px solid #eee; }
@@ -62,11 +63,16 @@ input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; borde
 .info-item label { display: block; font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
 .info-item span { font-weight: 600; color: #333; }
 
-/* Announcements */
-.announcement-item { border-bottom: 1px solid #ddd; padding: 15px; cursor: pointer; transition: 0.2s; }
-.announcement-item:hover { background: #f9f9f9; }
-.announcement-body { padding: 15px; background: #f4f4f4; margin-top: 10px; border-radius: 5px; }
+/* --- 8. MAP & SEARCH LAYOUT --- */
+.search-panel { display: flex; flex-direction: column; gap: 15px; padding: 20px; background: white; border-radius: 12px; border: 2px solid #e1e1e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.input-group { display: flex; gap: 10px; align-items: center; width: 100%; }
+.input-group button { margin: 0; width: auto; flex-shrink: 0; }
 
+/* Announcements */
+.announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #3180ff; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
+.announcement-item:hover { background: #f9f9f9; border-left: 4px solid var(--mbm-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.announcement-body { padding: 15px; background: #91aeff; margin-top: 10px; border-radius: 5px; }
+.announcement-item.active { transform: scale(1.02); border: 1px solid var(--mbm-blue); border-radius: 8px;background: white;}
 /* Status Filters (The little pills) */
 .status-filters { display: flex; gap: 10px; margin: 10px 0 20px 0; }
 .status-filters button { padding: 8px 16px; border-radius: 20px; border: 1px solid #004a99; background: #fff; color: #004a99; width: auto; font-size: 0.85rem; }

@@ -122,20 +122,22 @@ function MapClickHandler({ isPicking, onPick }) {
       <div className="search-panel">
   {/* 1. Company Search */}
   <div className="input-group">
-    <input placeholder="Search Company..." onChange={e => setCompanySearch(e.target.value)} />
+    <label>Company Search</label>
+    <input placeholder="Input Company Name... eg. GulGul" onChange={e => setCompanySearch(e.target.value)} />
     <button onClick={handleCompanySearch}>Search</button>
   </div>
 
   {/* 2. City Search + Suggestions */}
   <div className="location-search-wrapper" style={{ position: 'relative' }}>
+    <label>Location Search</label>
    <input 
   value={cityQuery} 
-  placeholder="Type City Name..." 
+  placeholder="Type City Name... eg. Narayanpur Tatwara" 
   onChange={(e) => {
     const val = e.target.value;
     setCityQuery(val);
     if (val.length < 3) {
-      setSuggestions([]); // Closes dropdown if user clears/types < 3 chars
+      setSuggestions([]);
     } else {
       fetchSuggestions(val);
     }
@@ -159,7 +161,7 @@ function MapClickHandler({ isPicking, onPick }) {
 
   {/* 3. Location Buttons */}
   <div className="input-group">
-    <button onClick={useCurrentLocation}>📍 My Location</button>
+    <button onClick={useCurrentLocation}>📍 Use My Current Location</button>
     <button 
   onClick={() => setIsPicking(true)} 
   style={{ 
