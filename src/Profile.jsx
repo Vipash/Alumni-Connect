@@ -38,25 +38,23 @@ function Profile({ user, setUser }) {
   <div className="info-item">
     <label>Resume</label>
     <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
-      {/* VIEW BUTTON: Direct link, no transformation */}
+      {/* VIEW BUTTON */}
       <a 
         href={user.resumeUrl} 
         target="_blank" 
         rel="noopener noreferrer" 
+        type="application/pdf"
         className="social-icon"
-        style={{ background: '#0077b5', color: 'white', padding: '5px 10px', borderRadius: '4px', textDecoration: 'none' }}
+        style={{ background: '#0077b5', color: 'white', padding: '8px 15px', borderRadius: '4px', textDecoration: 'none', fontSize: '14px' }}
       >
         View PDF 👁️
       </a>
       
-      {/* DOWNLOAD BUTTON: Using a more robust replace logic */}
+      {/* DOWNLOAD BUTTON */}
       <a 
-        href={user.resumeUrl.includes('/upload/') 
-          ? user.resumeUrl.replace('/upload/', '/upload/fl_attachment/') 
-          : user.resumeUrl} 
-        download="Resume.pdf"
+        href={user.resumeUrl.replace('/upload/', '/upload/fl_attachment/')} 
         className="social-icon"
-        style={{ background: '#28a745', color: 'white', padding: '5px 10px', borderRadius: '4px', textDecoration: 'none' }}
+        style={{ background: '#28a745', color: 'white', padding: '8px 15px', borderRadius: '4px', textDecoration: 'none', fontSize: '14px' }}
       >
         Download ⬇️
       </a>
