@@ -47,15 +47,13 @@ body {
 /* 3. Modal Overlay: The "Centered Box" system */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  background: rgba(38, 42, 107, 0.3);
+  background: rgba(38, 42, 107, 0.2); /* Faint blue tint to let background show */
 }
 
 .picker-info-box {
@@ -70,17 +68,16 @@ body {
 }
 
 .modal-box {
-  background: var(--white);
+  background: rgba(255, 255, 255, 0.95); /* Slight transparency */
+  backdrop-filter: blur(10px);           /* Glass effect */
   padding: 30px;
   border-radius: 20px;
-  width: 400px;
-  max-width: 90%;
-  max-height: 85vh; /* Don't let it touch screen borders */
-  overflow-y: auto; /* Adds scrollbar if content is too long */
-  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   text-align: center;
-  
-  /* Optional: Smooth scrolling for mobile */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -155,25 +152,12 @@ body {
   border-bottom: 1px solid #eee;
 }
 
-/* Admin Dashboard Expansion */
 .admin-fullscreen-wrapper {
   width: 100vw;
   height: 100vh;
   background: #f4f7f6; /* Professional light gray for admin work */
   padding: 20px;
   overflow-y: auto;
-}
-
-/* Ensure the modal doesn't turn white when the form gets long */
-.modal-box {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  max-height: 90vh;
-  overflow-y: auto;
-  width: 100%;
-  max-width: 500px;
-  padding: 30px;
-  border-radius: 12px;
 }
 
 .admin-container {
@@ -271,15 +255,10 @@ button {
   width: 100%;
   margin-bottom: 10px;
 }
-/* Target the modal box ONLY when the admin dashboard is inside it */
+
 .modal-box:has(.admin-modal-content) {
   width: 95%;            /* Use most of the screen width */
   max-width: 1000px;     /* But don't let it get ridiculously wide on huge monitors */
-  padding: 20px;
-}
-.modal-box {
-  max-height: 85vh;
-  overflow-y: auto;
   padding: 20px;
 }
 

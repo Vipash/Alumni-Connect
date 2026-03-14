@@ -125,10 +125,8 @@ const renderTabContent = () => {
           </div>
         </div>
       ) : (
-        /* 3. VISITOR VIEW */
         <>
-          {view === 'home' && <div className="auth-page-wrapper"></div>}
-          
+        <div className="auth-page-wrapper"></div>
           <div className={`map-layer ${view === 'picker' ? 'active' : ''}`}>
             <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
