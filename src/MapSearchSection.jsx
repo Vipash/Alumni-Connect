@@ -93,6 +93,21 @@ function MapClickHandler({ isPicking, onPick }) {
     setSuggestions(await res.json());
   };
 
+const [selectedAlumni, setSelectedAlumni] = useState(null); // For the details pop-up
+const [showContact, setShowContact] = useState(false); // To toggle phone/email
+
+const handleViewContact = (alumniName) => {
+const confirmMsg = "NOTICE: For privacy and security, this interaction will be recorded in the University Security Logs. Do you wish to proceed?";
+  
+  if (window.confirm(confirmMsg)) {
+    // SECURITY LOGGING (Mock logic for now)
+    console.log(`[SECURITY LOG]: Student viewed contact details for ${alumniName} at ${new Date().toLocaleString()}`);
+    
+    // In a real app, you would fetch('/api/log-security', { method: 'POST', body: ... })
+    setShowContact(true);
+  }
+};
+
   return (
     <div className="map-page-wrapper">
       <div className="map-fancy-container">
@@ -107,10 +122,27 @@ function MapClickHandler({ isPicking, onPick }) {
            }} />
            {searchPos && <Marker position={searchPos} icon={searchIcon}><Popup>Search Location</Popup></Marker>}
            {alumni.map(user => (
-             <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
-               <Popup><strong>{user.name}</strong><br/>{user.company}</Popup>
-             </Marker>
-           ))}
+  <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
+    <Popup>
+      <div style={{ textAlign: 'center' }}>
+        <strong style={{ fontSize: '1.1rem' }}>{user.name}</strong>
+        <p style={{ margin: '5px 0', color: '#666' }}>{user.company}</p>
+        
+        <div className="popup-btn-group">
+          <button className="nav-btn" onClick={() => {
+            setSelectedAlumni(user);
+            setShowContact(false); // Reset contact view for new selection
+          }}>
+            View Full Profile
+          </button>
+          <button className="admin-btn" style={{ borderColor: '#d4af37', color: '#d4af37' }}>
+            🔖 Bookmark
+          </button>
+        </div>
+      </div>
+    </Popup>
+  </Marker>
+))}
         </MapContainer>
       </div>
 
@@ -159,7 +191,7 @@ function MapClickHandler({ isPicking, onPick }) {
 
           {/* 3. Location Buttons: 50/50 Split */}
           <div className="button-row">
-            <button className="nav-btn" onClick={useCurrentLocation}>📍 Current Location</button>
+            <button className="nav-btn" onClick={useCurrentLocation}>📍 Use My Current Location</button>
             <button 
               className={isPicking ? 'admin-btn' : 'nav-btn'}
               onClick={() => setIsPicking(!isPicking)} 
@@ -172,7 +204,7 @@ function MapClickHandler({ isPicking, onPick }) {
         {/* 4. Nearby Alumni List */}
         {closest && closest.length > 0 && (
           <div className="nearby-list">
-            <h4>Nearby Alumni List (Top 3)</h4>
+            <h4>Nearby Alumni</h4>
             {closest.map((item, index) => (
               <div key={index} className="nearby-item">
                 <strong>{item.name}</strong> - {item.company} 
@@ -182,6 +214,37 @@ function MapClickHandler({ isPicking, onPick }) {
           </div>
         )}
       </div>
+      {selectedAlumni && (
+  <div className="modal-overlay" style={{ zIndex: 1000 }}>
+    <div className="modal-box" style={{ textAlign: 'left', maxWidth: '400px' }}>
+      <h2 style={{ borderBottom: `2px solid var(--mbm-gold)`, paddingBottom: '10px' }}>
+        Alumni Profile
+      </h2>
+      
+      <div style={{ margin: '15px 0' }}>
+        <p><strong>Name:</strong> {selectedAlumni.name}</p>
+        <p><strong>Company:</strong> {selectedAlumni.company}</p>
+        <p><strong>Role:</strong> {selectedAlumni.role || 'Senior Consultant'}</p>
+        <p><strong>Batch:</strong> {selectedAlumni.batch || '2020'}</p>
+      </div>
+
+      <div style={{ background: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
+        {!showContact ? (
+          <button className="nav-btn" onClick={() => handleViewContact(selectedAlumni.name)}>
+            🔓 Display Contact Details
+          </button>
+        ) : (
+          <div className="loading" style={{ animation: 'none' }}>
+            <p style={{ margin: '0', color: 'var(--mbm-blue)' }}><strong>Email:</strong> {selectedAlumni.email}</p>
+            <p style={{ margin: '5px 0 0 0', color: 'var(--mbm-blue)' }}><strong>Phone:</strong> {selectedAlumni.phone || '+91 XXXXX XXXXX'}</p>
+          </div>
+        )}
+      </div>
+
+      <button className="admin-btn" onClick={() => setSelectedAlumni(null)}>Close Window</button>
+    </div>
+  </div>
+)}
     </div>
   );
 }

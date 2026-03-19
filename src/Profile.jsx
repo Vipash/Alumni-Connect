@@ -47,7 +47,7 @@ function Profile({ user, setUser }) {
         className="social-icon"
         style={{ background: '#0077b5', color: 'white', padding: '8px 15px', borderRadius: '4px', textDecoration: 'none', fontSize: '14px' }}
       >
-        View PDF 👁️
+        View Resume
       </a>
       
       {/* DOWNLOAD BUTTON */}
@@ -56,7 +56,7 @@ function Profile({ user, setUser }) {
         className="social-icon"
         style={{ background: '#28a745', color: 'white', padding: '8px 15px', borderRadius: '4px', textDecoration: 'none', fontSize: '14px' }}
       >
-        Download ⬇️
+        Download
       </a>
     </div>
   </div>
