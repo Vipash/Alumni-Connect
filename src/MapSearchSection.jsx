@@ -96,15 +96,28 @@ function MapClickHandler({ isPicking, onPick }) {
 const [selectedAlumni, setSelectedAlumni] = useState(null); // For the details pop-up
 const [showContact, setShowContact] = useState(false); // To toggle phone/email
 
-const handleViewContact = (alumniName) => {
-const confirmMsg = "NOTICE: For privacy and security, this interaction will be recorded in the University Security Logs. Do you wish to proceed?";
+const handleViewContact = async (alumni) => {
+  const confirmMsg = "NOTICE: Your request to view contact details will be logged for security purposes. Continue?";
   
   if (window.confirm(confirmMsg)) {
-    // SECURITY LOGGING (Mock logic for now)
-    console.log(`[SECURITY LOG]: Student viewed contact details for ${alumniName} at ${new Date().toLocaleString()}`);
-    
-    // In a real app, you would fetch('/api/log-security', { method: 'POST', body: ... })
-    setShowContact(true);
+    try {
+      // 1. Send Log to Backend
+      await fetch('/api/log-interaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          alumniId: alumni._id,
+          alumniName: alumni.name,
+          studentId: currentUser._id, // Assume you have user state from context/auth
+          studentName: currentUser.name
+        })
+      });
+
+      // 2. Reveal the contact info on success
+      setShowContact(true);
+    } catch (error) {
+      alert("Error logging security event. Please try again.");
+    }
   }
 };
 

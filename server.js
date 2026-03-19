@@ -177,11 +177,40 @@ app.delete('/api/delete-user/:id', async (req, res) => {
 });
 
 // Security Logs
-app.get('/api/admin/logs', async (req, res) => {
+// routes/security.js
+const SecurityLog = require('../models/SecurityLog');
+
+router.post('/log-interaction', async (req, res) => {
   try {
-    const logs = await Log.find().sort({ timestamp: -1 });
-    res.json(logs);
-  } catch (err) { res.status(500).send(err.message); }
+    const { alumniId, alumniName, studentId, studentName } = req.body;
+    
+    const newLog = new SecurityLog({
+      studentId,
+      studentName,
+      alumniId,
+      alumniName,
+      ipAddress: req.ip || req.headers['x-forwarded-for']
+    });
+
+    await newLog.save();
+    res.status(200).json({ message: "Interaction logged successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to log interaction" });
+  }
+});
+router.get('/api/admin/logs', async (req, res) => {
+  try {
+    const logs = await SecurityLog.find().sort({ timestamp: -1 });
+    const formattedLogs = logs.map(log => ({
+      _id: log._id,
+      viewerName: log.studentName,
+      alumniName: log.alumniName,
+      timestamp: log.timestamp
+    }));
+    res.json(formattedLogs);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch logs" });
+  }
 });
 
 app.delete('/api/admin/announcement/:id', async (req, res) => {

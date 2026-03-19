@@ -205,11 +205,14 @@ const [audience, setAudience] = useState('all');
                     <tr key={item._id}>
                       {activeTab === 'logs' ? (
                         <>
-                          <td>{item.viewerName}</td>
+                          <td>{item.studentName || item.viewerName}</td> 
                           <td>{item.alumniName}</td>
-                          <td>{new Date(item.timestamp).toLocaleString()}</td>
-                        </>
-                      ) : (
+                          <td>{new Date(item.timestamp).toLocaleString('en-IN', { 
+                          dateStyle: 'medium', 
+                          timeStyle: 'short' 
+                          })}</td>
+                          </>
+                          ) : (
                         <>
                           <td><strong>{item.name}</strong><br/><small>@{item.displayName}</small></td>
                           <td>{item.email}<br/><small>{item.mobile}</small></td>
