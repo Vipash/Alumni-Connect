@@ -100,15 +100,27 @@ const [selectedAlumni, setSelectedAlumni] = useState(null); // For the details p
 const [showContact, setShowContact] = useState(false); // To toggle phone/email
 
 const handleViewContact = async (alumni) => {
-  // 1. Force a fresh read from localStorage
-  const rawData = localStorage.getItem('user');
-  console.log("DEBUG: Raw User Data from storage:", rawData);
-  
+  // 1. Try different common keys to find the user
+  const keys = ['user', 'currentUser', 'loggedInUser'];
+  let rawData = null;
+  let usedKey = '';
+
+  for (const key of keys) {
+    const data = localStorage.getItem(key);
+    if (data) {
+      rawData = data;
+      usedKey = key;
+      break;
+    }
+  }
+
+  console.log(`DEBUG: Found user data under key: "${usedKey || 'NONE'}"`, rawData);
+
   const storedUser = rawData ? JSON.parse(rawData) : null;
 
-  // 2. Comprehensive check for user existence
-  if (!storedUser || (!storedUser._id && !storedUser.id)) {
-    alert("Session expired. Please log in again.");
+  // 2. Fallback check
+  if (!storedUser || !storedUser._id) {
+    alert("Session expired. Please log in again. (Reason: User data not found in storage)");
     return;
   }
 
@@ -186,8 +198,11 @@ const handleViewContact = async (alumni) => {
         
         {/* 1. Company Search: Label ON TOP */}
         <div className="company-search-container">
-          <label>Company Search</label>
+          <label htmlFor="company-input">Company Search</label>
           <input 
+            id="company-input" // Associates with the label
+            name="company-name" // Helps browser autofill
+            autoComplete="organization" // Tells browser this is a company field
             placeholder="Input Company Name... eg. GulGul" 
             onChange={e => setCompanySearch(e.target.value)} 
           />
@@ -196,9 +211,12 @@ const handleViewContact = async (alumni) => {
 
         {/* 2. City Search */}
         <div className="location-search-container">
-          <label>Location Search</label>
+          <label htmlFor="city-input">Location Search</label>
           <div className="location-search-wrapper">
             <input 
+              id="city-input"
+              name="city-query"
+              autoComplete="address-level2"
               value={cityQuery} 
               placeholder="Type City Name... eg. Narayanpur Tatwara" 
               onChange={(e) => {
