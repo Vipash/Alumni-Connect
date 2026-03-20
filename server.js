@@ -181,7 +181,7 @@ app.delete('/api/delete-user/:id', async (req, res) => {
 // routes/security.js
 const SecurityLog = require('./Log');
 
-router.post('/log-interaction', async (req, res) => {
+app.post('/api/log-interaction', async (req, res) => {
   try {
     const { alumniId, alumniName, studentId, studentName } = req.body;
     
@@ -199,6 +199,7 @@ router.post('/log-interaction', async (req, res) => {
     res.status(500).json({ error: "Failed to log interaction" });
   }
 });
+
 app.get('/api/admin/logs', async (req, res) => {
   try {
     const logs = await SecurityLog.find().sort({ timestamp: -1 });
