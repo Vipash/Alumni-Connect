@@ -11,6 +11,7 @@ const User = require('./alumni');
 const Log = require('./Log');
 
 const app = express();
+const router = express.Router();
 app.use(cors());
 app.use(express.json());
 
@@ -198,7 +199,7 @@ router.post('/log-interaction', async (req, res) => {
     res.status(500).json({ error: "Failed to log interaction" });
   }
 });
-router.get('/api/admin/logs', async (req, res) => {
+app.get('/api/admin/logs', async (req, res) => {
   try {
     const logs = await SecurityLog.find().sort({ timestamp: -1 });
     const formattedLogs = logs.map(log => ({
