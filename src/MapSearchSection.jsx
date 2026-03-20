@@ -97,6 +97,13 @@ const [selectedAlumni, setSelectedAlumni] = useState(null); // For the details p
 const [showContact, setShowContact] = useState(false); // To toggle phone/email
 
 const handleViewContact = async (alumni) => {
+  // Pull user from localStorage right before the call to be safe
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+
+  if (!storedUser || !storedUser._id) {
+    alert("Session expired. Please log in again.");
+    return;}
+    
   const confirmMsg = "NOTICE: Your request to view contact details will be logged for security purposes. Continue?";
   
   if (window.confirm(confirmMsg)) {
@@ -236,10 +243,23 @@ const handleViewContact = async (alumni) => {
       <div style={{ margin: '15px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px', textAlign: 'left' }}>
         <img 
-          src={selectedAlumni.profilePic || 'https://via.placeholder.com/80?text=User'} 
-          alt="Profile" 
-          style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--mbm-gold)' }}
-        />
+  /* 1. Try 'photo', then 'profilePic', then the local default-avatar */
+  src={selectedAlumni.photo || selectedAlumni.profilePic || '/default-avatar.png'} 
+  alt="Profile" 
+  style={{ 
+    width: '80px', 
+    height: '80px', 
+    borderRadius: '50%', 
+    objectFit: 'cover', 
+    border: '2px solid var(--mbm-gold)',
+    backgroundColor: '#f0f0f0' 
+  }}
+  /* 2. Emergency fallback if the URL exists but is a 404/broken link */
+  onError={(e) => { 
+    e.target.onerror = null; 
+    e.target.src = '/default-avatar.png'; 
+  }}
+/>
         <div>
           <h2 style={{ margin: 0, color: 'var(--mbm-blue)' }}>{selectedAlumni.name}</h2>
           <p style={{ margin: 0, color: '#666' }}>{selectedAlumni.company}</p>
