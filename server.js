@@ -177,6 +177,23 @@ app.delete('/api/delete-user/:id', async (req, res) => {
   } catch (err) { res.status(400).send(err.message); }
 });
 
+// stats
+app.get('/api/admin/stats', async (req, res) => {
+  try {
+    const totalAlumni = await User.countDocuments({ role: 'alumni', isVerified: true });
+    const pendingAlumni = await User.countDocuments({ role: 'alumni', isVerified: false });
+    const totalStudents = await User.countDocuments({ role: 'student', isVerified: true });
+    const pendingStudents = await User.countDocuments({ role: 'student', isVerified: false });
+
+    res.json({
+      alumni: { verified: totalAlumni, pending: pendingAlumni },
+      students: { verified: totalStudents, pending: pendingStudents }
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 // Security Logs
 // routes/security.js
 const SecurityLog = require('./Log');
@@ -184,13 +201,14 @@ const SecurityLog = require('./Log');
 app.post('/api/log-interaction', async (req, res) => {
   try {
     const { alumniId, alumniName, studentId, studentName } = req.body;
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
     
     const newLog = new SecurityLog({
       studentId,
       studentName,
       alumniId,
       alumniName,
-      ipAddress: req.ip || req.headers['x-forwarded-for']
+      ipAddress: clientIp
     });
 
     await newLog.save();
@@ -207,6 +225,7 @@ app.get('/api/admin/logs', async (req, res) => {
       _id: log._id,
       viewerName: log.studentName,
       alumniName: log.alumniName,
+      ipAddress: log.ipAddress
       timestamp: log.timestamp
     }));
     res.json(formattedLogs);

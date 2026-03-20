@@ -73,6 +73,11 @@ input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; borde
 .admin-tabs {display: flex; flex-direction: row !important; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;}
 .admin-tabs button {width: auto !important; flex: 1; min-width: 120px; margin-bottom: 0; background: #f1f4f9; color: var(--mbm-blue);}
 .admin-tabs button.active {background-color: var(--mbm-blue); color: white; border-bottom: 3px solid var(--mbm-gold);}
+.admin-stats-grid {display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; background: #f8f9fa; border-bottom: 1px solid #ddd;}
+.stat-card {background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #007bff;}
+.stat-card h4 { margin: 0 0 10px 0; color: #555; font-size: 0.9rem; }
+.stat-card p { margin: 5px 0; font-size: 1.1rem; }
+.pending-text { color: #d9534f; font-size: 0.85rem !important; font-weight: bold; }
 
 /* Profile Page */
 .profile-header { display: flex; padding: 30px; background: #f8f9fa; align-items: center; gap: 25px; border-bottom: 1px solid #eee; }
