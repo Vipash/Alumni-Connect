@@ -109,7 +109,7 @@ const handleViewContact = async (alumni) => {
           alumniId: alumni._id,
           alumniName: alumni.name,
           studentId: currentUser._id, // Assume you have user state from context/auth
-          studentName: currentUser.name
+          viewerName: currentUser.name
         })
       });
 
@@ -233,12 +233,22 @@ const handleViewContact = async (alumni) => {
       <h2 style={{ borderBottom: `2px solid var(--mbm-gold)`, paddingBottom: '10px' }}>
         Alumni Profile
       </h2>
-      
       <div style={{ margin: '15px 0' }}>
-        <p><strong>Name:</strong> {selectedAlumni.name}</p>
-        <p><strong>Company:</strong> {selectedAlumni.company}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px', textAlign: 'left' }}>
+        <img 
+          src={selectedAlumni.profilePic || 'https://via.placeholder.com/80?text=User'} 
+          alt="Profile" 
+          style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--mbm-gold)' }}
+        />
+        <div>
+          <h2 style={{ margin: 0, color: 'var(--mbm-blue)' }}>{selectedAlumni.name}</h2>
+          <p style={{ margin: 0, color: '#666' }}>{selectedAlumni.company}</p>
+        </div>
+      </div>
+      <div style={{ textAlign: 'left', marginBottom: '20px' }}>
         <p><strong>Role:</strong> {selectedAlumni.role || 'Senior Consultant'}</p>
         <p><strong>Batch:</strong> {selectedAlumni.batch || '2020'}</p>
+      </div>
       </div>
 
       <div style={{ background: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>

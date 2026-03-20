@@ -67,6 +67,11 @@ input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; borde
 .table-wrapper tr td:nth-child(3) {font-family: 'Courier New', Courier, monospace; /* Monospace for timestamps looks more "log-like" */ color: #636e72; font-size: 0.9rem;}
 .table-wrapper tr:hover {background-color: rgba(38, 42, 107, 0.03);}
 .active-log-indicator {height: 8px; width: 8px; background-color: #ff3f52; border-radius: 50%; display: inline-block; margin-right: 8px;}
+.admin-header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 15px;}
+.back-btn {width: auto !important; margin-bottom: 0;}
+.admin-tabs {display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;}
+.admin-tabs button {width: auto !important; flex: 1; min-width: 120px; margin-bottom: 0; background: #f1f4f9; color: var(--mbm-blue);}
+.admin-tabs button.active {background-color: var(--mbm-blue); color: white; border-bottom: 3px solid var(--mbm-gold);}
 
 /* Profile Page */
 .profile-header { display: flex; padding: 30px; background: #f8f9fa; align-items: center; gap: 25px; border-bottom: 1px solid #eee; }
