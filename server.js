@@ -178,7 +178,7 @@ app.delete('/api/delete-user/:id', async (req, res) => {
 
 // Security Logs
 // routes/security.js
-const SecurityLog = require('../Log');
+const SecurityLog = require('./Log');
 
 router.post('/log-interaction', async (req, res) => {
   try {
