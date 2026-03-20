@@ -100,53 +100,36 @@ const [selectedAlumni, setSelectedAlumni] = useState(null); // For the details p
 const [showContact, setShowContact] = useState(false); // To toggle phone/email
 
 const handleViewContact = async (alumni) => {
-  // 1. Try different common keys to find the user
-  const keys = ['user', 'currentUser', 'loggedInUser'];
-  let rawData = null;
-  let usedKey = '';
+  // 1. Get user from storage (now that App.jsx is saving it)
+  const storedUser = JSON.parse(localStorage.getItem('user'));
 
-  for (const key of keys) {
-    const data = localStorage.getItem(key);
-    if (data) {
-      rawData = data;
-      usedKey = key;
-      break;
-    }
-  }
-
-  console.log(`DEBUG: Found user data under key: "${usedKey || 'NONE'}"`, rawData);
-
-  const storedUser = rawData ? JSON.parse(rawData) : null;
-
-  // 2. Fallback check
   if (!storedUser || !storedUser._id) {
-    alert("Session expired. Please log in again. (Reason: User data not found in storage)");
+    alert("Session expired. Please log in again.");
     return;
   }
 
-  if (window.confirm("NOTICE: This interaction will be recorded. Continue?")) {
+  const confirmMsg = "NOTICE: Your request to view contact details will be logged for security purposes. Continue?";
+  
+  if (window.confirm(confirmMsg)) {
     try {
-      // Use storedUser._id OR storedUser.id (depending on your backend naming)
-      const userId = storedUser._id || storedUser.id;
-      
       const response = await fetch('/api/log-interaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           alumniId: alumni._id,
           alumniName: alumni.name,
-          studentId: userId, 
-          viewerName: storedUser.name || "Student"
+          studentId: storedUser._id, 
+          studentName: storedUser.name || storedUser.displayName || "Student" // Match server.js key
         })
       });
 
       if (response.ok) {
         setShowContact(true);
       } else {
-        alert("Server error. Please try again.");
+        alert("Server error logging interaction.");
       }
     } catch (error) {
-      alert("Network error.");
+      alert("Network error. Please try again.");
     }
   }
 };

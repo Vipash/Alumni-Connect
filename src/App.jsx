@@ -60,6 +60,7 @@ function App() {
 
     if (res.ok) {
       const data = await res.json();
+      localStorage.setItem('user', JSON.stringify(data));
       setLoggedInUser(data);
       setLoginStatus(data.isVerified ? 'approved' : 'pending');
     } else { alert("Login failed."); }
