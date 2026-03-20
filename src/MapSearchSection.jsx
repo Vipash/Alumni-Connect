@@ -82,7 +82,10 @@ function MapClickHandler({ isPicking, onPick }) {
     const matches = alumni.filter(a => a.company?.toLowerCase().includes(companySearch.toLowerCase()));
     setFiltered(matches);
     setCurrentIndex(0);
-    if (matches.length > 0) setSearchPos([matches[0].location.coordinates[1], matches[0].location.coordinates[0]]);
+    if (matches.length > 0) {
+    const coords = [matches[0].location.coordinates[1], matches[0].location.coordinates[0]];
+    setSearchPos(coords);
+  }
   };
 
   // 3. City Search (Nominatim)
@@ -97,26 +100,30 @@ const [selectedAlumni, setSelectedAlumni] = useState(null); // For the details p
 const [showContact, setShowContact] = useState(false); // To toggle phone/email
 
 const handleViewContact = async (alumni) => {
-  // 1. Correctly pull and check the user
-  const storedUser = JSON.parse(localStorage.getItem('user'));
+  // 1. Force a fresh read from localStorage
+  const rawData = localStorage.getItem('user');
+  console.log("DEBUG: Raw User Data from storage:", rawData);
+  
+  const storedUser = rawData ? JSON.parse(rawData) : null;
 
-  if (!storedUser || !storedUser._id) {
+  // 2. Comprehensive check for user existence
+  if (!storedUser || (!storedUser._id && !storedUser.id)) {
     alert("Session expired. Please log in again.");
     return;
   }
 
-  const confirmMsg = "NOTICE: Your request to view contact details will be logged for security purposes. Continue?";
-  
-  if (window.confirm(confirmMsg)) {
+  if (window.confirm("NOTICE: This interaction will be recorded. Continue?")) {
     try {
-      // 2. Use 'storedUser' consistently (not currentUser)
+      // Use storedUser._id OR storedUser.id (depending on your backend naming)
+      const userId = storedUser._id || storedUser.id;
+      
       const response = await fetch('/api/log-interaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           alumniId: alumni._id,
           alumniName: alumni.name,
-          studentId: storedUser._id, 
+          studentId: userId, 
           viewerName: storedUser.name || "Student"
         })
       });
@@ -124,11 +131,10 @@ const handleViewContact = async (alumni) => {
       if (response.ok) {
         setShowContact(true);
       } else {
-        alert("Server failed to log the interaction. Please try again.");
+        alert("Server error. Please try again.");
       }
     } catch (error) {
-      console.error("Log error:", error);
-      alert("Network error. Please try again.");
+      alert("Network error.");
     }
   }
 };
@@ -145,7 +151,11 @@ const handleViewContact = async (alumni) => {
              findClosest(ll.lat, ll.lng);
              setIsPicking(false);
            }} />
-           {searchPos && <Marker position={searchPos} icon={searchIcon}><Popup>Search Location</Popup></Marker>}
+           {searchPos && !companySearch && (
+    <Marker position={searchPos} icon={searchIcon}>
+      <Popup>Search Location</Popup>
+    </Marker>
+  )}
            {alumni.map(user => (
   <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
     <Popup>
