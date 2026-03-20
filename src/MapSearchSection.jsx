@@ -97,33 +97,38 @@ const [selectedAlumni, setSelectedAlumni] = useState(null); // For the details p
 const [showContact, setShowContact] = useState(false); // To toggle phone/email
 
 const handleViewContact = async (alumni) => {
-  // Pull user from localStorage right before the call to be safe
+  // 1. Correctly pull and check the user
   const storedUser = JSON.parse(localStorage.getItem('user'));
 
   if (!storedUser || !storedUser._id) {
     alert("Session expired. Please log in again.");
-    return;}
-    
+    return;
+  }
+
   const confirmMsg = "NOTICE: Your request to view contact details will be logged for security purposes. Continue?";
   
   if (window.confirm(confirmMsg)) {
     try {
-      // 1. Send Log to Backend
-      await fetch('/api/log-interaction', {
+      // 2. Use 'storedUser' consistently (not currentUser)
+      const response = await fetch('/api/log-interaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           alumniId: alumni._id,
           alumniName: alumni.name,
-          studentId: currentUser._id, // Assume you have user state from context/auth
-          viewerName: currentUser.name
+          studentId: storedUser._id, 
+          viewerName: storedUser.name || "Student"
         })
       });
 
-      // 2. Reveal the contact info on success
-      setShowContact(true);
+      if (response.ok) {
+        setShowContact(true);
+      } else {
+        alert("Server failed to log the interaction. Please try again.");
+      }
     } catch (error) {
-      alert("Error logging security event. Please try again.");
+      console.error("Log error:", error);
+      alert("Network error. Please try again.");
     }
   }
 };
@@ -273,7 +278,7 @@ const handleViewContact = async (alumni) => {
 
       <div style={{ background: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
         {!showContact ? (
-          <button className="nav-btn" onClick={() => handleViewContact(selectedAlumni.name)}>
+          <button className="nav-btn" onClick={() => handleViewContact(selectedAlumni)}>
             🔓 Display Contact Details
           </button>
         ) : (
