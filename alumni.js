@@ -19,8 +19,7 @@ const userSchema = new mongoose.Schema({
   linkedin: { type: String, default: "" },
   resumeUrl: { type: String, default: "" },
   profilePhoto: { type: String, default: "" },
-  
-  // Location for Alumni map
+  bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   location: {
     type: { type: String, enum: ['Point'], default: 'Point' },
     coordinates: { type: [Number] } 

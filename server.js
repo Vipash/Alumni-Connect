@@ -139,6 +139,33 @@ app.post('/api/view-contact', async (req, res) => {
   }
 });
 
+app.post('/api/bookmarks/toggle', async (req, res) => {
+  const { userId, alumniId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    const index = user.bookmarks.indexOf(alumniId);
+
+    if (index === -1) {
+      user.bookmarks.push(alumniId);
+    } else {
+      user.bookmarks.splice(index, 1);
+    }
+    await user.save();
+    res.json(user.bookmarks);
+  } catch (err) {
+    res.status(500).send("Error toggling bookmark");
+  }
+});
+app.post('/api/bookmarks/details', async (req, res) => {
+  try {
+    const { ids } = req.body;
+    const alumni = await User.find({ _id: { $in: ids } });
+    res.json(alumni);
+  } catch (err) {
+    res.status(500).send("Error fetching details");
+  }
+});
+
 app.get('/api/admin/:filter/:role', async (req, res) => {
   try {
     const { filter, role } = req.params;

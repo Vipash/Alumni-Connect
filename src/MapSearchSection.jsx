@@ -72,6 +72,29 @@ function MapClickHandler({ isPicking, onPick }) {
   return null;
 }
 
+const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || {});
+
+const toggleBookmark = async (alumniId) => {
+  if (!user._id) return alert("Please log in to bookmark alumni.");
+
+  try {
+    const res = await fetch('/api/bookmarks/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user._id, alumniId })
+    });
+    
+    if (res.ok) {
+      const updatedBookmarks = await res.json();
+      const updatedUser = { ...user, bookmarks: updatedBookmarks };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  } catch (err) {
+    console.error("Bookmark error:", err);
+  }
+};
+
   // 1. Fetch data
   useEffect(() => {
     fetch('/api/get-alumni').then(res => res.json()).then(setAlumni);
@@ -134,8 +157,54 @@ const handleViewContact = async (alumni) => {
   }
 };
 
+const [showBookmarks, setShowBookmarks] = useState(false);
+const [bookmarkedAlumni, setBookmarkedAlumni] = useState([]);
+
+// Fetch details when sidebar opens
+useEffect(() => {
+  if (showBookmarks && user.bookmarks?.length > 0) {
+    fetch('/api/bookmarks/details', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: user.bookmarks })
+    })
+    .then(res => res.json())
+    .then(data => setBookmarkedAlumni(data));
+  }
+}, [showBookmarks, user.bookmarks]);
+
   return (
     <div className="map-page-wrapper">
+      <button 
+      className="bookmark-toggle-btn" 
+      onClick={() => setShowBookmarks(!showBookmarks)}
+    >
+      🔖 {user.bookmarks?.length || 0}
+    </button>
+
+    {/* 2. THE SIDEBAR */}
+    <div className={`bookmark-sidebar ${showBookmarks ? 'open' : ''}`}>
+      <div className="sidebar-header">
+        <h3>My Bookmarks</h3>
+        <button className="close-sidebar" onClick={() => setShowBookmarks(false)}>×</button>
+      </div>
+      <div className="sidebar-content">
+        {bookmarkedAlumni.length > 0 ? (
+          bookmarkedAlumni.map(alumnus => (
+            <div key={alumnus._id} className="bookmark-item" onClick={() => {
+              setSearchPos([alumnus.location.coordinates[1], alumnus.location.coordinates[0]]);
+              setSelectedAlumni(alumnus); 
+              setShowBookmarks(false);
+            }}>
+              <strong>{alumnus.name}</strong>
+              <p>{alumnus.company} • {alumnus.branch}</p>
+            </div>
+          ))
+        ) : (
+          <p className="empty-msg" style={{padding:'20px', textAlign:'center', color:'#888'}}>No bookmarks yet!</p>
+        )}
+      </div>
+    </div>
       <div className="map-fancy-container">
         {/* ... MapContainer remains exactly the same ... */}
         <MapContainer center={[26.2389, 73.0243]} zoom={5} style={{ height: '400px', width: '100%' }}>
@@ -151,22 +220,33 @@ const handleViewContact = async (alumni) => {
       <Popup>Search Location</Popup>
     </Marker>
   )}
-           {alumni.map(user => (
-  <Marker key={user._id} position={[user.location.coordinates[1], user.location.coordinates[0]]}>
+           {alumni.map(alumniItem => (
+  <Marker 
+    key={alumniItem._id} 
+    position={[alumniItem.location.coordinates[1], alumniItem.location.coordinates[0]]}
+  >
     <Popup>
       <div style={{ textAlign: 'center' }}>
-        <strong style={{ fontSize: '1.1rem' }}>{user.name}</strong>
-        <p style={{ margin: '5px 0', color: '#666' }}>{user.company}</p>
+        <strong style={{ fontSize: '1.1rem' }}>{alumniItem.name}</strong>
+        <p style={{ margin: '5px 0', color: '#666' }}>{alumniItem.company}</p>
         
         <div className="popup-btn-group">
           <button className="nav-btn" onClick={() => {
-            setSelectedAlumni(user);
-            setShowContact(false); // Reset contact view for new selection
+            setSelectedAlumni(alumniItem);
+            setShowContact(false); 
           }}>
             View Full Profile
           </button>
-          <button className="admin-btn" style={{ borderColor: '#d4af37', color: '#d4af37' }}>
-            🔖 Bookmark
+          <button 
+            className="admin-btn" 
+            style={{ 
+              borderColor: user.bookmarks?.includes(alumniItem._id) ? 'var(--mbm-gold)' : '#ccc', 
+              color: user.bookmarks?.includes(alumniItem._id) ? 'var(--mbm-gold)' : '#666',
+              marginTop: '5px'
+            }}
+            onClick={() => toggleBookmark(alumniItem._id)}
+          >
+            {user.bookmarks?.includes(alumniItem._id) ? '🔖 Bookmarked' : '🔖 Bookmark'}
           </button>
         </div>
       </div>
@@ -299,8 +379,18 @@ const handleViewContact = async (alumni) => {
           </div>
         )}
       </div>
-
-      <button className="admin-btn" onClick={() => setSelectedAlumni(null)}>Close Window</button>
+     <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+  <button 
+    className="admin-btn" 
+    style={{ flex: 1, borderColor: '#d4af37', color: '#d4af37' }}
+    onClick={() => toggleBookmark(selectedAlumni._id)}
+  >
+    {user.bookmarks?.includes(selectedAlumni._id) ? '🔖 Saved' : '🔖 Bookmark'}
+  </button>
+  <button className="admin-btn" style={{ flex: 1 }} onClick={() => setSelectedAlumni(null)}>
+    Close Window
+  </button>
+</div>
     </div>
   </div>
 )}

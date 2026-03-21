@@ -94,6 +94,12 @@ input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; borde
 .input-group button { margin: 0; width: auto; flex-shrink: 0; }
 .button-row { display: flex; gap: 10px; width: 100%; }
 .button-row button { flex: 1; margin: 0; }
+.bookmark-toggle-btn {position: absolute; top: 80px; right: 20px; z-index: 1000; background: white; border: 2px solid var(--mbm-blue); padding: 10px 15px; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+.bookmark-sidebar {position: fixed; top: 0; right: -350px; /* Hidden by default */ width: 320px; height: 100vh; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 2000; transition: right 0.3s ease; padding: 20px;}
+.bookmark-sidebar.open {right: 0;}
+.sidebar-header {display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+.bookmark-item {padding: 15px; border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: background 0.2s;}
+.bookmark-item:hover {background: #f0f7ff;}
 
 /* Announcements */
 .announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
