@@ -218,7 +218,7 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .status-filters button { padding: 8px 16px; border-radius: 20px; border: 1px solid #004a99; background: #fff; color: #004a99; width: auto; font-size: 0.85rem; }
 .status-filters button.selected { background: #004a99; color: white; }
 
-input, select, textarea { width: 100%; padding: 14px 16px; margin-bottom: 20px; border: 1.5px solid #dcdde1; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; outline: none;}
+input, select, textarea { width: 100%; padding: 14px 16px; margin-bottom: 20px; border: 1.5px solid #dcdde1; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; outline: none; box-sizing: border-box;}
 input:focus { border-color: var(--mbm-blue); box-shadow: 0 0 0 3px rgba(38, 42, 107, 0.15);}
 
 /* Typography */
