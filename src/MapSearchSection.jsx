@@ -295,7 +295,7 @@ const handleViewContact = async (alumni) => {
         ) : (
           <div className="loading" style={{ animation: 'none' }}>
             <p style={{ margin: '0', color: 'var(--mbm-blue)' }}><strong>Email:</strong> {selectedAlumni.email}</p>
-            <p style={{ margin: '5px 0 0 0', color: 'var(--mbm-blue)' }}><strong>Phone:</strong> {selectedAlumni.phone || '+91 XXXXX XXXXX'}</p>
+            <p style={{ margin: '5px 0 0 0', color: 'var(--mbm-blue)' }}><strong>Phone:</strong> {selectedAlumni.mobile ? `+91 ${selectedAlumni.mobile}` : '+91 XXXXX XXXXX'}</p>
           </div>
         )}
       </div>

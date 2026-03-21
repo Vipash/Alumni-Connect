@@ -5,6 +5,7 @@ function EditProfile({ user, onCancel, onUpdate }) {
   const [formData, setFormData] = useState({
     displayName: user.displayName || user.name || '',
     bio: user.bio || '',
+    mobile: user.mobile || '',
     linkedin: user.linkedin || '',
     resumeUrl: user.resumeUrl || '',
     profilePhoto: user.profilePhoto || ''
@@ -101,6 +102,15 @@ function EditProfile({ user, onCancel, onUpdate }) {
         rows="5" 
         style={{ width: '100%', display: 'block', marginBottom: '10px' }}
       />
+
+      <label>Mobile Number</label>
+        <input 
+          type="tel"
+          pattern="[0-9]{10}"
+          value={editData.mobile}
+          onChange={(e) => setEditData({ ...editData, mobile: e.target.value })}
+          placeholder="10-digit mobile number"
+        />
 
       <label>LinkedIn URL</label>
       <input name="linkedin" value={formData.linkedin} onChange={handleChange} />
