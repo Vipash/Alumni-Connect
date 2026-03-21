@@ -5,11 +5,9 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const Announcement = require('./Announcement');
-
+const SecurityLog = require('./SecurityLog');
 // Models
 const User = require('./alumni'); 
-const Log = require('./Log');
-
 const app = express();
 const router = express.Router();
 app.use(cors());
@@ -195,9 +193,6 @@ app.get('/api/admin/stats', async (req, res) => {
 });
 
 // Security Logs
-// routes/security.js
-const SecurityLog = require('./Log');
-
 app.post('/api/log-interaction', async (req, res) => {
   try {
     const { alumniId, alumniName, studentId, studentName } = req.body;
@@ -223,9 +218,9 @@ app.get('/api/admin/logs', async (req, res) => {
     const logs = await SecurityLog.find().sort({ timestamp: -1 });
     const formattedLogs = logs.map(log => ({
       _id: log._id,
-      viewerName: log.studentName,
+      viewerName: log.studentName || "Unknown",
       alumniName: log.alumniName,
-      ipAddress: log.ipAddress
+      ipAddress: log.ipAddress || "N/A",
       timestamp: log.timestamp
     }));
     res.json(formattedLogs);
