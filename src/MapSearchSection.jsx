@@ -177,9 +177,13 @@ useEffect(() => {
     <div className="map-page-wrapper">
       <button 
       className="bookmark-toggle-btn" 
-      onClick={() => setShowBookmarks(!showBookmarks)}
+      onClick={(e) => {
+  e.stopPropagation();
+  if(!showBookmarks) fetchBookmarkDetails(); // Optional: pre-fetch check
+  setShowBookmarks(!showBookmarks);
+}}
     >
-      🔖 {user.bookmarks?.length || 0}
+      🔖 {user.bookmarks?.length || 0} Saved
     </button>
 
     {/* 2. THE SIDEBAR */}
