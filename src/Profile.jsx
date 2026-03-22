@@ -93,6 +93,7 @@ function Profile({ user, setUser }) {
               <label>Roll Number</label>
               <span>{user.rollNumber || "Not Specified"}</span>
             </div>
+          )}
           {user.role === 'alumni' && (
             <div className="info-item">
               <label>Current Company</label>
