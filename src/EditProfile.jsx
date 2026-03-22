@@ -44,34 +44,31 @@ function EditProfile({ user, onCancel, onUpdate }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const finalData = { 
-    ...formData, 
-    userId: user._id 
-  };
-  console.log("SUBMITTING THIS TO SERVER:", finalData);
-    try {
-      const response = await fetch(`/api/profile/update`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user._id, ...formData })
-      });
+  e.preventDefault();
+  
+  try {
+    const response = await fetch(`/api/profile/update`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...formData, userId: user._id }) // Send everything together
+    });
 
-      const data = await response.json(); // Get server response
+    const data = await response.json();
 
-      if (response.ok) {
-        setSuccessMessage("✅ Profile updated successfully!");
-        setTimeout(() => {
-          onUpdate(data); 
-        }, 2000); 
-      } else {
-        alert("Failed to save: " + (data.message || "Unknown error"));
-      }
-    } catch (err) {
-      console.error("Update error:", err);
-      alert("Network error. Check console.");
+    if (response.ok) {
+      setSuccessMessage("✅ Profile updated successfully!");
+      // Using a slightly shorter timeout for better UX
+      setTimeout(() => {
+        onUpdate(data); 
+      }, 1500); 
+    } else {
+      alert("Failed to save: " + (data.message || "Unknown error"));
     }
-  };
+  } catch (err) {
+    console.error("Update error:", err);
+    alert("Network error.");
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="profile-container">
@@ -104,13 +101,14 @@ function EditProfile({ user, onCancel, onUpdate }) {
       />
 
       <label>Mobile Number</label>
-        <input 
-          type="tel"
-          pattern="[0-9]{10}"
-          value={editData.mobile}
-          onChange={(e) => setEditData({ ...editData, mobile: e.target.value })}
-          placeholder="10-digit mobile number"
-        />
+<input 
+  name="mobile"
+  type="tel"
+  pattern="[0-9]{10}"
+  value={formData.mobile} 
+  onChange={handleChange} 
+  placeholder="10-digit mobile number"
+/>
 
       <label>LinkedIn URL</label>
       <input name="linkedin" value={formData.linkedin} onChange={handleChange} />

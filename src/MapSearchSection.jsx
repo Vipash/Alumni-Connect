@@ -194,15 +194,28 @@ useEffect(() => {
       <div className="sidebar-content">
         {bookmarkedAlumni.length > 0 ? (
           bookmarkedAlumni.map(alumnus => (
-            <div key={alumnus._id} className="bookmark-item" onClick={() => {
-              setSearchPos([alumnus.location.coordinates[1], alumnus.location.coordinates[0]]);
-              setSelectedAlumni(alumnus); 
-              setShowBookmarks(false);
-            }}>
-              <strong>{alumnus.name}</strong>
-              <p>{alumnus.company} • {alumnus.branch}</p>
-            </div>
-          ))
+  <div key={alumnus._id} className="bookmark-item" style={{ position: 'relative' }}>
+    <div onClick={() => {
+      setSearchPos([alumnus.location.coordinates[1], alumnus.location.coordinates[0]]);
+      setSelectedAlumni(alumnus); 
+      setShowBookmarks(false);
+    }}>
+      <strong>{alumnus.name}</strong>
+      <p>{alumnus.company} • {alumnus.branch}</p>
+    </div>
+    
+    {/* NEW DELETE BUTTON */}
+    <button 
+      className="delete-bookmark-small"
+      onClick={(e) => {
+        e.stopPropagation(); // Prevents clicking the alumni
+        toggleBookmark(alumnus._id); // Re-uses your existing toggle logic to remove it
+      }}
+    >
+      ×
+    </button>
+  </div>
+))
         ) : (
           <p className="empty-msg" style={{padding:'20px', textAlign:'center', color:'#888'}}>No bookmarks yet!</p>
         )}
