@@ -57,6 +57,12 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .admin-btn { border: 2px solid var(--mbm-blue); background: transparent; color: var(--mbm-blue); }
 .nav-btn { background-color: var(--mbm-blue); color: white; }
 
+/* --- Sidebar Brand Styling --- */
+.sidebar-header-brand {display: flex; align-items: center; gap: 12px; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);}
+.sidebar-logo {width: 40px; height: 40px; object-fit: contain;}
+.brand-text {color: var(--white); font-size: 1.2rem; font-weight: 700; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;}
+.sidebar {background-color: var(--mbm-blue); color: white;}
+
 /* Sidebar Navigation */
 .sidebar-nav button { background: none; border: none; color: #bdc3c7; text-align: left; padding: 12px 15px; font-size: 1rem; cursor: pointer; transition: 0.3s; border-radius: 5px; margin-bottom: 5px; }
 .sidebar-nav button.active, .sidebar-nav button:hover { background-color: #007bff; color: white; }

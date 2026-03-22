@@ -102,8 +102,14 @@ const renderTabContent = () => {
       {loginStatus === 'approved' ? (
         <div className="workspace-layout">
           <aside className="sidebar">
-            <div className="sidebar-header">
-              <h2>Alumni Connect</h2>
+            <div className="sidebar-header-brand">
+  <img 
+    src="/MBM_Logo.png"
+    alt="University Logo" 
+    className="sidebar-logo" 
+    onError={(e) => { e.target.style.display = 'none'; }} // Hides broken img icon if logo is missing
+  />
+  <h2 className="brand-text">Alumni Connect</h2>
               <p>Welcome, <strong>{loggedInUser?.name}</strong></p>
             </div>
             <nav className="sidebar-nav">
