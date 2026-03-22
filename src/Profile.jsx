@@ -82,12 +82,17 @@ function Profile({ user, setUser }) {
           </div>
           <div className="info-item">
             <label>Batch</label>
-            <span>Class of {user.passoutYear}</span>
+            <span>{user.passoutYear}</span>
           </div>
           <div className="info-item">
             <label>Contact</label>
             <span>{user.mobile}</span>
           </div>
+          {user.role === 'student' && (
+            <div className="info-item">
+              <label>Roll Number</label>
+              <span>{user.rollNumber || "Not Specified"}</span>
+            </div>
           {user.role === 'alumni' && (
             <div className="info-item">
               <label>Current Company</label>
