@@ -20,6 +20,19 @@ router.post('/log', async (req, res) => {
   }
 });
 
+// Get history for a specific Alumni (to see who contacted them)
+router.get('/alumni/:id', async (req, res) => {
+  try {
+    const history = await Connection.find({ alumni: req.params.id })
+      .populate('student', 'name email branch') // Populate student info instead
+      .populate('notice', 'title company')
+      .sort({ connectedAt: -1 });
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get history for a specific student
 router.get('/student/:id', async (req, res) => {
   try {
