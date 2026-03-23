@@ -169,6 +169,9 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .profile-details-mini { text-align: left; padding: 10px 0; }
 .profile-details-mini p { margin: 8px 0; font-size: 0.95rem; }
 .alumni-mini-card {background: #f1f4f9; padding: 15px; border-radius: 10px;  display: flex; justify-content: space-between; align-items: center; margin-top: 15px;}
+.myposts-list {display: flex; flex-direction: column; gap: 10px;}
+.mypost-item {display: flex; justify-content: space-between; align-items: center; background: #fdfdfd; padding: 15px; border: 1px solid #eee; border-radius: 8px;}
+.mypost-item .delete-btn-small {width: auto !important; background: #ff7675 !important; color: white !important;}
 
 /* Announcements */
 .announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }

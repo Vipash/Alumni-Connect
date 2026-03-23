@@ -5,15 +5,53 @@ function ConnectHub({ user }) {
   const [notices, setNotices] = useState([]);
   const [history, setHistory] = useState([]);
   const [selectedNotice, setSelectedNotice] = useState(null); 
-  const [viewProfile, setViewProfile] = useState(null); // State for Mini Profile
+  const [viewProfile, setViewProfile] = useState(null); 
   const [showForm, setShowForm] = useState(false);
 
+  // 1. Fetch Data
   useEffect(() => {
     fetch('/api/notices').then(res => res.json()).then(setNotices);
-    // Fetch history for BOTH roles now
-    const endpoint = user.role === 'student' ? `/api/connections/student/${user._id}` : `/api/connections/alumni/${user._id}`;
+    
+    const endpoint = user.role === 'student' 
+      ? `/api/connections/student/${user._id}` 
+      : `/api/connections/alumni/${user._id}`;
+      
     fetch(endpoint).then(res => res.json()).then(setHistory);
-  }, [user]);
+  }, [user, activeSubTab]); // Refresh when tabs change
+
+  // 2. Fix: Handle Posting Notice (Prevents the Redirect)
+  const handleSubmitNotice = async (e) => {
+    e.preventDefault(); 
+    const fd = new FormData(e.target);
+    const data = Object.fromEntries(fd.entries());
+    data.postedBy = user._id;
+
+    try {
+      const res = await fetch('/api/notices/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        const newNotice = await res.json();
+        setNotices([newNotice, ...notices]);
+        setShowForm(false);
+        setActiveSubTab('myposts'); // Stay in Hub, just switch tab
+      }
+    } catch (err) { console.error("Post failed:", err); }
+  };
+
+  // 3. Fix: Handle Deleting Notice
+  const handleDelete = async (noticeId) => {
+    if (!window.confirm("Delete this notice?")) return;
+    try {
+      const res = await fetch(`/api/notices/${noticeId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setNotices(notices.filter(n => n._id !== noticeId));
+      }
+    } catch (err) { console.error(err); }
+  };
 
   const handleConnect = async (notice) => {
     const message = `Hi ${notice.postedBy?.name}, I'm ${user.name} from MBM...`;
@@ -84,55 +122,70 @@ function ConnectHub({ user }) {
         )
       )}
 
-      {activeSubTab === 'history' && (
-        <div className="history-section">
-          <table className="admin-table">
-            <thead>
-              <tr><th>Date</th><th>{user.role === 'student' ? 'Alumni' : 'Student'}</th><th>Opportunity</th><th>Method</th></tr>
-            </thead>
-            <tbody>
-              {history.map(h => (
-                <tr key={h._id}>
-                  <td>{new Date(h.connectedAt).toLocaleDateString()}</td>
-                  <td>{user.role === 'student' ? h.alumni?.name : h.student?.name}</td>
-                  <td>{h.notice?.title}</td>
-                  <td><span className="badge-pill">{h.contactMethod}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+     {activeSubTab === 'history' && (
+  <div className="history-section">
+    <table className="admin-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Contacted Alumni</th> {/* Simplified label */}
+          <th>Opportunity</th>
+          <th>Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        {history.length > 0 ? history.map(h => (
+          <tr key={h._id}>
+            <td>{new Date(h.connectedAt).toLocaleDateString()}</td>
+            <td>{h.alumni?.name || "Unknown Alumni"}</td>
+            <td>{h.notice?.title || "General Inquiry"}</td>
+            <td><span className="badge-pill">{h.contactMethod}</span></td>
+          </tr>
+        )) : (
+          <tr>
+            <td colSpan="4" style={{textAlign: 'center', padding: '20px', color: '#888'}}>
+              No connection history found.
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+)}
 
       {activeSubTab === 'myposts' && (
         <div className="history-section">
           <h3>Your Active Listings</h3>
           <div className="notice-grid">
-            {myPosts.map(n => (
+            {myPosts.length > 0 ? myPosts.map(n => (
               <div key={n._id} className="notice-card">
                 <h4>{n.title}</h4>
                 <p>{n.company}</p>
-                <button className="delete-btn" onClick={() => handleDelete(n._id)}>Delete Post</button>
+                <button className="delete-btn" style={{backgroundColor: '#ff3f52'}} onClick={() => handleDelete(n._id)}>Delete Post</button>
               </div>
-            ))}
+            )) : <p>You haven't posted any notices yet.</p>}
           </div>
         </div>
       )}
 
-      {/* MINI PROFILE MODAL */}
+      {/* MINI PROFILE MODAL - Using Real Database Fields */}
       {viewProfile && (
         <div className="modal-overlay">
           <div className="modal-box mini-profile-box">
             <div className="profile-header-mini">
-               {/* Replace with actual avatar logic if available */}
-               <div className="avatar-placeholder">{viewProfile.name?.[0]}</div>
+               {viewProfile.profilePhoto ? (
+                 <img src={viewProfile.profilePhoto} alt="Profile" className="profile-avatar-mini" />
+               ) : (
+                 <div className="avatar-placeholder">{viewProfile.name?.[0]}</div>
+               )}
                <h3>{viewProfile.name}</h3>
-               <p className="branch-text">{viewProfile.branch} | {viewProfile.passoutYear}</p>
+               <p className="branch-text">{viewProfile.branch} | Class of {viewProfile.passoutYear}</p>
             </div>
             <hr />
-            <div className="profile-details-mini">
+            <div className="profile-details-mini" style={{textAlign: 'left'}}>
               <p>🏢 <strong>Company:</strong> {viewProfile.company || 'Not Specified'}</p>
-              <p>📍 <strong>Location:</strong> {viewProfile.location?.city || 'Remote/N/A'}</p>
+              <p>📍 <strong>City:</strong> {viewProfile.location?.city || 'Not Specified'}</p>
+              {viewProfile.bio && <p style={{fontStyle: 'italic', fontSize: '0.9rem', marginTop: '10px'}}>"{viewProfile.bio}"</p>}
             </div>
             <button className="admin-btn" onClick={() => setViewProfile(null)}>Close</button>
           </div>
@@ -146,24 +199,24 @@ function ConnectHub({ user }) {
             <form onSubmit={handleSubmitNotice} style={{textAlign: 'left'}}>
               <label>Role Title</label>
               <input name="title" required />
-              <div className="input-group">
-                <div><label>Company</label><input name="company" required /></div>
-                <div><label>Location</label><input name="location" required /></div>
+              <div className="input-group" style={{display: 'flex', gap: '10px'}}>
+                <div style={{flex:1}}><label>Company</label><input name="company" required /></div>
+                <div style={{flex:1}}><label>Location</label><input name="location" required /></div>
               </div>
-              <div className="input-group">
-                <div><label>Type</label>
+              <div className="input-group" style={{display: 'flex', gap: '10px'}}>
+                <div style={{flex:1}}><label>Type</label>
                   <select name="opportunityType">
                     <option>Internship</option><option>Full-time</option><option>Referral</option><option>Project</option><option>Scholarship</option>
                   </select>
                 </div>
-                <div><label>Deadline</label><input type="date" name="deadline" required /></div>
+                <div style={{flex:1}}><label>Deadline</label><input type="date" name="deadline" required /></div>
               </div>
               <label>Contact Method</label>
               <select name="contactMethod"><option>WhatsApp</option><option>Email</option></select>
               <label>Details</label>
               <textarea name="details" rows="4" required />
               <div className="button-row" style={{display: 'flex', gap: '10px'}}>
-                <button type="submit" className="submit-btn">Post</button>
+                <button type="submit" className="submit-btn">Post Now</button>
                 <button type="button" className="admin-btn" onClick={() => setShowForm(false)}>Cancel</button>
               </div>
             </form>

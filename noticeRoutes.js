@@ -60,7 +60,7 @@ router.delete('/:id', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const notices = await Notice.find()
-      .populate('postedBy', 'name email mobile') // Get author details
+      .populate('postedBy', 'name branch passoutYear company location profilePhoto bio') // Get author details
       .sort({ createdAt: -1 }); // Newest first
     res.json(notices);
   } catch (err) {
