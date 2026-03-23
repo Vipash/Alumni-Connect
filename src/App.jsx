@@ -7,9 +7,9 @@ import './App.css';
 import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';
-import ChatSection from './ChatSection';
 import AnnouncementsSection from './AnnouncementsSection';
 import InboxSection from './InboxSection';
+import ConnectHub from './ConnectHub';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -80,8 +80,8 @@ const renderTabContent = () => {
     case 'map':
       content = <MapSearchSection />;
       break;
-    case 'chats':
-      content = <ChatSection />;
+    case 'connect':
+      content = <ConnectHub user={loggedInUser} />;
       break;
     case 'inbox':
       content = <InboxSection />; // Ensure this component exists!
@@ -115,7 +115,7 @@ const renderTabContent = () => {
             <nav className="sidebar-nav">
               <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
               <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Map Search</button>
-              <button className={activeTab === 'chats' ? 'active' : ''} onClick={() => setActiveTab('chats')}>Chats</button>
+              <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
               <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox</button>
               <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
             </nav>

@@ -6,7 +6,6 @@
   --white: #ffffff;
   --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
-
 body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); color: #1a1a1a; }
 
 /* --- 2. LAYOUTS --- */
@@ -15,8 +14,7 @@ body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
   min-height: 100vh; width: 100%;
   background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/university-background.png');
   background-size: cover; background-position: center; background-attachment: fixed;
-  display: flex; justify-content: center; align-items: center;
-}
+  display: flex; justify-content: center; align-items: center;}
 .workspace-layout { display: flex; width: 100vw; height: 100vh; overflow: hidden; }
 .sidebar { width: 280px; background-color: #262a6b; color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
 .dashboard-content { flex: 1; background-color: #c0deff; padding: 40px; overflow-y: auto; }
@@ -41,12 +39,10 @@ body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
 .map-fancy-container {border: 4px solid var(--mbm-blue); border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(38, 42, 107, 0.2); transition: border-color 0.3s ease;}
 .alumni-detail-window {border-top: 5px solid var(--mbm-gold); padding: 25px; background: #ffffff;}
 .security-notice {font-size: 0.75rem; color: #d63031; background: #fff5f5; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px solid #fab1a0;}
-
 .table-wrapper { width: 100%; overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid #eee; max-height: 60vh; }
 table { width: 100%; border-collapse: collapse; min-width: 600px; }
 th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f0f0f0; }
 tr:hover { background-color: #f9f9f9; }
-
 .profile-card { background: rgb(219, 243, 255); border-radius: 12px; box-shadow: 0 8px 30px rgba(38,42,107,0.15); max-width: 800px; margin: 20px auto; overflow: hidden; padding: 20px; }
 .admin-announcement-form { margin-top: 30px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
@@ -101,140 +97,57 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .input-group button { margin: 0; width: auto; flex-shrink: 0; }
 .button-row { display: flex; gap: 10px; width: 100%; }
 .button-row button { flex: 1; margin: 0; }
-.map-page-wrapper {
-  position: relative; /* REQUIRED for the absolute buttons to stay inside */
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+.map-page-wrapper {position: relative; padding: 20px; max-width: 1200px; margin: 0 auto;}
+.bookmark-toggle-btn {position: absolute; top: 35px; right: 35px; z-index: 1100; background: white; border: 2px solid var(--mbm-gold); color: var(--mbm-blue); padding: 10px 18px; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: auto !important; margin: 0;}
+.bookmark-sidebar {position: absolute; top: 85px; right: 35px; width: 300px; max-height: 450px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1200; display: flex; flex-direction: column; overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border: 1px solid rgba(38, 42, 107, 0.1);}
+.bookmark-sidebar.open {opacity: 1; visibility: visible; transform: translateY(0);}
+.sidebar-header {padding: 12px 15px; background: var(--mbm-blue); color: white; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;}
+.sidebar-header h3 {margin: 0; font-size: 1rem;}
+.close-sidebar {background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;}
+.sidebar-content {padding: 5px 0; overflow-y: auto; /* Makes it scrollable */ flex-grow: 1;}
+.bookmark-item {padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: white; transition: background 0.2s;}
+.bookmark-item:hover {background: #f1f4f9;}
+.bookmark-item strong {display: block; color: var(--mbm-blue);}
+.bookmark-item p {margin: 2px 0 0 0; font-size: 0.85rem; color: #666;}
+.empty-msg {padding: 40px 20px; text-align: center; color: #888; font-style: italic;}
+.delete-bookmark-small {position: absolute; top: 12px; right: 10px; width: 24px !important; height: 24px; padding: 0 !important; line-height: 20px; background: #ff7675; color: white; border-radius: 50%; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; opacity: 0.6;}
+.delete-bookmark-small:hover {opacity: 1; background: #ff3f52; transform: scale(1.1);}
 
-.bookmark-toggle-btn {
-  position: absolute;
-  top: 35px;         /* Adjusted to sit neatly inside the padding */
-  right: 35px;
-  z-index: 1100;     /* MUST be higher than Leaflet's 1000 */
-  background: white;
-  border: 2px solid var(--mbm-gold);
-  color: var(--mbm-blue);
-  padding: 10px 18px;
-  border-radius: 30px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  width: auto !important; /* Overrides the global 'button' width: 100% */
-  margin: 0;
-}
-.bookmark-sidebar {
-  position: absolute;
-  top: 85px;         /* Appears right under the button */
-  right: 35px;
-  width: 300px;
-  max-height: 450px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  z-index: 1200;     /* Higher than the button */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;  /* Keeps the header rounded */
-  
-  /* Animation logic */
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(255, 255, 255, 0.9); /* Slightly transparent */
-  backdrop-filter: blur(8px);           /* Matching your modal vibe */
-  border: 1px solid rgba(38, 42, 107, 0.1);
-}
+/* --- NOTICE BOARD LAYOUT --- */
+.notice-board-container { padding: 20px; }
+.board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+.notice-grid { display: grid;  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));  gap: 20px;}
+.notice-card {background: white; border-radius: 12px; padding: 20px; border-left: 5px solid var(--mbm-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: relative; transition: transform 0.2s;}
+.notice-card:hover { transform: translateY(-5px); }
+.notice-badge {position: absolute; top: 15px; right: 15px; background: #f1f4f9; color: var(--mbm-blue); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;}
+.company-tag { color: #666; font-size: 0.9rem; margin: 5px 0 15px 0; }
+.notice-details {background: #fcfcfc; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem;}
+.deadline-text { color: #d63031; font-weight: 600; margin-top: 10px; }
+.notice-footer {display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 15px;}
+.posted-by { font-size: 0.8rem; color: #888; }
+.connect-btn {width: auto !important; padding: 8px 16px !important; background-color: var(--mbm-gold) !important; color: white !important; margin: 0 !important;}
+.add-notice-btn {width: auto !important; background-color: var(--mbm-blue) !important; color: white !important; padding: 10px 20px !important; border-radius: 30px !important; font-size: 0.9rem; margin: 0 !important;}
+.notice-form .input-group {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
+.notice-card:has(.notice-badge:contains('Internship')) { border-left-color: #2ecc71; }
+.notice-card:has(.notice-badge:contains('Full-time')) { border-left-color: #f1c40f; }
+.delete-btn-small {background: #fff0f0 !important; color: #ff3f52 !important; border: 1px solid #ffccd2 !important; width: 35px !important; height: 35px !important; padding: 0 !important; display: flex !important; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; margin: 0 !important; transition: all 0.2s ease;}
+.delete-btn-small:hover {background: #ff3f52 !important; color: white !important; transform: scale(1.05);}
 
-.bookmark-sidebar.open {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.sidebar-header {
-  padding: 12px 15px;
-  background: var(--mbm-blue);
-  color: white;
-  border-radius: 12px 12px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.sidebar-header h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.close-sidebar {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-.sidebar-content {
-  padding: 5px 0;
-  overflow-y: auto; /* Makes it scrollable */
-  flex-grow: 1;
-}
-
-.bookmark-item {
-  padding: 15px;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-  background: white;
-  transition: background 0.2s;
-}
-
-.bookmark-item:hover {
-  background: #f1f4f9;
-}
-
-.bookmark-item strong {
-  display: block;
-  color: var(--mbm-blue);
-}
-
-.bookmark-item p {
-  margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.empty-msg {
-  padding: 40px 20px;
-  text-align: center;
-  color: #888;
-  font-style: italic;
-}
-.delete-bookmark-small {
-  position: absolute;
-  top: 12px;
-  right: 10px;
-  width: 24px !important;
-  height: 24px;
-  padding: 0 !important;
-  line-height: 20px;
-  background: #ff7675;
-  color: white;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.6;
-}
-
-.delete-bookmark-small:hover {
-  opacity: 1;
-  background: #ff3f52;
-  transform: scale(1.1);
-}
+/* --- 9. CONNECT HUB SPECIFIC STYLES --- */
+.connect-hub-container {display: flex; flex-direction: column; gap: 20px;}
+.hub-header {display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
+.hub-tabs {display: flex; gap: 10px;}
+.hub-tabs button {width: auto !important; margin: 0 !important; background: transparent; color: #666; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 20px;}
+.hub-tabs button.active {color: var(--mbm-blue); border-bottom: 3px solid var(--mbm-gold); background: rgba(38, 42, 107, 0.05);}
+.hub-tabs button:hover {transform: none; /* Disable the standard button jump for tabs */ background: rgba(38, 42, 107, 0.02);}
+/* History Section Table Adjustments */
+.history-section {background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
+.badge-pill {padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: #e1f5fe; color: #01579b; text-transform: uppercase;}
+/* Notice Form Modal Tweaks */
+.notice-form-modal {max-width: 600px !important; text-align: left !important;}
+.notice-form-modal h3 {margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;}
+.notice-form-modal label {display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--mbm-blue);}
+.notice-form-modal .input-group {display: grid; grid-template-columns: 1fr 1fr; gap: 15px;}
 
 /* Announcements */
 .announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }

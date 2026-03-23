@@ -6,12 +6,15 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const Announcement = require('./Announcement');
 const SecurityLog = require('./SecurityLog');
+const noticeRoutes = require('./routes/noticeRoutes');
 // Models
 const User = require('./alumni'); 
 const app = express();
 const router = express.Router();
 app.use(cors());
 app.use(express.json());
+app.use('/api/notices', noticeRoutes);
+app.use('/api/connections', connectionRoutes);
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://AlumniAdmin:12345@cluster0.ajb1ovb.mongodb.net/alumni_db?appName=Cluster0';
 
