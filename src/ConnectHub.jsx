@@ -8,7 +8,9 @@ function ConnectHub({ user }) {
   const [viewProfile, setViewProfile] = useState(null); 
   const [showForm, setShowForm] = useState(false);
 
-  // 1. Fetch Data
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState('All');
+
   useEffect(() => {
     fetch('/api/notices').then(res => res.json()).then(setNotices);
     
@@ -17,9 +19,16 @@ function ConnectHub({ user }) {
       : `/api/connections/alumni/${user._id}`;
       
     fetch(endpoint).then(res => res.json()).then(setHistory);
-  }, [user, activeSubTab]); // Refresh when tabs change
+  }, [user, activeSubTab]);
 
-  // 2. Fix: Handle Posting Notice (Prevents the Redirect)
+  // Filtering Logic
+  const filteredNotices = notices.filter(n => {
+    const matchesSearch = n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          n.company.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === 'All' || n.opportunityType === filterType;
+    return matchesSearch && matchesType;
+  });
+  
   const handleSubmitNotice = async (e) => {
     e.preventDefault(); 
     const fd = new FormData(e.target);
@@ -37,12 +46,11 @@ function ConnectHub({ user }) {
         const newNotice = await res.json();
         setNotices([newNotice, ...notices]);
         setShowForm(false);
-        setActiveSubTab('myposts'); // Stay in Hub, just switch tab
+        setActiveSubTab('myposts'); 
       }
     } catch (err) { console.error("Post failed:", err); }
   };
 
-  // 3. Fix: Handle Deleting Notice
   const handleDelete = async (noticeId) => {
     if (!window.confirm("Delete this notice?")) return;
     try {
@@ -86,72 +94,100 @@ function ConnectHub({ user }) {
             <button className={activeSubTab === 'myposts' ? 'active' : ''} onClick={() => setActiveSubTab('myposts')}>My Posts</button>
           )}
         </div>
-        {user.role === 'alumni' && <button className="add-notice-btn" onClick={() => setShowForm(true)}>+ Post Opportunity</button>}
+        {user.role === 'alumni' && <button className="add-notice-btn" onClick={() => setShowForm(true)}>+ Post Notice</button>}
       </div>
 
       {activeSubTab === 'bulletin' && (
-        !selectedNotice ? (
-          <div className="notice-grid">
-            {notices.map(n => (
-              <div key={n._id} className="notice-card glance" onClick={() => setSelectedNotice(n)}>
-                <div className="notice-badge">{n.opportunityType}</div>
-                <h4>{n.title}</h4>
-                <p className="company-tag">🏢 {n.company}</p>
-                <span className="posted-at">📅 {new Date(n.createdAt).toLocaleDateString()}</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="notice-detail-view">
-            <button className="admin-btn" style={{width: 'auto', marginBottom: '15px'}} onClick={() => setSelectedNotice(null)}>← Back</button>
-            <div className="detail-content">
-              <span className="badge-pill">{selectedNotice.opportunityType}</span>
-              <h2>{selectedNotice.title}</h2>
-              <div className="details-text">{selectedNotice.details}</div>
-              
-              <div className="alumni-mini-card">
-                <p>Posted by: <strong>{selectedNotice.postedBy?.name}</strong></p>
-                <button className="nav-btn" style={{width: 'auto', fontSize: '0.8rem'}} onClick={() => setViewProfile(selectedNotice.postedBy)}>View Mini Profile</button>
+        <>
+          {!selectedNotice ? (
+            <>
+              <div className="search-bar-container">
+                <input 
+                  type="text" 
+                  placeholder="Search by Role or Company..." 
+                  className="hub-search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <select 
+                  className="hub-filter-select"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="All">All Types</option>
+                  <option value="Internship">Internship</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Referral">Referral</option>
+                  <option value="Project">Project</option>
+                  <option value="Scholarship">Scholarship</option>
+                </select>
               </div>
 
-              <div className="action-row" style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
-                <button className="submit-btn" onClick={() => handleConnect(selectedNotice)}>Connect Now</button>
+              <div className="notice-grid">
+                {/* Use filteredNotices here instead of notices */}
+                {filteredNotices.map(n => (
+                  <div key={n._id} className="notice-card glance" onClick={() => setSelectedNotice(n)}>
+                    <div className="notice-badge">{n.opportunityType}</div>
+                    <h4>{n.title}</h4>
+                    <p className="company-tag">🏢 {n.company}</p>
+                    <span className="posted-at">📅 {new Date(n.createdAt).toLocaleDateString()}</span>
+                  </div>
+                ))}
+                {filteredNotices.length === 0 && <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#888'}}>No matches found.</p>}
+              </div>
+            </>
+          ) : (
+            <div className="notice-detail-view">
+              <button className="admin-btn" style={{width: 'auto', marginBottom: '15px'}} onClick={() => setSelectedNotice(null)}>← Back</button>
+              <div className="detail-content">
+                <span className="badge-pill">{selectedNotice.opportunityType}</span>
+                <h2>{selectedNotice.title}</h2>
+                <div className="details-text">{selectedNotice.details}</div>
+                
+                <div className="alumni-mini-card">
+                  <p>Posted by: <strong>{selectedNotice.postedBy?.name}</strong></p>
+                  <button className="nav-btn" style={{width: 'auto', fontSize: '0.8rem'}} onClick={() => setViewProfile(selectedNotice.postedBy)}>View Profile</button>
+                </div>
+
+                <div className="action-row" style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
+                  <button className="submit-btn" onClick={() => handleConnect(selectedNotice)}>Connect Now</button>
+                </div>
               </div>
             </div>
-          </div>
-        )
+          )}
+        </>
       )}
 
-     {activeSubTab === 'history' && (
-  <div className="history-section">
-    <table className="admin-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Contacted Alumni</th> {/* Simplified label */}
-          <th>Opportunity</th>
-          <th>Method</th>
-        </tr>
-      </thead>
-      <tbody>
-        {history.length > 0 ? history.map(h => (
-          <tr key={h._id}>
-            <td>{new Date(h.connectedAt).toLocaleDateString()}</td>
-            <td>{h.alumni?.name || "Unknown Alumni"}</td>
-            <td>{h.notice?.title || "General Inquiry"}</td>
-            <td><span className="badge-pill">{h.contactMethod}</span></td>
-          </tr>
-        )) : (
-          <tr>
-            <td colSpan="4" style={{textAlign: 'center', padding: '20px', color: '#888'}}>
-              No connection history found.
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
-)}
+      {activeSubTab === 'history' && (
+        <div className="history-section">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Contacted Alumni</th>
+                <th>Role</th>
+                <th>Method</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.length > 0 ? history.map(h => (
+                <tr key={h._id}>
+                  <td>{new Date(h.connectedAt).toLocaleDateString()}</td>
+                  <td>{h.alumni?.name || "Unknown Alumni"}</td>
+                  <td>{h.notice?.title || "General Inquiry"}</td>
+                  <td><span className="badge-pill">{h.contactMethod}</span></td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan="4" style={{textAlign: 'center', padding: '20px', color: '#888'}}>
+                    No connection history found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {activeSubTab === 'myposts' && (
         <div className="history-section">
@@ -168,23 +204,28 @@ function ConnectHub({ user }) {
         </div>
       )}
 
-      {/* MINI PROFILE MODAL - Using Real Database Fields */}
       {viewProfile && (
         <div className="modal-overlay">
           <div className="modal-box mini-profile-box">
             <div className="profile-header-mini">
                {viewProfile.profilePhoto ? (
-                 <img src={viewProfile.profilePhoto} alt="Profile" className="profile-avatar-mini" />
-               ) : (
-                 <div className="avatar-placeholder">{viewProfile.name?.[0]}</div>
-               )}
+                <img 
+                  src={viewProfile.profilePhoto.startsWith('http') 
+                    ? viewProfile.profilePhoto 
+                    : `/${viewProfile.profilePhoto}`}
+                  alt="Profile" 
+                  className="profile-avatar-mini" 
+                  onError={(e) => { e.target.src = '/default-avatar.png'; }}
+                />
+              ) : (
+                <div className="avatar-placeholder">{viewProfile.name?.[0]}</div>
+              )}
                <h3>{viewProfile.name}</h3>
                <p className="branch-text">{viewProfile.branch} | Class of {viewProfile.passoutYear}</p>
             </div>
             <hr />
             <div className="profile-details-mini" style={{textAlign: 'left'}}>
               <p>🏢 <strong>Company:</strong> {viewProfile.company || 'Not Specified'}</p>
-              <p>📍 <strong>City:</strong> {viewProfile.location?.city || 'Not Specified'}</p>
               {viewProfile.bio && <p style={{fontStyle: 'italic', fontSize: '0.9rem', marginTop: '10px'}}>"{viewProfile.bio}"</p>}
             </div>
             <button className="admin-btn" onClick={() => setViewProfile(null)}>Close</button>
