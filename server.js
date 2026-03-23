@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const Announcement = require('./Announcement');
 const SecurityLog = require('./SecurityLog');
-const noticeRoutes = require('./routes/noticeRoutes');
+const noticeRoutes = require('./noticeRoutes');
 // Models
 const User = require('./alumni'); 
 const app = express();
