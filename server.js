@@ -7,6 +7,7 @@ const path = require('path');
 const Announcement = require('./Announcement');
 const SecurityLog = require('./SecurityLog');
 const noticeRoutes = require('./noticeRoutes');
+const connectionRoutes = require('./connectionRoutes');
 // Models
 const User = require('./alumni'); 
 const app = express();
