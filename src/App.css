@@ -148,6 +148,20 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .notice-form-modal h3 {margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;}
 .notice-form-modal label {display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--mbm-blue);}
 .notice-form-modal .input-group {display: grid; grid-template-columns: 1fr 1fr; gap: 15px;}
+/* --- DETAIL VIEW STYLING --- */
+.notice-card.glance {cursor: pointer; border-left-width: 8px;}
+.click-hint { font-size: 0.8rem; color: var(--mbm-blue); font-weight: bold; margin-top: 10px; }
+.posted-at { font-size: 0.75rem; color: #888; }
+.notice-detail-view {background: white; padding: 30px; border-radius: 15px; box-shadow: var(--shadow); animation: fadeIn 0.3s ease;}
+.detail-content h2 { margin-bottom: 5px; color: var(--mbm-blue); }
+.detail-content h3 { margin-top: 0; color: #666; font-weight: 400; }
+.details-text { background: #f8f9fa;  padding: 20px;  border-radius: 10px;  line-height: 1.6;  margin: 15px 0; white-space: pre-wrap;}
+.form-field { margin-bottom: 15px; text-align: left; }
+.form-field label {display: block;  font-weight: bold;  font-size: 0.85rem;  margin-bottom: 5px;  color: var(--mbm-blue);}
+.action-row { display: flex; gap: 15px; margin-top: 25px; }
+.connect-btn-large { flex: 2; background: var(--mbm-gold); color: white; padding: 15px; font-size: 1rem; }
+.delete-btn-large { flex: 1; background: #ff7675; color: white; padding: 15px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Announcements */
 .announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
