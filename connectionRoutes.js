@@ -1,7 +1,7 @@
 /* --- backend/routes/connectionRoutes.js --- */
 const express = require('express');
 const router = express.Router();
-const Connection = require('../models/Connection');
+const Connection = require('./Connection');
 
 // Record a new connection event
 router.post('/log', async (req, res) => {

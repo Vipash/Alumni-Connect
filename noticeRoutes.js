@@ -1,7 +1,7 @@
 /* --- backend/routes/noticeRoutes.js --- */
 const express = require('express');
 const router = express.Router();
-const Notice = require('../models/Notice');
+const Notice = require('./Notice');
 
 // @route   POST /api/notices/add
 // @desc    Create a new opportunity notice
