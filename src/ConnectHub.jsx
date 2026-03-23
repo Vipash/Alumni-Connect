@@ -4,9 +4,10 @@ function ConnectHub({ user }) {
   const [activeSubTab, setActiveSubTab] = useState('bulletin');
   const [notices, setNotices] = useState([]);
   const [history, setHistory] = useState([]);
+  const [selectedNotice, setSelectedNotice] = useState(null); 
   const [showForm, setShowForm] = useState(false);
 
-  // Fetch data on load
+  // 1. Fetch Data
   useEffect(() => {
     fetch('/api/notices').then(res => res.json()).then(setNotices);
     if (user.role === 'student') {
@@ -14,23 +15,16 @@ function ConnectHub({ user }) {
     }
   }, [user]);
 
-  // Logic to handle connecting
+  // 2. Handle Connecting
   const handleConnect = async (notice) => {
-    const message = `Hi ${notice.postedBy.name}, I'm ${user.name} from MBM. I'm interested in the ${notice.title} role at ${notice.company}.`;
-  
-    const isOwner = (notice) => {
-    const ownerId = notice.postedBy?._id || notice.postedBy;
-    return user._id === ownerId;
-  };
-
-    // Log connection to DB
+    const message = `Hi ${notice.postedBy?.name}, I'm ${user.name} from MBM. I'm interested in the ${notice.title} role at ${notice.company}.`;
     try {
       await fetch('/api/connections/log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           studentId: user._id,
-          alumniId: notice.postedBy._id,
+          alumniId: notice.postedBy?._id || notice.postedBy,
           noticeId: notice._id,
           contactMethod: notice.contactMethod
         })
@@ -38,12 +32,12 @@ function ConnectHub({ user }) {
     } catch (err) { console.error(err); }
 
     let url = notice.contactMethod === 'WhatsApp' 
-      ? `https://wa.me/${notice.postedBy.mobile}?text=${encodeURIComponent(message)}`
-      : `mailto:${notice.postedBy.email}?subject=Inquiry&body=${encodeURIComponent(message)}`;
+      ? `https://wa.me/${notice.postedBy?.mobile}?text=${encodeURIComponent(message)}`
+      : `mailto:${notice.postedBy?.email}?subject=Inquiry&body=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
-  // Logic to post new notice
+  // 3. Handle Posting Notice
   const handleSubmitNotice = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -60,14 +54,33 @@ function ConnectHub({ user }) {
       const newNotice = await res.json();
       setNotices([newNotice, ...notices]);
       setShowForm(false);
+      e.target.reset();
     }
+  };
+
+  // 4. Handle Deleting Notice
+  const handleDelete = async (noticeId) => {
+    if (!window.confirm("Remove this post permanently?")) return;
+    try {
+      const res = await fetch(`/api/notices/${noticeId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setNotices(notices.filter(n => n._id !== noticeId));
+        setSelectedNotice(null); // Return to board
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  // Helper: Check Ownership
+  const isOwner = (notice) => {
+    const ownerId = notice.postedBy?._id || notice.postedBy;
+    return user._id === ownerId;
   };
 
   return (
     <div className="connect-hub-container">
       <div className="hub-header">
         <div className="hub-tabs">
-          <button className={activeSubTab === 'bulletin' ? 'active' : ''} onClick={() => setActiveSubTab('bulletin')}>Bulletin Board</button>
+          <button className={activeSubTab === 'bulletin' ? 'active' : ''} onClick={() => {setActiveSubTab('bulletin'); setSelectedNotice(null);}}>Bulletin Board</button>
           <button className={activeSubTab === 'history' ? 'active' : ''} onClick={() => setActiveSubTab('history')}>My History</button>
         </div>
         {user.role === 'alumni' && <button className="add-notice-btn" onClick={() => setShowForm(true)}>+ Post Opportunity</button>}
@@ -75,7 +88,6 @@ function ConnectHub({ user }) {
 
       {activeSubTab === 'bulletin' ? (
         <>
-          {/* GLANCE VIEW (The Grid) */}
           {!selectedNotice ? (
             <div className="notice-grid">
               {notices.map(n => (
@@ -83,45 +95,25 @@ function ConnectHub({ user }) {
                   <div className="notice-badge">{n.opportunityType}</div>
                   <h4>{n.title}</h4>
                   <p className="company-tag">🏢 {n.company}</p>
-                  <span className="posted-at">Posted: {new Date(n.createdAt).toLocaleDateString()}</span>
-                  <p className="click-hint">Click to view details →</p>
+                  <span className="posted-at">📅 {new Date(n.createdAt).toLocaleDateString()}</span>
+                  <p className="click-hint">Click for full details →</p>
                 </div>
               ))}
             </div>
           ) : (
-            /* FULL DETAIL VIEW */
             <div className="notice-detail-view">
-              <button className="back-btn" onClick={() => setSelectedNotice(null)}>← Back to Board</button>
-              
+              <button className="admin-btn" style={{width: 'auto', marginBottom: '20px'}} onClick={() => setSelectedNotice(null)}>← Back to Board</button>
               <div className="detail-content">
-                <div className="detail-header">
-                  <span className="notice-badge-large">{selectedNotice.opportunityType}</span>
-                  <h2>{selectedNotice.title}</h2>
-                  <h3>{selectedNotice.company} • {selectedNotice.location}</h3>
-                  <p className="timestamp">Published on: {new Date(selectedNotice.createdAt).toLocaleString()}</p>
-                </div>
-
-                <div className="detail-body">
-                  <label>Description & Requirements:</label>
-                  <div className="details-text">{selectedNotice.details}</div>
-                  
-                  <p className="deadline-text">⏳ Application Deadline: {new Date(selectedNotice.deadline).toLocaleDateString()}</p>
-                </div>
-
+                <span className="badge-pill">{selectedNotice.opportunityType}</span>
+                <h2>{selectedNotice.title}</h2>
+                <p><strong>{selectedNotice.company}</strong> • {selectedNotice.location}</p>
+                <div className="details-text">{selectedNotice.details}</div>
+                <p className="deadline-text">⏳ Apply by: {new Date(selectedNotice.deadline).toLocaleDateString()}</p>
                 <div className="detail-footer">
-                  <div className="author-info">Posted by: <strong>{selectedNotice.postedBy?.name || "Alumni"}</strong></div>
-                  
-                  <div className="action-row">
-                    <button className="connect-btn-large" onClick={() => handleConnect(selectedNotice)}>
-                      Connect via {selectedNotice.contactMethod}
-                    </button>
-
-                    {/* FIXED DELETE LOGIC */}
-                    {isOwner(selectedNotice) && (
-                      <button className="delete-btn-large" onClick={() => handleDelete(selectedNotice._id)}>
-                        Remove Post
-                      </button>
-                    )}
+                  <p>Posted by: <strong>{selectedNotice.postedBy?.name || "Alumni"}</strong></p>
+                  <div className="action-row" style={{display: 'flex', gap: '10px'}}>
+                    <button className="submit-btn" onClick={() => handleConnect(selectedNotice)}>Connect Now</button>
+                    {isOwner(selectedNotice) && <button className="delete-btn" style={{width: 'auto'}} onClick={() => handleDelete(selectedNotice._id)}>Delete</button>}
                   </div>
                 </div>
               </div>
@@ -129,62 +121,50 @@ function ConnectHub({ user }) {
           )}
         </>
       ) : (
-        <ConnectionHistory user={user} />
+        <div className="history-section">
+          <table className="admin-table">
+            <thead>
+              <tr><th>Date</th><th>Alumni</th><th>Opportunity</th><th>Method</th></tr>
+            </thead>
+            <tbody>
+              {history.map(h => (
+                <tr key={h._id}>
+                  <td>{new Date(h.connectedAt).toLocaleDateString()}</td>
+                  <td>{h.alumni?.name}</td>
+                  <td>{h.notice?.title}</td>
+                  <td><span className="badge-pill">{h.contactMethod}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
-      {/* MODAL FORM (Updated with labels) */}
       {showForm && (
         <div className="modal-overlay">
           <div className="modal-box notice-form-modal">
-            <h3>Post New Opportunity</h3>
-            <form onSubmit={handleSubmitNotice}>
-              <div className="form-field">
-                <label>Job/Internship Title</label>
-                <input name="title" required placeholder="e.g. Software Engineering Intern" />
-              </div>
-              
+            <h3>Post Opportunity</h3>
+            <form onSubmit={handleSubmitNotice} style={{textAlign: 'left'}}>
+              <label>Role Title</label>
+              <input name="title" required />
               <div className="input-group">
-                <div className="form-field">
-                  <label>Company Name</label>
-                  <input name="company" required />
-                </div>
-                <div className="form-field">
-                  <label>Location</label>
-                  <input name="location" required />
-                </div>
+                <div><label>Company</label><input name="company" required /></div>
+                <div><label>Location</label><input name="location" required /></div>
               </div>
-
               <div className="input-group">
-                <div className="form-field">
-                  <label>Opportunity Type</label>
+                <div><label>Type</label>
                   <select name="opportunityType">
-                    <option value="Internship">Internship</option>
-                    <option value="Full-time">Full-time</option>
-                    <option value="Project">Project</option>
-                    <option value="Referral">Referral</option>
+                    <option>Internship</option><option>Full-time</option><option>Referral</option>
                   </select>
                 </div>
-                <div className="form-field">
-                  <label>Deadline Date</label>
-                  <input type="date" name="deadline" required />
-                </div>
+                <div><label>Deadline</label><input type="date" name="deadline" required /></div>
               </div>
-
-              <div className="form-field">
-                <label>Preferred Contact Channel</label>
-                <select name="contactMethod">
-                  <option value="WhatsApp">WhatsApp</option>
-                  <option value="Email">Email</option>
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label>Details & Link</label>
-                <textarea name="details" rows="5" required />
-              </div>
-
-              <div className="button-row">
-                <button type="submit" className="submit-btn">Post Opportunity</button>
+              <label>Contact Method</label>
+              <select name="contactMethod"><option>WhatsApp</option><option>Email</option></select>
+              <label>Details</label>
+              <textarea name="details" rows="4" required />
+              <div className="button-row" style={{display: 'flex', gap: '10px'}}>
+                <button type="submit" className="submit-btn">Post</button>
                 <button type="button" className="admin-btn" onClick={() => setShowForm(false)}>Cancel</button>
               </div>
             </form>
