@@ -93,7 +93,7 @@ const handleToggleFilled = async (noticeId, currentStatus) => {
 
   const handleConnect = async (notice) => {
     if (notice.isFilled || new Date(notice.deadline) < new Date()) {
-    alert("This opportunity is no longer accepting inquiries.");
+    alert("This notice is no longer accepting inquiries.");
     return;
   }
     const message = `Hi ${notice.postedBy?.name}, I'm ${user.name} from MBM...`;

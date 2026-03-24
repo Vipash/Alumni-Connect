@@ -4,7 +4,6 @@ const router = express.Router();
 const Notice = require('./Notice');
 
 // @route   POST /api/notices/add
-// @desc    Create a new opportunity notice
 router.post('/add', async (req, res) => {
   try {
     const { title, company, location, opportunityType, deadline, contactMethod, details, postedBy } = req.body;
