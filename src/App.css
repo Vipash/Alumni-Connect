@@ -188,6 +188,16 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .card-footer-tags { display: flex; align-items: center; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px; }
 @keyframes pulse {0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }}
 
+/*Inbox*/
+.topic-pills {display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;}
+.topic-pill {padding: 10px 20px; border: 2px solid #eee; border-radius: 25px; cursor: pointer; transition: all 0.3s ease; background: white; font-weight: 500;}
+.topic-pill.selected {border-color: var(--mbm-blue); background: var(--mbm-blue); color: white;}
+.alert-card {display: flex; align-items: center; gap: 15px; padding: 15px; background: #fdfdfd; border-left: 4px solid var(--mbm-blue); margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+.alert-card.read {opacity: 0.7; border-left-color: #ccc;}
+.tab-btn {position: relative; /* Essential for badge positioning */ padding: 10px 20px;}
+.notification-badge {position: absolute; top: -5px; right: -5px; background-color: #ff3f52; color: white; font-size: 0.7rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; /* Makes it pop against the button */ box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: bounce 0.5s ease-in-out;}
+@keyframes bounce {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); }}
+
 /* Announcements */
 .announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
 .announcement-item:hover { background: #f9f9f9; border-left: 4px solid var(--mbm-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }

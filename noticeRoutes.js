@@ -1,27 +1,43 @@
 /* --- backend/routes/noticeRoutes.js --- */
 const express = require('express');
 const router = express.Router();
-const Notice = require('./Notice');
+const Notice = require('../models/Notice'); // Ensure this path is correct
+const Notification = require('../models/Notification');
+const User = require('../models/User');
+
+// --- Helper Function for Alerts ---
+const createInterestAlerts = async (newNotice) => {
+  try {
+    // Find all users who have this opportunityType in their interests array
+    const matchingUsers = await User.find({ 
+      interests: newNotice.opportunityType 
+    });
+
+    if (matchingUsers.length === 0) return;
+
+    const notifications = matchingUsers.map(user => ({
+      userId: user._id,
+      message: `New ${newNotice.opportunityType} alert: ${newNotice.title} at ${newNotice.company}!`,
+      link: `/hub`, 
+      type: 'interest_match'
+    }));
+
+    await Notification.insertMany(notifications);
+  } catch (err) {
+    console.error("Alert Trigger Error:", err);
+  }
+};
 
 // @route   POST /api/notices/add
 router.post('/add', async (req, res) => {
   try {
-    const { title, company, location, opportunityType, deadline, contactMethod, details, postedBy } = req.body;
+    const newNotice = new Notice(req.body);
+    const savedNotice = await newNotice.save(); // FIXED: was 'await savedNotice.save()'
 
-    const newNotice = new Notice({
-      title,
-      company,
-      location,
-      opportunityType,
-      deadline,
-      contactMethod,
-      details,
-      postedBy
-    });
+    // Trigger the alerts in the background
+    await createInterestAlerts(savedNotice);
 
-    const savedNotice = await newNotice.save();
-    
-    // We populate the 'postedBy' field so the frontend gets the Alumni's name/details immediately
+    // Populate for the frontend response
     const populatedNotice = await savedNotice.populate('postedBy', 'name email mobile');
     
     res.status(201).json(populatedNotice);
@@ -31,58 +47,44 @@ router.post('/add', async (req, res) => {
   }
 });
 
-/* --- Add this to backend/routes/noticeRoutes.js --- */
-
-// @route   DELETE /api/notices/:id
-// @desc    Delete a notice (Only by the creator)
-router.delete('/:id', async (req, res) => {
-  try {
-    const notice = await Notice.findById(req.params.id);
-    
-    if (!notice) {
-      return res.status(404).json({ message: "Notice not found" });
-    }
-
-    // Optional: Add a check here to ensure the user deleting is the owner or an admin
-    // if (notice.postedBy.toString() !== req.body.userId) { ... }
-
-    await Notice.findByIdAndDelete(req.params.id);
-    res.json({ message: "Notice removed successfully" });
-  } catch (err) {
-    console.error("Delete Error:", err);
-    res.status(500).json({ message: "Server error during deletion" });
-  }
-});
-
 // @route   GET /api/notices
-// @desc    Get all active notices (sorted by newest first)
 router.get('/', async (req, res) => {
   try {
     const notices = await Notice.find()
-      .populate('postedBy', 'name branch passoutYear company location profilePhoto bio') // Get author details
-      .sort({ createdAt: -1 }); // Newest first
+      .populate('postedBy', 'name branch passoutYear company location profilePhoto bio')
+      .sort({ createdAt: -1 });
     res.json(notices);
   } catch (err) {
-    console.error("Fetch Notices Error:", err);
-    res.status(500).json({ message: "Server error while fetching notices" });
+    console.error("Fetch Error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
+// @route   PATCH /api/notices/:id
 router.patch('/:id', async (req, res) => {
   try {
     const { isFilled } = req.body;
-    
-    // 1. Find the notice
-    const notice = await Notice.findById(req.params.id);
+    const notice = await Notice.findByIdAndUpdate(
+      req.params.id, 
+      { isFilled }, 
+      { new: true }
+    );
     if (!notice) return res.status(404).json({ message: "Notice not found" });
-
-    // 2. Update the status
-    notice.isFilled = isFilled;
-    await notice.save();
-
     res.json(notice);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// @route   DELETE /api/notices/:id
+router.delete('/:id', async (req, res) => {
+  try {
+    const notice = await Notice.findByIdAndDelete(req.params.id);
+    if (!notice) return res.status(404).json({ message: "Notice not found" });
+    res.json({ message: "Notice removed successfully" });
+  } catch (err) {
+    console.error("Delete Error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

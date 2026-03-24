@@ -8,7 +8,7 @@ import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';
 import AnnouncementsSection from './AnnouncementsSection';
-import InboxSection from './InboxSection';
+import Inbox from './Inbox';
 import ConnectHub from './ConnectHub';
 
 // Fix for Leaflet Icons
@@ -71,6 +71,28 @@ function App() {
     if (pass === "admin123") setView('admin-dash');
   };
 
+  const [unreadCount, setUnreadCount] = useState(0);
+
+// Fetch unread count on load and periodically
+useEffect(() => {
+  if (user) {
+    fetch(`/api/notifications/${user._id}`)
+      .then(res => res.json())
+      .then(data => {
+        const unread = data.filter(n => !n.read).length;
+        setUnreadCount(unread);
+      });
+  }
+}, [user, activeTab]);
+
+const handleInboxClick = () => {
+  setActiveTab('inbox');
+  setUnreadCount(0); // Clear badge immediately for better feel
+  
+  // Optional: Backend call to mark all as read
+  fetch(`/api/notifications/${user._id}/mark-all-read`, { method: 'PATCH' });
+};
+
 const renderTabContent = () => {
   let content; 
   switch (activeTab) {
@@ -116,7 +138,7 @@ const renderTabContent = () => {
               <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
               <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Map Search</button>
               <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
-              <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox</button>
+              <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}</button>
               <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
             </nav>
             <button className="logout-btn" onClick={() => window.location.reload()}>Logout</button>

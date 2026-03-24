@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
   rollNumber: String,
   company: String,
   mobile: String,
-  displayName: String, // Ensure this exists here
+  displayName: String,
+  interests: {type: [String], default: []},
   isVerified: { type: Boolean, default: false }
 });
 

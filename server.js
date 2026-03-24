@@ -8,6 +8,7 @@ const Announcement = require('./Announcement');
 const SecurityLog = require('./SecurityLog');
 const noticeRoutes = require('./noticeRoutes');
 const connectionRoutes = require('./connectionRoutes');
+const notificationRoutes = require('./notificationRoutes');
 // Models
 const User = require('./alumni'); 
 const app = express();
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/notices', noticeRoutes);
 app.use('/api/connections', connectionRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://AlumniAdmin:12345@cluster0.ajb1ovb.mongodb.net/alumni_db?appName=Cluster0';
 
