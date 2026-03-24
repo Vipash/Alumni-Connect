@@ -10,6 +10,14 @@ function Inbox({ user }) {
     'Gate Prep', 'Consulting', 'Product Management', 'Remote Work'
   ];
 
+  const [notices, setNotices] = useState([]);
+
+    useEffect(() => {
+    fetch('/api/notices')
+        .then(res => res.json())
+        .then(setNotices);
+    }, []);
+
   // Fetch personal notifications
   useEffect(() => {
     fetch(`/api/notifications/${user._id}`)

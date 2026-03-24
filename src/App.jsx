@@ -75,22 +75,22 @@ function App() {
 
 // Fetch unread count on load and periodically
 useEffect(() => {
-  if (user) {
-    fetch(`/api/notifications/${user._id}`)
+  if (loggedInUser) { // Changed from 'user' to 'loggedInUser'
+    fetch(`/api/notifications/${loggedInUser._id}`) // Changed from 'user' to 'loggedInUser'
       .then(res => res.json())
       .then(data => {
         const unread = data.filter(n => !n.read).length;
         setUnreadCount(unread);
       });
   }
-}, [user, activeTab]);
+}, [loggedInUser, activeTab]); // Changed from 'user' to 'loggedInUser'
 
 const handleInboxClick = () => {
   setActiveTab('inbox');
-  setUnreadCount(0); // Clear badge immediately for better feel
-  
-  // Optional: Backend call to mark all as read
-  fetch(`/api/notifications/${user._id}/mark-all-read`, { method: 'PATCH' });
+  setUnreadCount(0); 
+  if (loggedInUser) {
+    fetch(`/api/notifications/${loggedInUser._id}/mark-all-read`, { method: 'PATCH' });
+  }
 };
 
 const renderTabContent = () => {
@@ -106,7 +106,7 @@ const renderTabContent = () => {
       content = <ConnectHub user={loggedInUser} />;
       break;
     case 'inbox':
-      content = <InboxSection />; // Ensure this component exists!
+      content = <Inbox user={loggedInUser} />;
       break;
     case 'announcements':
       content = <AnnouncementsSection />;
