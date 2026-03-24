@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('./Notification');
-const User = require('./User');
+const User = require('./alumni');
 
 // @route   GET /api/notifications/:userId
 // @desc    Get all notifications for a specific user
