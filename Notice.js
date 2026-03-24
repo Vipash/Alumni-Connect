@@ -6,7 +6,7 @@ const noticeSchema = new mongoose.Schema({
   location: { type: String, required: true },
   opportunityType: { 
     type: String, 
-    enum: ['Internship', 'Full-time', 'Project', 'Referral'], 
+    enum: ['Internship', 'Full-time', 'Project', 'Referral', 'Volunteer'], 
     required: true 
   },
   deadline: { type: Date, required: true },
@@ -22,6 +22,7 @@ const noticeSchema = new mongoose.Schema({
     ref: 'User', 
     required: true 
   },
+  isFilled: { type: Boolean, default: false }, 
   createdAt: { type: Date, default: Date.now }
 },
 { timestamps: true });

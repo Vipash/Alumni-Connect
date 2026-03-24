@@ -29,6 +29,36 @@ function ConnectHub({ user }) {
     return matchesSearch && matchesType;
   });
   
+  const getDeadlineStatus = (deadline) => {
+  const now = new Date();
+  const target = new Date(deadline);
+  const diffTime = target - now;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffTime < 0) return { label: 'Expired', class: 'expired' };
+  if (diffDays <= 2) return { label: 'Closing Soon', class: 'urgent' };
+  return { label: `${diffDays} days left`, class: 'active' };
+};
+
+// Helper: Check if already contacted
+const hasContacted = (noticeId) => {
+  return history.some(h => (h.notice?._id || h.notice) === noticeId);
+};
+
+// 4. Handle "Mark as Filled" (For Alumni)
+const handleToggleFilled = async (noticeId, currentStatus) => {
+  try {
+    const res = await fetch(`/api/notices/${noticeId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isFilled: !currentStatus })
+    });
+    if (res.ok) {
+      setNotices(notices.map(n => n._id === noticeId ? { ...n, isFilled: !currentStatus } : n));
+    }
+  } catch (err) { console.error(err); }
+};
+
   const handleSubmitNotice = async (e) => {
     e.preventDefault(); 
     const fd = new FormData(e.target);
@@ -62,6 +92,10 @@ function ConnectHub({ user }) {
   };
 
   const handleConnect = async (notice) => {
+    if (notice.isFilled || new Date(notice.deadline) < new Date()) {
+    alert("This opportunity is no longer accepting inquiries.");
+    return;
+  }
     const message = `Hi ${notice.postedBy?.name}, I'm ${user.name} from MBM...`;
     try {
       await fetch('/api/connections/log', {
@@ -124,17 +158,30 @@ function ConnectHub({ user }) {
               </div>
 
               <div className="notice-grid">
-                {/* Use filteredNotices here instead of notices */}
-                {filteredNotices.map(n => (
-                  <div key={n._id} className="notice-card glance" onClick={() => setSelectedNotice(n)}>
-                    <div className="notice-badge">{n.opportunityType}</div>
-                    <h4>{n.title}</h4>
-                    <p className="company-tag">🏢 {n.company}</p>
-                    <span className="posted-at">📅 {new Date(n.createdAt).toLocaleDateString()}</span>
-                  </div>
-                ))}
-                {filteredNotices.length === 0 && <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#888'}}>No matches found.</p>}
-              </div>
+  {filteredNotices.map(n => {
+    const deadline = getDeadlineStatus(n.deadline);
+    const contacted = hasContacted(n._id);
+    
+    return (
+      <div key={n._id} className={`notice-card glance ${n.isFilled ? 'filled-status' : ''}`} onClick={() => setSelectedNotice(n)}>
+        <div className="card-top-row">
+          <div className="notice-badge">{n.opportunityType}</div>
+          <div className={`deadline-badge ${deadline.class}`}>{deadline.label}</div>
+        </div>
+        
+        <h4>{n.title}</h4>
+        <p className="company-tag">🏢 {n.company}</p>
+        
+        <div className="card-footer-tags">
+          <span className="posted-at">📅 {new Date(n.createdAt).toLocaleDateString()}</span>
+          {contacted && <span className="contacted-tag">✓ Contacted</span>}
+          {n.isFilled && <span className="filled-tag">Filled</span>}
+        </div>
+        {filteredNotices.length === 0 && <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#888'}}>No matches found.</p>}
+      </div>
+    );
+  })}
+</div>
             </>
           ) : (
             <div className="notice-detail-view">
@@ -150,8 +197,19 @@ function ConnectHub({ user }) {
                 </div>
 
                 <div className="action-row" style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
-                  <button className="submit-btn" onClick={() => handleConnect(selectedNotice)}>Connect Now</button>
-                </div>
+  <button 
+    className="submit-btn" 
+    disabled={selectedNotice.isFilled || new Date(selectedNotice.deadline) < new Date()}
+    style={{
+      backgroundColor: (selectedNotice.isFilled || new Date(selectedNotice.deadline) < new Date()) ? '#ccc' : '',
+      cursor: (selectedNotice.isFilled || new Date(selectedNotice.deadline) < new Date()) ? 'not-allowed' : 'pointer'
+    }}
+    onClick={() => handleConnect(selectedNotice)}
+  >
+    {selectedNotice.isFilled ? "Position Filled" : 
+     (new Date(selectedNotice.deadline) < new Date() ? "Expired" : "Connect Now")}
+  </button>
+</div>
               </div>
             </div>
           )}
@@ -189,20 +247,29 @@ function ConnectHub({ user }) {
         </div>
       )}
 
-      {activeSubTab === 'myposts' && (
-        <div className="history-section">
-          <h3>Your Active Listings</h3>
-          <div className="notice-grid">
-            {myPosts.length > 0 ? myPosts.map(n => (
-              <div key={n._id} className="notice-card">
-                <h4>{n.title}</h4>
-                <p>{n.company}</p>
-                <button className="delete-btn" style={{backgroundColor: '#ff3f52'}} onClick={() => handleDelete(n._id)}>Delete Post</button>
-              </div>
-            )) : <p>You haven't posted any notices yet.</p>}
+     {activeSubTab === 'myposts' && (
+  <div className="history-section">
+    <h3>Your Active Listings</h3>
+    <div className="notice-grid">
+      {myPosts.map(n => (
+        <div key={n._id} className="notice-card">
+          <h4>{n.title}</h4>
+          <p>{n.company}</p>
+          <div className="action-row" style={{display: 'flex', gap: '10px', marginTop: '10px'}}>
+            <button 
+              className="nav-btn" 
+              style={{backgroundColor: n.isFilled ? '#6c757d' : '#2ecc71', fontSize: '0.8rem'}}
+              onClick={() => handleToggleFilled(n._id, n.isFilled)}
+            >
+              {n.isFilled ? "Re-open" : "Mark as Filled"}
+            </button>
+            <button className="delete-btn" style={{backgroundColor: '#ff3f52', fontSize: '0.8rem'}} onClick={() => handleDelete(n._id)}>Delete</button>
           </div>
         </div>
-      )}
+      ))}
+    </div>
+  </div>
+)}
 
       {viewProfile && (
         <div className="modal-overlay">

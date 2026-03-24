@@ -69,4 +69,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.patch('/:id', async (req, res) => {
+  try {
+    const { isFilled } = req.body;
+    
+    // 1. Find the notice
+    const notice = await Notice.findById(req.params.id);
+    if (!notice) return res.status(404).json({ message: "Notice not found" });
+
+    // 2. Update the status
+    notice.isFilled = isFilled;
+    await notice.save();
+
+    res.json(notice);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
