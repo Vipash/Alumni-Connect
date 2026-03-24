@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('./Notification');
+const User = require('./User');
 
 // @route   GET /api/notifications/:userId
 // @desc    Get all notifications for a specific user
@@ -33,12 +34,13 @@ router.patch('/:id/read', async (req, res) => {
 // @route   PATCH /api/users/:id/interests
 router.patch('/:id/interests', async (req, res) => {
   try {
-    const { interests } = req.body; // Expecting an array like ['SDE', 'Core']
+    const { interests } = req.body; 
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { interests },
       { new: true }
     );
+    if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
