@@ -1,9 +1,9 @@
 /* --- backend/routes/noticeRoutes.js --- */
 const express = require('express');
 const router = express.Router();
-const Notice = require('../models/Notice'); // Ensure this path is correct
-const Notification = require('../models/Notification');
-const User = require('../models/User');
+const Notice = require('./Notice'); // Ensure this path is correct
+const Notification = require('./Notification');
+const User = require('./User');
 
 // --- Helper Function for Alerts ---
 const createInterestAlerts = async (newNotice) => {
