@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const Notice = require('./Notice'); // Ensure this path is correct
 const Notification = require('./Notification');
-const User = require('./user');
+const User = require('./User');
 
 // --- Helper Function for Alerts ---
 const createInterestAlerts = async (newNotice) => {
