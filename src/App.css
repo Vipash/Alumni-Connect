@@ -197,6 +197,11 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .tab-btn {position: relative; /* Essential for badge positioning */ padding: 10px 20px;}
 .notification-badge {position: absolute; top: -5px; right: -5px; background-color: #ff3f52; color: white; font-size: 0.7rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; /* Makes it pop against the button */ box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: bounce 0.5s ease-in-out;}
 @keyframes bounce {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); }}
+.preference-cta {background: #f0f7ff; border: 1px dashed var(--mbm-blue); padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: #555;}
+.link-text {color: var(--mbm-blue); text-decoration: underline; cursor: pointer; font-weight: bold;}
+.digest-item {display: flex; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid #eee;}
+.digest-tag {background: #eee; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: #666;}
+.digest-sub {font-size: 0.85rem; color: #888; margin-bottom: 15px;}
 
 /* Announcements */
 .announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
