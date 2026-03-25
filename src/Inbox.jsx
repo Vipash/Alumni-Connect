@@ -1,23 +1,28 @@
 import { useState, useEffect } from 'react';
 
-function Inbox({ user }) {
+function Inbox({ user, setUser }) { // Added setUser to update global state
   const [activeTab, setActiveTab] = useState('alerts');
   const [notifications, setNotifications] = useState([]);
   const [notices, setNotices] = useState([]); 
+  
+  // FIX: Initialize interests directly from the user prop
   const [interests, setInterests] = useState(user?.interests || []);
 
   const availableCategories = ['Internship', 'Full-time', 'Referral', 'Project', 'Scholarship'];
 
+  // Sync state if the user prop changes (e.g., after a refresh)
   useEffect(() => {
-    if (user?._id) {
-      // 1. Fetch alerts
-      fetch(`/api/notifications/${user._id}`).then(res => res.json()).then(setNotifications);
-      // 2. Fetch all notices for digest
-      fetch('/api/notices').then(res => res.json()).then(setNotices);
-      // 3. Sync preferences from database
-      if (user.interests) setInterests(user.interests);
+    if (user?.interests) {
+      setInterests(user.interests);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user?._id) {
+      fetch(`/api/notifications/${user._id}`).then(res => res.json()).then(setNotifications);
+      fetch('/api/notices').then(res => res.json()).then(setNotices);
+    }
+  }, [user?._id]);
 
   const toggleInterest = async (topic) => {
     const updated = interests.includes(topic)
@@ -26,18 +31,21 @@ function Inbox({ user }) {
     
     setInterests(updated);
 
-    const response = await fetch(`/api/notifications/user/${user._id}/interests`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ interests: updated })
-  });
+    // 1. Update Backend
+    const res = await fetch(`/api/notifications/user/${user._id}/interests`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ interests: updated })
+    });
 
-  if (response.ok) {
-    const updatedUser = await response.json();
-    
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-  }
-};
+    if (res.ok) {
+      const updatedUser = { ...user, interests: updated };
+      // 2. Update Global State (App.jsx)
+      if (setUser) setUser(updatedUser);
+      // 3. Update LocalStorage so it survives refresh
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  };
 
   return (
     <div className="inbox-container">
@@ -52,14 +60,11 @@ function Inbox({ user }) {
       <div className="inbox-content">
         {activeTab === 'alerts' && (
           <div className="alerts-section">
-            <div className="preference-banner-muted">
+            {/* Softened, non-blocky banner */}
+            <div className="preference-banner-ghost">
               <p>
-                🔔 These alerts are based on your selected interests. <br />
-                <span className="pref-summary">
-                  Current Preferences: <strong>{interests.length > 0 ? interests.join(', ') : 'None selected'}</strong>.
-                </span>
-                <br />
-                To change these, <span className="link-text-muted" onClick={() => setActiveTab('prefs')}>visit preferences</span>.
+                🔔 Alerts are filtered by: <strong>{interests.length > 0 ? interests.join(', ') : 'None'}</strong>.
+                <span className="link-text-muted" onClick={() => setActiveTab('prefs')}> (Edit)</span>
               </p>
             </div>
 
@@ -84,7 +89,7 @@ function Inbox({ user }) {
         {activeTab === 'prefs' && (
           <div className="preferences-grid">
             <h3>Notification Preferences</h3>
-            <p className="sub-text">Choose which categories should trigger an instant alert.</p>
+            <p className="sub-text">Selected categories will trigger instant alerts.</p>
             <div className="topic-pills">
               {availableCategories.map(category => (
                 <div 
@@ -100,29 +105,17 @@ function Inbox({ user }) {
         )}
 
         {activeTab === 'digest' && (
-          <div className="digest-view">
-            <h3>Campus Activity (Past 24h)</h3>
-            <p className="digest-sub">A summary of all new opportunities, regardless of your preferences.</p>
-            <div className="digest-list">
-              {notices && notices.filter(n => {
-                const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                return new Date(n.createdAt) > yesterday;
-              }).length > 0 ? (
-                notices
-                  .filter(n => new Date(n.createdAt) > new Date(Date.now() - 24 * 60 * 60 * 1000))
-                  .map(n => (
-                    <div key={n._id} className="digest-item">
-                      <div className="digest-tag">{n.opportunityType}</div>
-                      <div className="digest-info">
-                        <strong>{n.title}</strong> at {n.company}
-                      </div>
-                    </div>
-                  ))
-              ) : (
-                <p className="empty-msg">No new developments in the last 24 hours.</p>
-              )}
-            </div>
-          </div>
+           <div className="digest-view">
+             <h3>Campus Activity (Past 24h)</h3>
+             <div className="digest-list">
+               {notices.filter(n => new Date(n.createdAt) > new Date(Date.now() - 24*60*60*1000)).map(n => (
+                 <div key={n._id} className="digest-item-soft">
+                   <span className="digest-pill">{n.opportunityType}</span>
+                   <strong>{n.title}</strong> at {n.company}
+                 </div>
+               ))}
+             </div>
+           </div>
         )}
       </div>
     </div>

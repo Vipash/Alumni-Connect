@@ -200,13 +200,16 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .digest-item {display: flex; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid #eee;}
 .digest-tag {background: #eee; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: #666;}
 .digest-sub {font-size: 0.85rem; color: #888; margin-bottom: 15px;}
-.preference-banner-muted {background: #f9f9fb; border-radius: 12px; padding: 15px; margin-bottom: 25px; color: #777; font-size: 0.85rem;line-height: 1.6; border: 1px solid #eee;}
 .pref-summary {color: #888; font-style: italic;}
-.link-text-muted {color: #a0aec0; text-decoration: underline; cursor: pointer; margin-left: 5px;}
 .alert-card-soft {display: flex; align-items: center; gap: 15px; padding: 12px 15px; margin-bottom: 8px; background: white; border-radius: 10px; transition: all 0.2s ease; border: 1px solid #f0f0f0;}
 .alert-card-soft.unread {background: #f0f7ff; border-left: 3px solid #3182ce;}
 .alert-dot {width: 8px; height: 8px; background: #3182ce; border-radius: 50%;}
 .empty-state-muted {text-align: center; padding: 40px; color: #ccc; font-size: 0.9rem;}
+.preference-banner-ghost {background: transparent; border-bottom: 1px solid #eee; padding: 0 5px 15px 5px; margin-bottom: 20px; color: #888; font-size: 0.8rem;}
+.preference-banner-ghost strong {color: #555; font-weight: 600;}
+.link-text-muted {color: #3182ce; cursor: pointer; font-weight: 500; text-decoration: none; margin-left: 4px;}
+.link-text-muted:hover {text-decoration: underline;}
+.topic-pill.selected {background-color: #3182ce; color: white; border-color: #3182ce;}
 
 /* Announcements */
 .announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
