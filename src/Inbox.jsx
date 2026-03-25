@@ -3,26 +3,24 @@ import { useState, useEffect } from 'react';
 function Inbox({ user }) {
   const [activeTab, setActiveTab] = useState('alerts');
   const [notifications, setNotifications] = useState([]);
-  const [notices, setNotices] = useState([]); // For the Daily Digest
+  const [notices, setNotices] = useState([]); 
   const [interests, setInterests] = useState(user?.interests || []);
 
-  // Use the actual categories from your Bulletin Board
   const availableCategories = ['Internship', 'Full-time', 'Referral', 'Project', 'Scholarship'];
 
-  // Fetch data
   useEffect(() => {
     if (user?._id) {
-      // Fetch Personal Alerts
-      fetch(`/api/notifications/${user._id}`)
-        .then(res => res.json())
-        .then(setNotifications);
-
-      // Fetch All Notices for the Daily Digest
-      fetch('/api/notices')
-        .then(res => res.json())
-        .then(setNotices);
+      fetch(`/api/notifications/${user._id}`).then(res => res.json()).then(setNotifications);
+      fetch('/api/notices').then(res => res.json()).then(setNotices);
+      if (user.interests) setInterests(user.interests);
     }
-  }, [user?._id]);
+  }, [user]);
+
+  useEffect(() => {
+  if (user?.interests) {
+    setInterests(user.interests);
+  }
+}, [user]);
 
   const toggleInterest = async (topic) => {
     const updated = interests.includes(topic)
@@ -31,7 +29,6 @@ function Inbox({ user }) {
     
     setInterests(updated);
 
-    // Sync with the combined route we built in notificationRoutes.js
     await fetch(`/api/notifications/user/${user._id}/interests`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -50,27 +47,31 @@ function Inbox({ user }) {
       </div>
 
       <div className="inbox-content">
-        
-        {/* --- ALERTS SECTION --- */}
         {activeTab === 'alerts' && (
           <div className="alerts-section">
-            {/* The "Go to Preferences" CTA Banner */}
-            <div className="preference-cta">
-              <p>🔔 These alerts are based on your categories. To customize what you see, <span className="link-text" onClick={() => setActiveTab('prefs')}>choose your preferences here</span>.</p>
+            <div className="preference-banner-muted">
+              <p>
+                🔔 These alerts are based on your selected interests. <br />
+                <span className="pref-summary">
+                  Current Preferences: <strong>{interests.length > 0 ? interests.join(', ') : 'None selected'}</strong>.
+                </span>
+                <br />
+                To change these, <span className="link-text-muted" onClick={() => setActiveTab('prefs')}>visit preferences</span>.
+              </p>
             </div>
 
             <div className="alerts-list">
               {notifications.length > 0 ? notifications.map(n => (
-                <div key={n._id} className={`alert-card ${n.read ? 'read' : 'unread'}`}>
-                  <div className="alert-icon">✨</div>
+                <div key={n._id} className={`alert-card-soft ${n.read ? 'read' : 'unread'}`}>
+                  <div className="alert-dot"></div>
                   <div className="alert-text">
                     <p>{n.message}</p>
-                    <span>{new Date(n.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    <span className="timestamp">{new Date(n.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                   </div>
                 </div>
               )) : (
-                <div className="empty-state">
-                  <p>No new alerts found. Try selecting more categories in Preferences!</p>
+                <div className="empty-state-muted">
+                  <p>No alerts yet. New posts matching your interests will appear here.</p>
                 </div>
               )}
             </div>
@@ -81,7 +82,7 @@ function Inbox({ user }) {
         {activeTab === 'prefs' && (
           <div className="preferences-grid">
             <h3>Notification Preferences</h3>
-            <p>Select the types of opportunities you want to be alerted about:</p>
+            <p className="sub-text">Choose which categories should trigger an instant alert.</p>
             <div className="topic-pills">
               {availableCategories.map(category => (
                 <div 
