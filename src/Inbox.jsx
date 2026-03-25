@@ -10,17 +10,14 @@ function Inbox({ user }) {
 
   useEffect(() => {
     if (user?._id) {
+      // 1. Fetch alerts
       fetch(`/api/notifications/${user._id}`).then(res => res.json()).then(setNotifications);
+      // 2. Fetch all notices for digest
       fetch('/api/notices').then(res => res.json()).then(setNotices);
+      // 3. Sync preferences from database
       if (user.interests) setInterests(user.interests);
     }
   }, [user]);
-
-  useEffect(() => {
-  if (user?.interests) {
-    setInterests(user.interests);
-  }
-}, [user]);
 
   const toggleInterest = async (topic) => {
     const updated = interests.includes(topic)
@@ -29,12 +26,18 @@ function Inbox({ user }) {
     
     setInterests(updated);
 
-    await fetch(`/api/notifications/user/${user._id}/interests`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ interests: updated })
-    });
-  };
+    const response = await fetch(`/api/notifications/user/${user._id}/interests`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ interests: updated })
+  });
+
+  if (response.ok) {
+    const updatedUser = await response.json();
+    
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  }
+};
 
   return (
     <div className="inbox-container">
@@ -78,7 +81,6 @@ function Inbox({ user }) {
           </div>
         )}
 
-        {/* --- PREFERENCES SECTION --- */}
         {activeTab === 'prefs' && (
           <div className="preferences-grid">
             <h3>Notification Preferences</h3>
@@ -97,13 +99,12 @@ function Inbox({ user }) {
           </div>
         )}
 
-        {/* --- DAILY DIGEST (All-Purpose) --- */}
         {activeTab === 'digest' && (
           <div className="digest-view">
             <h3>Campus Activity (Past 24h)</h3>
             <p className="digest-sub">A summary of all new opportunities, regardless of your preferences.</p>
             <div className="digest-list">
-              {notices.filter(n => {
+              {notices && notices.filter(n => {
                 const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
                 return new Date(n.createdAt) > yesterday;
               }).length > 0 ? (
@@ -128,4 +129,4 @@ function Inbox({ user }) {
   );
 }
 
-export default Inbox;   
+export default Inbox;

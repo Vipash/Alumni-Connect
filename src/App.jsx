@@ -28,6 +28,15 @@ function App() {
     rollNumber: '', company: '', mobile: '', password: '', displayName: ''
   });
 
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      setLoggedInUser(parsedUser);
+      setLoginStatus(parsedUser.isVerified ? 'approved' : 'pending');
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -106,7 +115,7 @@ const renderTabContent = () => {
       content = <ConnectHub user={loggedInUser} />;
       break;
     case 'inbox':
-      content = <Inbox user={loggedInUser} />;
+        return <Inbox user={loggedInUser} setUser={setLoggedInUser} />;
       break;
     case 'announcements':
       content = <AnnouncementsSection />;
