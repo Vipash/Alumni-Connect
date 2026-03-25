@@ -210,6 +210,16 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .link-text-muted {color: #3182ce; cursor: pointer; font-weight: 500; text-decoration: none; margin-left: 4px;}
 .link-text-muted:hover {text-decoration: underline;}
 .topic-pill.selected {background-color: #3182ce; color: white; border-color: #3182ce;}
+.save-prefs-btn {margin-top: 20px; background: #3182ce; color: white; padding: 10px 25px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none;}
+.digest-card-detailed {background: #fff; border: 1px solid #edf2f7; border-radius: 10px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+.type-tag {font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 8px; display: inline-block;}
+.type-tag.internship { background: #ebf8ff; color: #2b6cb0; }
+.type-tag.full-time { background: #f0fff4; color: #2f855a; }
+.digest-body p {margin: 4px 0 0; font-size: 0.85rem; color: #718096;}
+.digest-footer {margin-top: 10px; font-size: 0.75rem; color: #a0aec0; border-top: 1px solid #f7fafc; padding-top: 8px;}
+.backfill-divider {font-size: 0.75rem; font-weight: bold; color: #a0aec0; text-transform: uppercase; margin: 20px 0 10px 5px; letter-spacing: 1px;}
+.alert-card-soft.backfill {border-left: 3px solid #cbd5e0; /* Grey instead of Blue */ background: #fafafa; opacity: 0.9;}
+.alert-dot-grey {width: 8px; height: 8px; background: #a0aec0; border-radius: 50%;}
 
 /* Announcements */
 .announcement-item { border-left: 4px solid transparent; border-bottom: 1px solid #faffca; padding: 15px; cursor: pointer; transition: all 0.3s ease; }

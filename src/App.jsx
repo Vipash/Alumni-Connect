@@ -87,6 +87,7 @@ const [loginStatus, setLoginStatus] = useState(() => {
       localStorage.setItem('user', JSON.stringify(data));
       setLoggedInUser(data);
       setLoginStatus(data.isVerified ? 'approved' : 'pending');
+      setActiveTab('profile');
     } else { alert("Login failed."); }
   };
 

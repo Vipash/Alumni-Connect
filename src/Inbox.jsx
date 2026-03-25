@@ -1,54 +1,66 @@
 import { useState, useEffect } from 'react';
 
-function Inbox({ user, setUser }) { // Added setUser to update global state
+function Inbox({ user, setUser }) {
   const [activeTab, setActiveTab] = useState('alerts');
   const [notifications, setNotifications] = useState([]);
+  const [recentMatches, setRecentMatches] = useState([]);
   const [notices, setNotices] = useState([]); 
   
-  // FIX: Initialize interests directly from the user prop
-  const [interests, setInterests] = useState(user?.interests || []);
+  // States for the Preferences UI
+  const [pendingInterests, setPendingInterests] = useState(user?.interests || []);
+  const [isSaving, setIsSaving] = useState(false);
 
   const availableCategories = ['Internship', 'Full-time', 'Referral', 'Project', 'Scholarship'];
 
   // Sync state if the user prop changes (e.g., after a refresh)
   useEffect(() => {
     if (user?.interests) {
-      setInterests(user.interests);
+      setPendingInterests(user.interests);
     }
   }, [user]);
 
+  // Combined Effect for fetching data
   useEffect(() => {
     if (user?._id) {
-      fetch(`/api/notifications/${user._id}`).then(res => res.json()).then(setNotifications);
-      fetch('/api/notices').then(res => res.json()).then(setNotices);
+      // 1. Fetch real notifications
+      fetch(`/api/notifications/${user._id}`)
+        .then(res => res.json())
+        .then(setNotifications);
+
+      // 2. Fetch all notices for Digest and Backfill
+      fetch('/api/notices')
+        .then(res => res.json())
+        .then(allNotices => {
+          setNotices(allNotices);
+          
+          // Backfill logic: find matches in the last 7 days
+          if (user.interests) {
+            const matches = allNotices.filter(notice => 
+              user.interests.includes(notice.opportunityType) &&
+              new Date(notice.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+            );
+            setRecentMatches(matches);
+          }
+        });
     }
-  }, [user?._id]);
+  }, [user]);
 
-  const toggleInterest = async (topic) => {
-  const updated = interests.includes(topic)
-    ? interests.filter(t => t !== topic)
-    : [...interests, topic];
-  
-  setInterests(updated);
+  const handleSavePreferences = async () => {
+    setIsSaving(true);
+    const res = await fetch(`/api/notifications/user/${user._id}/interests`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ interests: pendingInterests })
+    });
 
-  // 1. Tell the server
-  const res = await fetch(`/api/notifications/user/${user._id}/interests`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ interests: updated })
-  });
-
-  if (res.ok) {
-    // 2. Create a fresh user object with the NEW interests
-    const updatedUser = { ...user, interests: updated };
-    
-    // 3. UPDATE THE GLOBAL STATE (The most important part)
-    if (setUser) setUser(updatedUser);
-    
-    // 4. UPDATE LOCALSTORAGE (So refresh works)
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-  }
-};
+    if (res.ok) {
+      const updatedUser = { ...user, interests: pendingInterests };
+      if (setUser) setUser(updatedUser); 
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      alert("Preferences saved!");
+    }
+    setIsSaving(false);
+  };
 
   return (
     <div className="inbox-container">
@@ -63,26 +75,44 @@ function Inbox({ user, setUser }) { // Added setUser to update global state
       <div className="inbox-content">
         {activeTab === 'alerts' && (
           <div className="alerts-section">
-            {/* Softened, non-blocky banner */}
             <div className="preference-banner-ghost">
               <p>
-                🔔 Alerts are filtered by: <strong>{interests.length > 0 ? interests.join(', ') : 'None'}</strong>.
+                🔔 Alerts are filtered by: <strong>{user?.interests?.length > 0 ? user.interests.join(', ') : 'None'}</strong>.
                 <span className="link-text-muted" onClick={() => setActiveTab('prefs')}> (Edit)</span>
               </p>
             </div>
 
             <div className="alerts-list">
-              {notifications.length > 0 ? notifications.map(n => (
+              {/* Actual Notifications */}
+              {notifications.map(n => (
                 <div key={n._id} className={`alert-card-soft ${n.read ? 'read' : 'unread'}`}>
                   <div className="alert-dot"></div>
                   <div className="alert-text">
                     <p>{n.message}</p>
-                    <span className="timestamp">{new Date(n.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    <span className="timestamp">New Alert • {new Date(n.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
-              )) : (
+              ))}
+
+              {/* Backfilled Matches */}
+              {recentMatches.length > 0 && (
+                <>
+                  <div className="backfill-divider">Recent matches from the past week</div>
+                  {recentMatches.map(m => (
+                    <div key={m._id} className="alert-card-soft backfill">
+                      <div className="alert-dot-grey"></div>
+                      <div className="alert-text">
+                        <p>Opportunity found: <strong>{m.opportunityType}</strong> at {m.company}</p>
+                        <span className="timestamp">{m.title} • {new Date(m.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {notifications.length === 0 && recentMatches.length === 0 && (
                 <div className="empty-state-muted">
-                  <p>No alerts yet. New posts matching your interests will appear here.</p>
+                  <p>No alerts or recent matches found for your current interests.</p>
                 </div>
               )}
             </div>
@@ -92,33 +122,52 @@ function Inbox({ user, setUser }) { // Added setUser to update global state
         {activeTab === 'prefs' && (
           <div className="preferences-grid">
             <h3>Notification Preferences</h3>
-            <p className="sub-text">Selected categories will trigger instant alerts.</p>
+            <p className="sub-text">Choose categories you are interested in. Remember to save!</p>
             <div className="topic-pills">
               {availableCategories.map(category => (
                 <div 
                   key={category} 
-                  className={`topic-pill ${interests.includes(category) ? 'selected' : ''}`}
-                  onClick={() => toggleInterest(category)}
+                  className={`topic-pill ${pendingInterests.includes(category) ? 'selected' : ''}`}
+                  onClick={() => {
+                    const updated = pendingInterests.includes(category)
+                      ? pendingInterests.filter(t => t !== category)
+                      : [...pendingInterests, category];
+                    setPendingInterests(updated);
+                  }}
                 >
-                  {category} {interests.includes(category) ? '✓' : '+'}
+                  {category}
                 </div>
               ))}
             </div>
+            <button className="save-prefs-btn" onClick={handleSavePreferences} disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save Preferences"}
+            </button>
           </div>
         )}
 
         {activeTab === 'digest' && (
-           <div className="digest-view">
-             <h3>Campus Activity (Past 24h)</h3>
-             <div className="digest-list">
-               {notices.filter(n => new Date(n.createdAt) > new Date(Date.now() - 24*60*60*1000)).map(n => (
-                 <div key={n._id} className="digest-item-soft">
-                   <span className="digest-pill">{n.opportunityType}</span>
-                   <strong>{n.title}</strong> at {n.company}
-                 </div>
-               ))}
-             </div>
-           </div>
+          <div className="digest-view">
+            <div className="digest-header">
+              <h3>Campus Activity (Past 24h)</h3>
+              <span className="digest-date">{new Date().toLocaleDateString()}</span>
+            </div>
+            <div className="digest-list">
+              {notices.filter(n => new Date(n.createdAt) > new Date(Date.now() - 24*60*60*1000)).map(n => (
+                <div key={n._id} className="digest-card-detailed">
+                  <div className="digest-main">
+                    <span className={`type-tag ${n.opportunityType.toLowerCase().replace(' ', '-')}`}>{n.opportunityType}</span>
+                    <div className="digest-body">
+                      <strong>{n.title}</strong>
+                      <p>{n.company} • {n.branch || "All Branches"}</p>
+                    </div>
+                  </div>
+                  <div className="digest-footer">
+                    <span>Posted at {new Date(n.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
