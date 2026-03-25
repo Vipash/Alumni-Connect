@@ -25,27 +25,30 @@ function Inbox({ user, setUser }) { // Added setUser to update global state
   }, [user?._id]);
 
   const toggleInterest = async (topic) => {
-    const updated = interests.includes(topic)
-      ? interests.filter(t => t !== topic)
-      : [...interests, topic];
+  const updated = interests.includes(topic)
+    ? interests.filter(t => t !== topic)
+    : [...interests, topic];
+  
+  setInterests(updated);
+
+  // 1. Tell the server
+  const res = await fetch(`/api/notifications/user/${user._id}/interests`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ interests: updated })
+  });
+
+  if (res.ok) {
+    // 2. Create a fresh user object with the NEW interests
+    const updatedUser = { ...user, interests: updated };
     
-    setInterests(updated);
-
-    // 1. Update Backend
-    const res = await fetch(`/api/notifications/user/${user._id}/interests`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ interests: updated })
-    });
-
-    if (res.ok) {
-      const updatedUser = { ...user, interests: updated };
-      // 2. Update Global State (App.jsx)
-      if (setUser) setUser(updatedUser);
-      // 3. Update LocalStorage so it survives refresh
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    }
-  };
+    // 3. UPDATE THE GLOBAL STATE (The most important part)
+    if (setUser) setUser(updatedUser);
+    
+    // 4. UPDATE LOCALSTORAGE (So refresh works)
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  }
+};
 
   return (
     <div className="inbox-container">

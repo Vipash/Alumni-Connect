@@ -19,15 +19,30 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 function App() {
   const [view, setView] = useState('home'); 
-  const [loginStatus, setLoginStatus] = useState(null); 
-  const [loggedInUser, setLoggedInUser] = useState(null); 
+  const [loggedInUser, setLoggedInUser] = useState(() => {
+  const saved = localStorage.getItem('user');
+  return saved ? JSON.parse(saved) : null;
+});
+const [loginStatus, setLoginStatus] = useState(() => {
+  const saved = localStorage.getItem('user');
+  if (!saved) return null;
+  const parsed = JSON.parse(saved);
+  return parsed.isVerified ? 'approved' : 'pending';
+}); 
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [activeTab, setActiveTab] = useState('profile');
   const [formData, setFormData] = useState({ 
     name: '', email: '', role: '', branch: '', passoutYear: '', 
     rollNumber: '', company: '', mobile: '', password: '', displayName: ''
   });
-
+  const handleLogout = () => {
+  localStorage.removeItem('user'); // 1. Clear the data
+  setLoggedInUser(null);           // 2. Clear state
+  setLoginStatus(null);           // 3. Reset status
+  setView('home');                // 4. Go back to home
+  // window.location.reload();    // Optional, but the states above handle it
+};
+  
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -150,7 +165,7 @@ const renderTabContent = () => {
               <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}</button>
               <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
             </nav>
-            <button className="logout-btn" onClick={() => window.location.reload()}>Logout</button>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
           </aside>
           <main className="dashboard-content">
             {renderTabContent()}
