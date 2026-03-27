@@ -32,12 +32,12 @@ router.patch('/:id/read', async (req, res) => {
 });
 
 // @route   PATCH /api/users/:id/interests
-router.patch('/:id/interests', async (req, res) => {
+router.patch('/user/:id/interests', async (req, res) => {
   try {
     const { interests } = req.body; 
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { interests },
+      { interests }, // MongoDB will save this array perfectly
       { new: true }
     );
     if (!user) return res.status(404).json({ message: "User not found" });

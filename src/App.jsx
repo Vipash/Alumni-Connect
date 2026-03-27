@@ -43,15 +43,6 @@ const [loginStatus, setLoginStatus] = useState(() => {
   // window.location.reload();    // Optional, but the states above handle it
 };
   
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      setLoggedInUser(parsedUser);
-      setLoginStatus(parsedUser.isVerified ? 'approved' : 'pending');
-    }
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
