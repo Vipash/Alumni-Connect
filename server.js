@@ -102,6 +102,38 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+app.patch('/api/profile/complete', async (req, res) => {
+  try {
+    const { 
+      userId, dob, fatherName, tenthYear, twelfthYear, 
+      currentAddress, permanentAddress, hobbiesTechnical, hobbiesPersonal 
+    } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          dob,
+          fatherName,
+          tenthYear,
+          twelfthYear,
+          currentAddress,
+          permanentAddress,
+          hobbiesTechnical,
+          hobbiesPersonal,
+          isProfileComplete: true // Auto-unlock the site on successful save
+        }
+      },
+      { new: true }
+    );
+
+    const { password: _, ...userProfile } = updatedUser._doc;
+    res.json(userProfile);
+  } catch (err) {
+    res.status(500).send("Failed to update detailed profile");
+  }
+});
+
 app.patch('/api/profile/update', async (req, res) => {
   try {
     const { userId, bio, linkedin, resumeUrl, profilePhoto, displayName, mobile } = req.body;
@@ -194,11 +226,40 @@ app.get('/api/get-alumni', async (req, res) => {
   } catch (err) { res.status(500).send("Failed to fetch alumni"); }
 });
 
-// Verification/Deletion
+// Verification and Mail/Deletion
+const nodemailer = require('nodemailer');
+
+// Setup your Email Transporter (Use environment variables for credentials!)
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS 
+  }
+});
+
 app.patch('/api/verify-user/:id', async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.params.id, { isVerified: true });
-    res.send("User Verified!");
+    const user = await User.findByIdAndUpdate(req.params.id, { isVerified: true }, { new: true });
+    
+    // Send Approval Email
+    const mailOptions = {
+      from: '"MBM Alumni Connect" <your-email@gmail.com>',
+      to: user.email,
+      subject: "Registration Approved! 🎓",
+      html: `
+        <h3>Welcome, ${user.name}!</h3>
+        <p>Your registration for the MBM Alumni Connect portal has been approved by the Admin.</p>
+        <p><strong>Login Details:</strong><br>
+           Email: ${user.email}<br>
+           Password: [The password you set during registration]</p>
+        <p>Please log in and complete your profile to access all features.</p>
+        <a href="https://your-site-link.com">Login Now</a>
+      `
+    };
+
+    transporter.sendMail(mailOptions);
+    res.send("User Verified and Email Sent!");
   } catch (err) { res.status(400).send(err.message); }
 });
 

@@ -17,11 +17,18 @@ const userSchema = new mongoose.Schema({
   resumeUrl: { type: String, default: "" },
   profilePhoto: { type: String, default: "" },
   bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  location: {
-    type: { type: String, enum: ['Point'], default: 'Point' },
-    coordinates: { type: [Number] } 
-  },
-  isVerified: { type: Boolean, default: false }
+  location: {type: { type: String, enum: ['Point'], default: 'Point' }, coordinates: { type: [Number] }},
+  isVerified: { type: Boolean, default: false },
+  dob: { type: Date },
+  fatherName: { type: String },
+  tenthYear: { type: Number },
+  twelfthYear: { type: Number },
+  currentAddress: { type: String },
+  permanentAddress: { type: String },
+  hobbiesTechnical: { type: [String], default: [] },
+  hobbiesPersonal: { type: [String], default: [] },
+  
+  isProfileComplete: { type: Boolean, default: false },
 }, { timestamps: true });
 
 userSchema.index({ location: '2dsphere' });

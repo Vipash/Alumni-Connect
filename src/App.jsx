@@ -145,23 +145,35 @@ const renderTabContent = () => {
     src="/MBM_Logo.png"
     alt="University Logo" 
     className="sidebar-logo" 
-    onError={(e) => { e.target.style.display = 'none'; }} // Hides broken img icon if logo is missing
+    onError={(e) => { e.target.style.display = 'none'; }} 
   />
   <h2 className="brand-text">Alumni Connect</h2>
               <p>Welcome, <strong>{loggedInUser?.name}</strong></p>
             </div>
-            <nav className="sidebar-nav">
-              <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
-              <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Map Search</button>
-              <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
-              <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}</button>
-              <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
-            </nav>
-            <button className="logout-btn" onClick={handleLogout}>Logout</button>
-          </aside>
-          <main className="dashboard-content">
-            {renderTabContent()}
-          </main>
+            {loggedInUser?.isProfileComplete ? (
+      <nav className="sidebar-nav">
+        <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
+        <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Map Search</button>
+        <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
+        <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox</button>
+      </nav>
+    ) : (
+      <div className="onboarding-notice">
+        <p>Please complete your profile setup to unlock all features.</p>
+      </div>
+    )}
+    
+    <button className="logout-btn" onClick={handleLogout}>Logout</button>
+  </aside>
+
+  <main className="dashboard-content">
+    {/* If not complete, force the Profile component even if they try to switch tabs */}
+    {!loggedInUser?.isProfileComplete ? (
+      <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
+    ) : (
+      renderTabContent()
+    )}
+  </main>
         </div>
       ) : view === 'admin-dash' ? (
         <div className="modal-overlay">
@@ -262,7 +274,7 @@ const renderTabContent = () => {
 
     {/* --- SECTION 3: ACCOUNT INFORMATION --- */}
     <h3>Account Information</h3>
-    <label>Display Name</label>
+    <label>USername</label>
     <input placeholder="e.g. Vipss" value={formData.displayName} required onChange={e => setFormData({...formData, displayName: e.target.value})} />
 
     <label>Password</label>
