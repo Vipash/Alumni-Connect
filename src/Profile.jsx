@@ -95,6 +95,16 @@ function Profile({ user, setUser }) {
     );
   }
 
+  const calculateCompletion = (user) => {
+  const fields = [
+    'displayName', 'bio', 'mobile', 'linkedin', 'resumeUrl', 
+    'profilePhoto', 'fatherName', 'dob', 'tenthYear', 'twelfthYear', 
+    'currentAddress', 'permanentAddress'
+  ];
+  const filledFields = fields.filter(field => user[field] && user[field] !== "");
+  return Math.round((filledFields.length / fields.length) * 100);
+};
+
   // --- VIEW 2: EDITING MODE ---
   if (isEditing) {
     return (
@@ -107,6 +117,33 @@ function Profile({ user, setUser }) {
   }
 
   // --- VIEW 3: STANDARD PROFILE VIEW ---
+const getProfileStatus = (user) => {
+    const fieldMapping = {
+      displayName: 'Display Name',
+      bio: 'Professional Bio',
+      mobile: 'Mobile Number',
+      linkedin: 'LinkedIn Link',
+      resumeUrl: 'Resume File',
+      profilePhoto: 'Profile Photo',
+      fatherName: 'Father\'s Name',
+      dob: 'Date of Birth',
+      tenthYear: '10th Year',
+      twelfthYear: '12th Year',
+      currentAddress: 'Current Address',
+      permanentAddress: 'Permanent Address'
+    };
+    
+    const missing = Object.keys(fieldMapping).filter(field => !user[field] || user[field] === "");
+    const completion = Math.round(((Object.keys(fieldMapping).length - missing.length) / Object.keys(fieldMapping).length) * 100);
+    
+    return { 
+      percentage: completion, 
+      missingNames: missing.map(key => fieldMapping[key]) 
+    };
+  };
+
+  const status = getProfileStatus(user);
+
   return (
     <div className="profile-card">
       <div className="profile-header">
@@ -115,72 +152,115 @@ function Profile({ user, setUser }) {
             src={user.profilePhoto || "/default-avatar.png"} 
             alt="Profile" 
             onError={(e) => { e.target.src = "/default-avatar.png"; }}
-            style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover' }}
+            className="profile-avatar"
           />
         </div>
         <div className="header-text">
           <h1>{user.displayName || user.name}</h1>
           <p className="user-role-tag">{user.role.toUpperCase()}</p>
-          <div className="social-links">
+          
+          {/* Progress Bar with Hover Info */}
+          <div className="progress-container" title={status.missingNames.length > 0 ? `Missing: ${status.missingNames.join(', ')}` : "Profile Complete!"}>
+            <div className="progress-label">
+              Profile Completion: {status.percentage}% 
+              <span className="info-icon"> ⓘ</span>
+            </div>
+            <div className="progress-bar-bg">
+              <div className="progress-bar-fill" style={{ width: `${status.percentage}%` }}></div>
+            </div>
+            {status.missingNames.length > 0 && (
+               <div className="missing-fields-tooltip">
+                 <strong>To reach 100%, add:</strong>
+                 <ul>{status.missingNames.slice(0, 3).map(name => <li key={name}>{name}</li>)}</ul>
+                 {status.missingNames.length > 3 && <li>...and {status.missingNames.length - 3} more</li>}
+               </div>
+            )}
+          </div>
+
+          <div className="social-links" style={{marginTop: '15px'}}>
             {user.linkedin && (
               <a href={user.linkedin} target="_blank" rel="noreferrer" className="social-icon linkedin">
                 LinkedIn 🔗
               </a>
             )}
-            {user.resumeUrl && (
-              <a href={user.resumeUrl} target="_blank" rel="noopener noreferrer" className="social-icon resume">
-                View Resume
+            {/* RE-ADDED RESUME BUTTON */}
+            {user.resumeUrl ? (
+              <a href={user.resumeUrl} download target="_blank" rel="noopener noreferrer" className="social-icon resume-btn">
+                Download Resume 📄
               </a>
+            ) : (
+              <span className="social-icon disabled">No Resume Uploaded</span>
             )}
           </div>
         </div>
       </div>
 
       <div className="profile-body">
-        <section className="profile-section">
-          <h3>About Me</h3>
+        {/* ROW 1: ABOUT */}
+        <section className="profile-row-group">
+          <h4 className="row-title">Professional Bio</h4>
           <p className="bio-text">{user.bio || "No bio added yet."}</p>
         </section>
 
-        <section className="profile-section grid-info">
-          {/* Previous fields */}
-          <div className="info-item"><label>Email</label><span>{user.email}</span></div>
-          <div className="info-item"><label>Branch</label><span>{user.branch}</span></div>
-          <div className="info-item"><label>Batch</label><span>{user.passoutYear}</span></div>
-          
-          {/* New detailed fields */}
-          <div className="info-item"><label>Father's Name</label><span>{user.fatherName}</span></div>
-          <div className="info-item"><label>DOB</label><span>{new Date(user.dob).toLocaleDateString()}</span></div>
-          <div className="info-item"><label>10th Passout</label><span>{user.tenthYear}</span></div>
-          <div className="info-item"><label>12th Passout</label><span>{user.twelfthYear}</span></div>
-          
-          <div className="info-item full-width">
+        {/* ROW 2: CORE DETAILS */}
+        <section className="profile-row-group">
+          <h4 className="row-title">Basic Information</h4>
+          <div className="grid-info">
+            <div className="info-item"><label>Email</label><span>{user.email}</span></div>
+            <div className="info-item"><label>Mobile</label><span>{user.mobile || 'N/A'}</span></div>
+            <div className="info-item"><label>Branch</label><span>{user.branch}</span></div>
+            <div className="info-item"><label>Batch</label><span>{user.passoutYear}</span></div>
+            <div className="info-item"><label>Father's Name</label><span>{user.fatherName}</span></div>
+            <div className="info-item"><label>DOB</label><span>{user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'}</span></div>
+          </div>
+        </section>
+
+        {/* ROW 3: ACADEMIC HISTORY */}
+        <section className="profile-row-group">
+          <h4 className="row-title">Academic History</h4>
+          <div className="grid-info">
+            <div className="info-item"><label>10th Passout Year</label><span>{user.tenthYear}</span></div>
+            <div className="info-item"><label>12th Passout Year</label><span>{user.twelfthYear}</span></div>
+          </div>
+        </section>
+
+        {/* ROW 4: ADDRESSES */}
+        <section className="profile-row-group">
+          <h4 className="row-title">Contact Addresses</h4>
+          <div className="address-grid">
+            <div className="info-item">
               <label>Current Address</label>
               <p className="address-text">{user.currentAddress}</p>
             </div>
-            
-            <div className="info-item full-width">
+            <div className="info-item">
               <label>Permanent Address</label>
               <p className="address-text">{user.permanentAddress}</p>
             </div>
-
-          <div className="info-item">
-            <label>Technical Hobbies</label>
-            <div className="tags">
-              {user.hobbiesTechnical?.map(h => <span key={h} className="tag tech-tag">{h}</span>)}
-            </div>
           </div>
-          <div className="info-item">
-            <label>Personal Hobbies</label>
-            <div className="tags">
-              {user.hobbiesPersonal?.map(h => <span key={h} className="tag personal-tag">{h}</span>)}
+        </section>
+
+        {/* ROW 5: HOBBIES */}
+        <section className="profile-row-group" style={{borderBottom: 'none'}}>
+          <h4 className="row-title">Interests & Skills</h4>
+          <div className="hobbies-container">
+            <div className="hobby-block">
+              <label>Technical Hobbies</label>
+              <div className="tags">
+                {user.hobbiesTechnical?.map(h => <span key={h} className="tag tech-tag">{h}</span>)}
+              </div>
+            </div>
+            <div className="hobby-block" style={{marginTop: '10px'}}>
+              <label>Personal Hobbies</label>
+              <div className="tags">
+                {user.hobbiesPersonal?.map(h => <span key={h} className="tag personal-tag">{h}</span>)}
+              </div>
             </div>
           </div>
         </section>
       </div>
 
-      <div className="profile-footer">
-        <button className="edit-profile-btn" onClick={() => setIsEditing(true)}>
+      <div className="profile-footer" style={{textAlign: 'center', padding: '20px'}}>
+        <button className="complete-profile-btn" style={{width: 'auto', padding: '12px 40px'}} onClick={() => setIsEditing(true)}>
           Edit Profile Details
         </button>
       </div>

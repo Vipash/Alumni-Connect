@@ -111,6 +111,11 @@ function EditProfile({ user, onCancel, onUpdate }) {
               <input type="date" name="dob" value={formData.dob} onChange={handleChange} />
             </div>
 
+            <div className="form-group full-width">
+              <label>Bio</label>
+              <textarea name="bio" value={formData.bio} onChange={handleChange} rows="3" />
+            </div>
+
             <div className="full-width"><h4 className="section-header">Academic History</h4></div>
             <div className="form-group">
               <label>10th Pass-out Year</label>
@@ -120,11 +125,6 @@ function EditProfile({ user, onCancel, onUpdate }) {
             <div className="form-group">
               <label>12th Pass-out Year</label>
               <input type="number" name="twelfthYear" value={formData.twelfthYear} onChange={handleChange} />
-            </div>
-
-            <div className="form-group full-width">
-              <label>Bio</label>
-              <textarea name="bio" value={formData.bio} onChange={handleChange} rows="3" />
             </div>
 
             <div className="full-width"><h4 className="section-header">Addresses</h4></div>
