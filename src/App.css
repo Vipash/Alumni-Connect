@@ -53,6 +53,25 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .admin-btn { border: 2px solid var(--mbm-blue); background: transparent; color: var(--mbm-blue); }
 .nav-btn { background-color: var(--mbm-blue); color: white; }
 
+/* Center everything on the screen with a nice background */
+.landing-auth-container {height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top right, #262a6b, #1a1e4d);}
+.minimal-auth-card {background: white; padding: 50px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center;}
+.portal-logo {font-size: 2rem; color: #262a6b; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px;}
+.portal-subtitle {color: #64748b; margin-bottom: 35px; font-size: 0.9rem;}
+.minimal-select {width: 100%; padding: 15px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem; font-weight: 600; color: #262a6b; cursor: pointer; appearance: none;
+  background: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23262a6b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 15px center/15px;}
+.auth-action-row {display: flex; gap: 15px; margin-top: 25px;}
+.primary-auth-btn {flex: 1; padding: 15px; background: #d4af37; /* Gold */ color: #262a6b; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: transform 0.2s;}
+.secondary-auth-btn {flex: 1; padding: 15px; background: #f1f5f9; color: #262a6b; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;}
+.primary-auth-btn:hover { transform: translateY(-2px); background: #c29d2f; }
+.full-width { width: 100%; flex: none; }
+.role-dropdown {width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 1rem; font-weight: 600; color: #262a6b; margin-bottom: 20px; background-color: #f8fafc;}
+.auth-actions {display: flex; gap: 12px; margin-top: 10px;}
+.primary-btn {flex: 1; background-color: #d4af37; /* MBM Gold */ color: #262a6b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;}
+.secondary-btn {flex: 1; background-color: #262a6b; /* MBM Blue */ color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;}
+.full-width { width: 100%; }
+.subtitle { color: #64748b; margin-bottom: 25px; font-size: 0.9rem; }
+
 /* --- Sidebar Brand Styling --- */
 .sidebar-header-brand {display: flex; align-items: center; gap: 12px; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);}
 .sidebar-logo {width: 40px; height: 40px; object-fit: contain;}

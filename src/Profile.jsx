@@ -183,7 +183,11 @@ const getProfileStatus = (user) => {
                 LinkedIn 🔗
               </a>
             )}
-            {/* RE-ADDED RESUME BUTTON */}
+            {user.resumeUrl && (
+              <a href={user.resumeUrl} target="_blank" rel="noopener noreferrer" className="social-icon resume">
+                View Resume
+              </a>
+            )}
             {user.resumeUrl ? (
               <a href={user.resumeUrl} download target="_blank" rel="noopener noreferrer" className="social-icon resume-btn">
                 Download Resume 📄

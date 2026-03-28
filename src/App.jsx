@@ -10,6 +10,7 @@ import MapSearchSection from './MapSearchSection';
 import AnnouncementsSection from './AnnouncementsSection';
 import Inbox from './Inbox';
 import ConnectHub from './ConnectHub';
+import AuthHome from './AuthHome';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -153,7 +154,7 @@ const renderTabContent = () => {
             {loggedInUser?.isProfileComplete ? (
       <nav className="sidebar-nav">
         <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
-        <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Map Search</button>
+        <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Alumni Search</button>
         <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
         <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox</button>
         <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
@@ -201,22 +202,19 @@ const renderTabContent = () => {
                   style={{ width: '200px', height: 'auto', marginBottom: '5px' }} />
                   </div>
                   {view === 'home' && (
-                  <>
-                    <h1>MBM Alumni Connect</h1>
-                    <h3>Student</h3>
-                    <button onClick={() => setView('login-student')}>Sign In</button>
-                    <button onClick={() => { setFormData({...formData, role: 'student'}); setView('reg-student'); }}>Register as Student</button>
-                    <h3>Alumnus</h3>
-                    <button onClick={() => setView('login-alumni')}>Sign In</button>
-                    <button onClick={() => { setFormData({...formData, role: 'alumni'}); setView('reg-alumni'); }}>Register as Alumnus</button>
-                    <hr />
-                    <button className="admin-btn" onClick={handleAdminLogin}>Admin Sign In</button>
-                  </>
-                )}
+                      <AuthHome 
+                        onLogin={(role) => setView(`login-${role}`)} 
+                        onRegister={(role) => { 
+                            setFormData({ ...formData, role: role }); 
+                            setView(`reg-${role}`); 
+                        }}
+                        onAdminLogin={handleAdminLogin}
+                      />
+                    )}
                 {(view === 'login-student' || view === 'login-alumni') && (
                   <form onSubmit={handleLogin} className="login-container">
                     <button type="button" onClick={() => setView('home')}>← Back</button>
-                    <h2>{view === 'login-student' ? 'Student' : 'Alumni'} Sign In</h2>
+                    <h2>{view.includes('student') ? 'Student' : 'Alumni'} Sign In</h2>
                     <label>Email</label>
                     <input name="email" type="email" required />
                     <label>Password</label>
