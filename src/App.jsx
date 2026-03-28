@@ -156,6 +156,7 @@ const renderTabContent = () => {
         <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Map Search</button>
         <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
         <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox</button>
+        <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
       </nav>
     ) : (
       <div className="onboarding-notice">
@@ -167,7 +168,6 @@ const renderTabContent = () => {
   </aside>
 
   <main className="dashboard-content">
-    {/* If not complete, force the Profile component even if they try to switch tabs */}
     {!loggedInUser?.isProfileComplete ? (
       <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
     ) : (
@@ -274,7 +274,7 @@ const renderTabContent = () => {
 
     {/* --- SECTION 3: ACCOUNT INFORMATION --- */}
     <h3>Account Information</h3>
-    <label>USername</label>
+    <label>Username</label>
     <input placeholder="e.g. Vipss" value={formData.displayName} required onChange={e => setFormData({...formData, displayName: e.target.value})} />
 
     <label>Password</label>

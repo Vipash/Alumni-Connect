@@ -8,7 +8,15 @@ function EditProfile({ user, onCancel, onUpdate }) {
     mobile: user.mobile || '',
     linkedin: user.linkedin || '',
     resumeUrl: user.resumeUrl || '',
-    profilePhoto: user.profilePhoto || ''
+    profilePhoto: user.profilePhoto || '',
+    fatherName: user.fatherName || '',
+    dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : '',
+    tenthYear: user.tenthYear || '',
+    twelfthYear: user.twelfthYear || '',
+    currentAddress: user.currentAddress || '',
+    permanentAddress: user.permanentAddress || '',
+    hobbiesTechnical: user.hobbiesTechnical?.join(', ') || '',
+    hobbiesPersonal: user.hobbiesPersonal?.join(', ') || ''
   });
 
   const handleFileUpload = async (e, fieldName) => {
@@ -44,102 +52,120 @@ function EditProfile({ user, onCancel, onUpdate }) {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  try {
-    const response = await fetch(`/api/profile/update`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...formData, userId: user._id }) // Send everything together
-    });
+    e.preventDefault();
+    try {
+      // Logic Fix: We send all data to the standard update route
+      const response = await fetch(`/api/profile/update`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          ...formData, 
+          userId: user._id,
+          // Convert comma strings back to arrays for the database
+          hobbiesTechnical: formData.hobbiesTechnical.split(',').map(s => s.trim()),
+          hobbiesPersonal: formData.hobbiesPersonal.split(',').map(s => s.trim())
+        }) 
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      setSuccessMessage("✅ Profile updated successfully!");
-      // Using a slightly shorter timeout for better UX
-      setTimeout(() => {
-        onUpdate(data); 
-      }, 1500); 
-    } else {
-      alert("Failed to save: " + (data.message || "Unknown error"));
+      if (response.ok) {
+        setSuccessMessage("✅ Profile updated successfully!");
+        setTimeout(() => {
+          onUpdate(data); 
+        }, 1500); 
+      } else {
+        alert("Failed to save: " + (data.message || "Unknown error"));
+      }
+    } catch (err) {
+      console.error("Update error:", err);
+      alert("Network error.");
     }
-  } catch (err) {
-    console.error("Update error:", err);
-    alert("Network error.");
-  }
-};
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="profile-container">
-      <h3>Edit Profile</h3>
-      {successMessage && (
-        <div style={{ 
-          backgroundColor: '#d4edda', 
-          color: '#155724', 
-          padding: '10px', 
-          borderRadius: '5px', 
-          marginBottom: '15px',
-          textAlign: 'center',
-          fontWeight: 'bold'
-        }}>
-          {successMessage}
+    <div className="profile-card">
+      <form onSubmit={handleSubmit} className="edit-profile-form">
+        <h3>Edit Detailed Profile</h3>
+        {successMessage && <div className="success-banner">{successMessage}</div>}
+        
+        <div className="onboarding-form"> {/* Reusing grid styles from App.css */}
+          <div className="form-grid">
+            <div className="form-group">
+              <label>Display Name</label>
+              <input name="displayName" value={formData.displayName} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Mobile Number</label>
+              <input name="mobile" type="tel" value={formData.mobile} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Father's Name</label>
+              <input name="fatherName" value={formData.fatherName} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Date of Birth</label>
+              <input type="date" name="dob" value={formData.dob} onChange={handleChange} />
+            </div>
+
+            <div className="full-width"><h4 className="section-header">Academic History</h4></div>
+            <div className="form-group">
+              <label>10th Pass-out Year</label>
+              <input type="number" name="tenthYear" value={formData.tenthYear} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>12th Pass-out Year</label>
+              <input type="number" name="twelfthYear" value={formData.twelfthYear} onChange={handleChange} />
+            </div>
+
+            <div className="form-group full-width">
+              <label>Bio</label>
+              <textarea name="bio" value={formData.bio} onChange={handleChange} rows="3" />
+            </div>
+
+            <div className="full-width"><h4 className="section-header">Addresses</h4></div>
+            <div className="form-group full-width">
+              <label>Current Address</label>
+              <textarea name="currentAddress" value={formData.currentAddress} onChange={handleChange} />
+            </div>
+
+            <div className="form-group full-width">
+              <label>Permanent Address</label>
+              <textarea name="permanentAddress" value={formData.permanentAddress} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Technical Hobbies</label>
+              <input name="hobbiesTechnical" value={formData.hobbiesTechnical} onChange={handleChange} placeholder="e.g. Coding, Robotics" />
+            </div>
+
+            <div className="form-group">
+              <label>Personal Hobbies</label>
+              <input name="hobbiesPersonal" value={formData.hobbiesPersonal} onChange={handleChange} placeholder="e.g. Hiking, Guitar" />
+            </div>
+
+            <div className="form-group">
+               <label>Profile Photo</label>
+               <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'profilePhoto')} />
+            </div>
+
+            <div className="form-group">
+               <label>Resume (PDF)</label>
+               <input type="file" accept=".pdf" onChange={(e) => handleFileUpload(e, 'resumeUrl')} />
+            </div>
+          </div>
+
+          <div className="form-actions" style={{ marginTop: '30px', display: 'flex', gap: '10px' }}>
+            <button type="submit" className="submit-btn">Save All Changes</button>
+            <button type="button" className="admin-btn" onClick={onCancel}>Cancel</button>
+          </div>
         </div>
-      )}
-      
-      <label>Display Name</label>
-      <input name="displayName" value={formData.displayName} onChange={handleChange} />
-
-      <label>Bio</label>
-      {/* Changed to textarea for a larger box */}
-      <textarea 
-        name="bio" 
-        value={formData.bio} 
-        onChange={handleChange} 
-        rows="5" 
-        style={{ width: '100%', display: 'block', marginBottom: '10px' }}
-      />
-
-      <label>Mobile Number</label>
-<input 
-  name="mobile"
-  type="tel"
-  pattern="[0-9]{10}"
-  value={formData.mobile} 
-  onChange={handleChange} 
-  placeholder="10-digit mobile number"
-/>
-
-      <label>LinkedIn URL</label>
-      <input name="linkedin" value={formData.linkedin} onChange={handleChange} />
-
-      <label>Resume (PDF)</label>
-<input type="file" accept=".pdf" onChange={(e) => handleFileUpload(e, 'resumeUrl')} />
-{formData.resumeUrl && <span style={{color: 'green', fontSize: '12px'}}>✅ File uploaded</span>}
-
-<label>Profile Photo</label>
-<div className="upload-preview-container">
-  {formData.profilePhoto && (
-    <img 
-      src={formData.profilePhoto} 
-      alt="Preview" 
-      style={{ width: '60px', height: '60px', borderRadius: '50%', marginBottom: '10px', objectFit: 'cover' }} 
-    />
-  )}
-  <input 
-    type="file" 
-    accept="image/*" 
-    onChange={(e) => handleFileUpload(e, 'profilePhoto')} 
-  />
-  <p style={{ fontSize: '12px', color: '#666' }}>
-    {formData.profilePhoto ? "Click above to change current photo" : "No photo uploaded yet"}
-  </p>
-</div>
-<div className="form-actions" style={{ marginTop: '20px' }}>
-        <button type="submit">Save Changes</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
 

@@ -151,10 +151,19 @@ function Profile({ user, setUser }) {
           {/* New detailed fields */}
           <div className="info-item"><label>Father's Name</label><span>{user.fatherName}</span></div>
           <div className="info-item"><label>DOB</label><span>{new Date(user.dob).toLocaleDateString()}</span></div>
-          <div className="info-item"><label>10th/12th Batch</label><span>{user.tenthYear} / {user.twelfthYear}</span></div>
+          <div className="info-item"><label>10th Passout</label><span>{user.tenthYear}</span></div>
+          <div className="info-item"><label>12th Passout</label><span>{user.twelfthYear}</span></div>
           
-          <div className="info-item full-width"><label>Current Address</label><span>{user.currentAddress}</span></div>
-          
+          <div className="info-item full-width">
+              <label>Current Address</label>
+              <p className="address-text">{user.currentAddress}</p>
+            </div>
+            
+            <div className="info-item full-width">
+              <label>Permanent Address</label>
+              <p className="address-text">{user.permanentAddress}</p>
+            </div>
+
           <div className="info-item">
             <label>Technical Hobbies</label>
             <div className="tags">

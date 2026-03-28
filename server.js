@@ -136,9 +136,12 @@ app.patch('/api/profile/complete', async (req, res) => {
 
 app.patch('/api/profile/update', async (req, res) => {
   try {
-    const { userId, bio, linkedin, resumeUrl, profilePhoto, displayName, mobile } = req.body;
+    const { 
+      userId, bio, linkedin, resumeUrl, profilePhoto, displayName, mobile,
+      fatherName, dob, tenthYear, twelfthYear, currentAddress, 
+      permanentAddress, hobbiesTechnical, hobbiesPersonal 
+    } = req.body;
     
-    // Find the user by ID and update only the fields provided
     const updatedUser = await User.findByIdAndUpdate(
       userId, 
       { 
@@ -148,7 +151,15 @@ app.patch('/api/profile/update', async (req, res) => {
           resumeUrl, 
           profilePhoto,
           displayName,
-          mobile 
+          mobile,
+          fatherName,
+          dob,
+          tenthYear,
+          twelfthYear,
+          currentAddress,
+          permanentAddress,
+          hobbiesTechnical,
+          hobbiesPersonal
         } 
       },
       { new: true }
@@ -156,7 +167,6 @@ app.patch('/api/profile/update', async (req, res) => {
     
     if (!updatedUser) return res.status(404).send("User not found");
 
-    // Important: Don't send the password back!
     const { password: _, ...userProfile } = updatedUser._doc;
     res.json(userProfile);
     
