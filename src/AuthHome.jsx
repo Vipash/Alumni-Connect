@@ -2,38 +2,47 @@ import { useState } from 'react';
 
 function AuthHome({ onLogin, onRegister, onAdminLogin }) {
   const [selectedRole, setSelectedRole] = useState('student');
+  const [adminPass, setAdminPass] = useState('');
+
+  const handleAdminSubmit = () => {
+    if (adminPass === "admin123") {
+      onAdminLogin(); // This triggers the setView('admin-dash') in App.jsx
+    } else {
+      alert("Incorrect Admin Password");
+    }
+  };
 
   return (
-    <div className="modal-box minimalist-auth">
-      <div className="logo-section">
-        <img src="/MBM_Logo.png" alt="MBM Logo" style={{ width: '180px' }} />
-      </div>
-      
+    <div className="minimalist-auth-content">
       <h1>MBM Alumni Connect</h1>
       <p className="subtitle">Select your role to get started</p>
 
-      {/* FIELD 1: ROLE DROPDOWN */}
-      <div className="form-group">
-        <select 
-          className="role-dropdown"
-          value={selectedRole} 
-          onChange={(e) => setSelectedRole(e.target.value)}
-        >
-          <option value="student">I am a Student</option>
-          <option value="alumni">I am an Alumnus</option>
-          <option value="admin">I am an Admin</option>
-        </select>
-      </div>
+      <select 
+        className="role-dropdown"
+        value={selectedRole} 
+        onChange={(e) => setSelectedRole(e.target.value)}
+      >
+        <option value="student">I am a Student</option>
+        <option value="alumni">I am an Alumnus</option>
+        <option value="admin">I am an Admin</option>
+      </select>
 
       <div className="auth-actions">
         {selectedRole === 'admin' ? (
-          /* FIELD 2: ADMIN SIGN IN */
-          <button className="primary-btn full-width" onClick={onAdminLogin}>
-            Sign In as Admin
-          </button>
+          <div style={{ width: '100%' }}>
+            <input 
+              type="password" 
+              placeholder="Enter Admin Password" 
+              value={adminPass}
+              onChange={(e) => setAdminPass(e.target.value)}
+              style={{ marginBottom: '10px', padding: '12px', width: '100%', borderRadius: '8px', border: '2px solid #e2e8f0' }}
+            />
+            <button className="secondary-btn full-width" onClick={handleAdminSubmit}>
+              Access Admin Dashboard
+            </button>
+          </div>
         ) : (
           <>
-            {/* FIELD 2 & 3: LOGIN / REGISTER */}
             <button className="secondary-btn" onClick={() => onLogin(selectedRole)}>
               Sign In
             </button>
@@ -46,4 +55,5 @@ function AuthHome({ onLogin, onRegister, onAdminLogin }) {
     </div>
   );
 }
+
 export default AuthHome;
