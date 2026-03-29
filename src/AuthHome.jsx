@@ -5,12 +5,12 @@ function AuthHome({ onLogin, onRegister, onAdminLogin }) {
   const [adminPass, setAdminPass] = useState('');
 
   const handleAdminSubmit = () => {
-    if (adminPass === "admin123") {
-      onAdminLogin(); // This triggers the setView('admin-dash') in App.jsx
-    } else {
-      alert("Incorrect Admin Password");
-    }
-  };
+  if (adminPass === "admin123") {
+    onAdminLogin();
+  } else {
+    alert("Incorrect Admin Password");
+  }
+};
 
   return (
     <div className="minimalist-auth-content">

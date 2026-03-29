@@ -84,9 +84,8 @@ const [loginStatus, setLoginStatus] = useState(() => {
   };
 
   const handleAdminLogin = () => {
-    const pass = prompt("Admin Password:");
-    if (pass === "admin123") setView('admin-dash');
-  };
+  setView('admin-dash');
+};
 
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -137,94 +136,139 @@ const renderTabContent = () => {
   
   return (
     <div className="app-root">
-      {/* 1. DASHBOARD VIEW */}
+      {/* 1. DASHBOARD VIEW (Logged In) */}
       {loginStatus === 'approved' ? (
         <div className="workspace-layout">
           <aside className="sidebar">
             <div className="sidebar-header-brand">
-  <img 
-    src="/MBM_Logo.png"
-    alt="University Logo" 
-    className="sidebar-logo" 
-    onError={(e) => { e.target.style.display = 'none'; }} 
-  />
-  <h2 className="brand-text">Alumni Connect</h2>
+              <img src="/MBM_Logo.png" alt="University Logo" className="sidebar-logo" />
+              <h2 className="brand-text">Alumni Connect</h2>
               <p>Welcome, <strong>{loggedInUser?.name}</strong></p>
             </div>
             {loggedInUser?.isProfileComplete ? (
-      <nav className="sidebar-nav">
-        <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
-        <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Alumni Search</button>
-        <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
-        <button className={activeTab === 'inbox' ? 'active' : ''} onClick={() => setActiveTab('inbox')}>Inbox</button>
-        <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
-      </nav>
-    ) : (
-      <div className="onboarding-notice">
-        <p>Please complete your profile setup to unlock all features.</p>
-      </div>
-    )}
-    
-    <button className="logout-btn" onClick={handleLogout}>Logout</button>
-  </aside>
+              <nav className="sidebar-nav">
+                <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
+                <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Alumni Search</button>
+                <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
+                <button className={activeTab === 'inbox' ? 'active' : ''} onClick={handleInboxClick}>Inbox</button>
+                <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
+              </nav>
+            ) : (
+              <div className="onboarding-notice">
+                <p>Please complete your profile setup.</p>
+              </div>
+            )}
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          </aside>
 
-  <main className="dashboard-content">
-    {!loggedInUser?.isProfileComplete ? (
-      <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
-    ) : (
-      renderTabContent()
-    )}
-  </main>
+          <main className="dashboard-content">
+            {!loggedInUser?.isProfileComplete ? (
+              <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
+            ) : (
+              renderTabContent()
+            )}
+          </main>
         </div>
       ) : view === 'admin-dash' ? (
         <div className="modal-overlay">
           <div className="admin-fullscreen-wrapper">
-          <AdminDashboard setView={setView} />
+            <AdminDashboard setView={setView} />
           </div>
         </div>
       ) : (
-        <>
-        <div className="auth-page-wrapper"></div>
-          <div className={`map-layer ${view === 'picker' ? 'active' : ''}`}>
-            <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              {view === 'picker' && <LocationPicker setCoords={setSelectedCoords} onConfirm={() => setView('reg-alumni')} />}
-            </MapContainer>
+        /* 2. PUBLIC LANDING PAGE (Logged Out) */
+        <div className="landing-page-container">
+          {/* TOP NAVBAR */}
+          <nav className="portal-navbar">
+            <div className="nav-logo">
+              <img src="/MBM_Logo.png" alt="Logo" />
+              <span>MBM University</span>
+            </div>
+            <div className="nav-links">
+              <button onClick={() => setView('home')}>Home</button>
+              <button onClick={() => alert("Opening Manual...")}>Instruction Manual</button>
+              <button onClick={() => setView('about')}>About Us</button>
+              <button className="portal-access-btn" onClick={() => setView('login-choice')}>
+                Access Portal
+              </button>
+            </div>
+          </nav>
+
+          {/* NEWS TICKER */}
+          <div className="news-ticker">
+            <div className="ticker-wrap">
+              <div className="ticker-item">📢 Next Alumni Meet: December 2026</div>
+              <div className="ticker-item">🎓 New Research Wing Inaugurated</div>
+              <div className="ticker-item">📰 Latest E-Magazine "MBM Connect" Out Now!</div>
+              <div className="ticker-item">✨ 500+ New Placements in Computer Science</div>
+            </div>
           </div>
 
-          {view !== 'picker' && (
+          {/* HERO SECTION */}
+          <header className="hero-section">
+            <div className="hero-content">
+              <img src="/MBM_Logo.png" alt="Floating Logo" className="floating-logo" />
+              <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
+              <p className="hero-subtitle">Bridging Generations of Excellence</p>
+              <div className="scroll-hint">Scroll down for activities ↓</div>
+            </div>
+          </header>
+
+          {/* ACTIVITIES SECTION */}
+          <section className="portal-info-section">
+            <div className="activity-card">
+              <h3>Recent University Activities</h3>
+              <p>Explore the latest updates from the campus, including technical fests, research breakthroughs, and infrastructure developments.</p>
+              <button className="secondary-btn" style={{width: 'auto'}}>View Gallery</button>
+            </div>
+            <div className="magazine-outlet">
+              <h3>Alumni E-Magazine</h3>
+              <div className="mag-preview">
+                <p>The "MBM Connect" March 2026 Edition is now live. Features interviews with distinguished alumni in Silicon Valley.</p>
+                <button className="primary-btn" style={{width: 'auto'}}>Download PDF</button>
+              </div>
+            </div>
+          </section>
+
+          {/* AUTH MODAL (POPS UP ON CLICK) */}
+          {(view === 'login-choice' || view.startsWith('login-') || view.startsWith('reg-') || view === 'picker') && (
             <div className="modal-overlay">
               <div className="modal-box">
-                <div className="logo-section" style={{ textAlign: 'center', marginBottom: '20px' }}>
-                  <img 
-                  src="/MBM_Logo.png"
-                  alt="MBM Logo" 
-                  style={{ width: '200px', height: 'auto', marginBottom: '5px' }} />
-                  </div>
-                  {view === 'home' && (
-                      <AuthHome 
-                        onLogin={(role) => setView(`login-${role}`)} 
-                        onRegister={(role) => { 
-                            setFormData({ ...formData, role: role }); 
-                            setView(`reg-${role}`); 
-                        }}
-                        onAdminLogin={handleAdminLogin}
-                      />
-                    )}
+                <button className="close-x" onClick={() => setView('home')}>×</button>
+                
+                {/* Logo shown inside modal only for login/reg steps */}
+                {view !== 'home' && (
+                   <div className="logo-section" style={{textAlign:'center', marginBottom:'10px'}}>
+                     <img src="/MBM_Logo.png" alt="Logo" style={{width:'80px'}} />
+                   </div>
+                )}
+
+                {view === 'login-choice' && (
+                  <AuthHome 
+                    onLogin={(role) => setView(`login-${role}`)} 
+                    onRegister={(role) => { 
+                        setFormData({ ...formData, role: role }); 
+                        setView(`reg-${role}`); 
+                    }}
+                    onAdminLogin={handleAdminLogin}
+                  />
+                )}
+
                 {(view === 'login-student' || view === 'login-alumni') && (
                   <form onSubmit={handleLogin} className="login-container">
-                    <button type="button" onClick={() => setView('home')}>← Back</button>
+                    <button type="button" onClick={() => setView('login-choice')}>← Back</button>
                     <h2>{view.includes('student') ? 'Student' : 'Alumni'} Sign In</h2>
                     <label>Email</label>
                     <input name="email" type="email" required />
                     <label>Password</label>
                     <input name="password" type="password" required />
-                    <button type="submit">Sign In</button>
+                    <button type="submit" className="primary-btn">Sign In</button>
                   </form>
                 )}
                 {(view === 'reg-alumni' || view === 'reg-student') && (
+                  /* Keep your existing registration form code here */
                   <form onSubmit={handleSubmit} className="registration-form">
-                    <button type="button" onClick={() => setView('home')}>← Back</button>
+                    <button type="button" onClick={() => setView('login-choice')}>← Back</button>
                     <h2>{view === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
 
     {/* --- SECTION 1: PERSONAL INFORMATION --- */}
@@ -281,10 +325,18 @@ const renderTabContent = () => {
     <button type="submit" className="submit-btn">Complete Registration</button>
                   </form>
                 )}
+                {view === 'picker' && (
+                   <div className="map-picker-container" style={{height: '400px'}}>
+                      <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%' }}>
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        <LocationPicker setCoords={setSelectedCoords} onConfirm={() => setView('reg-alumni')} />
+                      </MapContainer>
+                   </div>
+                )}
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
