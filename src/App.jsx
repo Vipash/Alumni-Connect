@@ -210,7 +210,7 @@ const renderTabContent = () => {
               <img src="/MBM_Logo.png" alt="Floating Logo" className="floating-logo" />
               <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
               <p className="hero-subtitle">Bridging Generations of Excellence</p>
-              <div className="scroll-hint">Scroll down for activities ↓</div>
+              <div className="scroll-hint">↓</div>
             </div>
           </header>
 
