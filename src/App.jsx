@@ -109,6 +109,25 @@ const handleInboxClick = () => {
   }
 };
 
+const [isMapOpen, setIsMapOpen] = useState(false);
+
+useEffect(() => {
+  if (isMapOpen) {
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 200);
+  }
+}, [isMapOpen]);
+
+const downloadMagazine = () => {
+    const link = document.createElement('a');
+    link.href = '/sfdsj.pdf'; 
+    link.download = 'MBM_Alumni_Connect_Magazine.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
 const renderTabContent = () => {
   let content; 
   switch (activeTab) {
@@ -175,7 +194,16 @@ const renderTabContent = () => {
             <AdminDashboard setView={setView} />
           </div>
         </div>
-      ) : (
+      ) : view === 'about' || view === 'manual' ? (
+          <div className="placeholder-view">
+            <nav className="portal-navbar">...</nav> {/* Keep your navbar here so you can go back */}
+            <div style={{padding: '100px', textAlign: 'center'}}>
+                <h1>{view === 'about' ? 'About Us' : 'Instruction Manual'}</h1>
+                <p>This page is currently under construction. Please check back soon!</p>
+                <button onClick={() => setView('home')} style={{width: 'auto'}}>Back to Home</button>
+            </div>
+          </div>
+        ) : (
         /* 2. PUBLIC LANDING PAGE (Logged Out) */
         <div className="landing-page-container">
           {/* TOP NAVBAR */}
@@ -186,7 +214,7 @@ const renderTabContent = () => {
             </div>
             <div className="nav-links">
               <button onClick={() => setView('home')}>Home</button>
-              <button onClick={() => alert("Opening Manual...")}>Instruction Manual</button>
+              <button onClick={() => setView('manual')}>Instruction Manual</button>
               <button onClick={() => setView('about')}>About Us</button>
               <button className="portal-access-btn" onClick={() => setView('login-choice')}>
                 Access Portal
@@ -224,14 +252,16 @@ const renderTabContent = () => {
             <div className="magazine-outlet">
               <h3>Alumni E-Magazine</h3>
               <div className="mag-preview">
-                <p>The "MBM Connect" March 2026 Edition is now live. Features interviews with distinguished alumni in Silicon Valley.</p>
-                <button className="primary-btn" style={{width: 'auto'}}>Download PDF</button>
+                <p>The "Alumni Association e-Magazine" March 2026 Edition is now live.</p>
+                <a href="/sfdsj.pdf" download="MBM_Magazine_March_2026.pdf">
+                  <button className="primary-btn" style={{width: 'auto'}}>Download PDF</button>
+                </a>
               </div>
             </div>
           </section>
 
           {/* AUTH MODAL (POPS UP ON CLICK) */}
-          {(view === 'login-choice' || view.startsWith('login-') || view.startsWith('reg-') || view === 'picker') && (
+          {(view === 'login-choice' || view.startsWith('login-') || view.startsWith('reg-')) && (
             <div className="modal-overlay">
               <div className="modal-box">
                 <button className="close-x" onClick={() => setView('home')}>×</button>
@@ -294,9 +324,9 @@ const renderTabContent = () => {
         <label>Current Company</label>
         <input placeholder="Where do you work?" value={formData.company} required onChange={e => setFormData({...formData, company: e.target.value})} />
         <label>Location</label>
-        <button type="button" className="location-btn" onClick={() => setView('picker')}>
-          {selectedCoords ? "Location Picked ✅" : "Click to Pin Location on Map"}
-        </button>
+        <button type="button" className="location-btn" onClick={() => setIsMapOpen(true)}>
+                    {selectedCoords ? "Location Picked ✅" : "Click to Pin Location on Map"}
+                  </button>
       </>
     )}
 
@@ -325,14 +355,27 @@ const renderTabContent = () => {
     <button type="submit" className="submit-btn">Complete Registration</button>
                   </form>
                 )}
-                {view === 'picker' && (
-                   <div className="map-picker-container" style={{height: '400px'}}>
-                      <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%' }}>
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                        <LocationPicker setCoords={setSelectedCoords} onConfirm={() => setView('reg-alumni')} />
-                      </MapContainer>
-                   </div>
-                )}
+                {isMapOpen && (
+          <div className="modal-overlay" style={{zIndex: 5000, background: 'rgba(0,0,0,0.7)'}}>
+            <div className="modal-box" style={{maxWidth: '800px', width: '90%', height: '500px'}}>
+              {/* CRITICAL: This 'x' only closes the map, not the form! */}
+              <button className="close-x" onClick={() => setIsMapOpen(false)}>×</button>
+              <h3>Pin Your Location</h3>
+              <div style={{height: '100%', marginTop: '10px'}}>
+                <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '350px', borderRadius: '12px' }}>
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <LocationPicker 
+                    setCoords={setSelectedCoords} 
+                    onConfirm={() => setIsMapOpen(false)} 
+                  />
+                </MapContainer>
+                <button className="primary-btn" style={{marginTop: '15px'}} onClick={() => setIsMapOpen(false)}>
+                  Confirm Location
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
               </div>
             </div>
           )}
