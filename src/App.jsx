@@ -333,7 +333,6 @@ function App() {
                     </p>
                   </div>
                   <div className="explore-container">
-                    <p className="explore-text">WELCOME</p>
                     <div className="scroll-hint">
                       ↓ Explore MBM Alumni Connect ↓
                     </div>
