@@ -11,6 +11,8 @@ import AnnouncementsSection from './AnnouncementsSection';
 import Inbox from './Inbox';
 import ConnectHub from './ConnectHub';
 import AuthHome from './AuthHome';
+import InstructionManual from './InstructionManual';
+import AboutUs from './AboutUs';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -373,27 +375,8 @@ function App() {
               </>
             )}
 
-            {/* VIEW: ABOUT / MANUAL */}
-            {(view === 'about' || view === 'manual') && (
-              <div className="placeholder-view-container">
-                <div className="placeholder-card">
-                  <h1>
-                    {view === 'about' ? 'About Us' : 'Instruction Manual'}
-                  </h1>
-                  <p>
-                    This page is currently under construction. Information will
-                    be added soon.
-                  </p>
-                  <button
-                    className="primary-btn"
-                    onClick={() => setView('home')}
-                    style={{ width: 'auto' }}
-                  >
-                    Return to Home
-                  </button>
-                </div>
-              </div>
-            )}
+            {view === 'manual' && <InstructionManual setView={setView} />}
+            {view === 'about' && <AboutUs setView={setView} />}
 
             {/* VIEW: AUTH MODAL (Now sits ON TOP of home content instead of replacing it) */}
             {(view === 'login-choice' ||

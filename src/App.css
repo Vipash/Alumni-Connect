@@ -82,7 +82,7 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 @keyframes hero-float {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); }}
 .hero-title {font-size: clamp(2rem, 5vw, 4rem); /* Scales with screen size */ letter-spacing: 4px;  font-weight: 900;  margin: 10px 0; color: #ffffff !important; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);}
 .hero-subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 40px; }
-.scroll-hint {color: var(--mbm-gold) !important; font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.85; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); animation: subtleSlide 3.5s infinite ease-in-out;  cursor: default; user-select: none;}
+.scroll-hint {color: var(--mbm-gold) !important; font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; opacity: 0.85; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); animation: subtleSlide 3s infinite ease-in-out;  cursor: default; user-select: none;}
 @keyframes subtleSlide {0%, 100% {transform: translateY(0); opacity: 0.7;} 50% {transform: translateY(-6px); opacity: 1;}}
 /* Info Section (Activities & Magazine) */
 .portal-info-section {position: relative; z-index: 10; margin-top: 100vh; background: #f8fafc; padding: 80px 10% 120px 10%; box-shadow: 0 -20px 40px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 40px; min-height: 120vh;}
@@ -120,6 +120,42 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .explore-section {position: absolute;  bottom: 40px;  left: 50%; transform: translateX(-50%); text-align: center;  animation: fadeIn 2s ease-in;}
 .explore-section p {margin-bottom: 5px;  font-weight: 800;  letter-spacing: 2px; color: #D4AF37; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
 .explore-container {position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); text-align: center; z-index: 5;}
+/* --- 7. INSTRUCTION MANUAL STYLES --- */
+.manual-container {padding: 120px 20px 60px; background: #f1f5f9; min-height: 100vh; display: flex; justify-content: center;}
+.manual-card {background: white; max-width: 900px; width: 100%; padding: 60px; border-radius: 16px; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05); color: #334155; line-height: 1.7;}
+.manual-header {border-bottom: 3px solid var(--mbm-blue); padding-bottom: 20px; margin-bottom: 30px;}
+.manual-header h1 {color: var(--mbm-blue); font-size: 2.2rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+.last-updated {font-size: 0.85rem; color: #94a3b8; font-weight: 600;}
+/* Table of Contents Box */
+.manual-toc {background: #f8fafc; padding: 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid var(--mbm-gold);}
+.manual-toc h3 {margin-top: 0; font-size: 1.2rem; color: var(--mbm-blue); margin-bottom: 15px;}
+.manual-toc ul {list-style: none; padding: 0;}
+.manual-toc li {margin: 10px 0; font-weight: 500;}
+.manual-toc a {text-decoration: none; color: #1e40af; /* Deep blue for links */ transition: all 0.2s ease;}
+.manual-toc a:hover {color: var(--mbm-gold); padding-left: 5px;}
+/* Content Sections */
+.manual-section {margin-bottom: 50px; scroll-margin-top: 120px;}
+.manual-section h2 {color: var(--mbm-blue); font-size: 1.5rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;}
+.manual-section p {margin-bottom: 15px; font-size: 1.05rem; color: #475569;}
+.manual-section ul {padding-left: 20px; margin-bottom: 20px;}
+.manual-section li {margin-bottom: 8px;}
+.manual-divider {border: 0; height: 1px; background: #e2e8f0; margin: 40px 0;}
+.return-home {max-width: 250px; margin: 40px auto 0; display: block;}
+/* Mobile Responsiveness */
+@media (max-width: 600px) {.manual-card {padding: 30px 20px;} .manual-header h1 {font-size: 1.6rem;}}
+/* --- ABOUT US STYLES --- */
+.about-container {padding: 120px 20px 60px; background: #f1f5f9; min-height: 100vh; display: flex; justify-content: center;}
+.about-card {background: white; max-width: 900px; width: 100%; padding: 50px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);}
+.about-header {text-align: center; margin-bottom: 40px;}
+.about-logo {width: 100px; margin-bottom: 15px;}
+.about-content p {color: #475569; font-size: 1.05rem; line-height: 1.8; margin-bottom: 20px; text-align: justify;}
+.vision-mission-grid {display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 40px 0;}
+.vm-card {background: #f8fafc; padding: 25px; border-radius: 15px; border-top: 4px solid var(--mbm-blue); transition: transform 0.3s ease;}
+.vm-card:hover {transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
+.vm-card h3 {color: var(--mbm-blue); margin-top: 0; text-transform: uppercase; letter-spacing: 1px;}
+.vm-card p {font-style: italic; font-size: 0.95rem; color: #334155;}
+@media (max-width: 768px) {.vision-mission-grid { grid-template-columns: 1fr; }}
+
 /* --- Sidebar Brand Styling --- */
 .sidebar-header-brand {display: flex; align-items: center; gap: 12px; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);}
 .sidebar-logo {width: 40px; height: 40px; object-fit: contain;}
