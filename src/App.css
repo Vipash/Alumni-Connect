@@ -52,15 +52,9 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
 /* --- 6. LANDING PAGE OVERHAUL --- */
 /* Full Landing Container */
-.landing-page-container {
-  width: 100%; 
-  min-height: 100vh; 
-  scroll-behavior: smooth; 
-  background: #f8fafc; 
-  display: block;
-}
+.landing-page-container {width: 100%;  min-height: 100vh;  scroll-behavior: smooth;  background: #f8fafc;  display: block;}
 /* Unified Navbar */
-.portal-navbar {display: flex; justify-content: space-between; align-items: center; padding: 10px 5%; background: var(--mbm-blue); position: sticky; top: 0; z-index: 2000; color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2);}
+.portal-navbar {display: flex; justify-content: space-between; align-items: center; height: 60px; padding: 10px 5%; background: var(--mbm-blue); position: sticky; top: 0; z-index: 2000; color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2);}
 .nav-logo { display: flex; align-items: center; gap: 10px; }
 .nav-logo img { width: 45px; height: 45px; object-fit: contain; }
 .nav-logo span { font-weight: 700; font-size: 1.2rem; }
@@ -68,53 +62,14 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .nav-links button { background: none; color: white; width: auto; margin: 0; font-size: 0.9rem; padding: 8px 15px; }
 .portal-access-btn { background: var(--mbm-gold) !important;  color: var(--mbm-blue) !important; border-radius: 30px !important;  font-weight: 800 !important;}
 /* News Ticker */
-.news-ticker {
-  background: var(--mbm-gold); 
-  color: var(--mbm-blue); 
-  padding: 10px 0; 
-  overflow: hidden; 
-  font-weight: bold; 
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  width: 100%;
-}
-
-.ticker-wrap {
-  display: inline-flex;
-  white-space: nowrap;
-  animation: ticker-scrolling 30s linear infinite; /* One consistent name */
-}
-
-.ticker-item { 
-  padding: 0 100px; 
-  display: inline-block;
-}
-
-/* This is the magic line for stopping on hover */
-.news-ticker:hover .ticker-wrap {
-  animation-play-state: paused;
-  cursor: pointer;
-}
-
-@keyframes ticker-scrolling {
-  0% { transform: translateX(100vw); }
-  100% { transform: translateX(-100%); }
-}
+.news-ticker {background: var(--mbm-gold);  color: var(--mbm-blue); height: 30px;  padding: 10px 0;  overflow: hidden; font-size: 0.85rem; font-weight: bold; line-height: 30px;  border-bottom: 1px solid rgba(0,0,0,0.1); width: 100%; overflow: hidder;}
+.ticker-wrap {display: inline-flex; white-space: nowrap; animation: ticker-scrolling 30s linear infinite; /* One consistent name */}
+.ticker-item { padding: 0 100px;  display: inline-block;}
+.news-ticker:hover .ticker-wrap {animation-play-state: paused; cursor: pointer;}
+@keyframes ticker-scrolling {0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); }}
 /* Hero Section */
-.hero-section {
-  height: 90vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  position: sticky;
-  top: 60px; /* Adjust this to match .portal-navbar height */
-  z-index: 1; 
-  background: linear-gradient(rgba(26, 30, 77, 0.6), rgba(38, 42, 107, 0.6)), 
-              url('/university-background.png');
-  background-size: cover;
-  background-position: center;
-}
+.hero-section {height: calc(100vh - 90px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; top: 60px; z-index: 1;  background: linear-gradient(rgba(26, 30, 77, 0.6), rgba(38, 42, 107, 0.6)), 
+  url('/university-background.png'); background-size: contain; background-repeat: no-repeat; background-position: center;}
 .hero-title { font-size: clamp(2rem, 5vw, 4rem);  letter-spacing: 4px; font-weight: 900;  margin: 10px 0; color: #ffffff !important;  text-shadow: 0px 4px 15px rgba(0, 0, 0, 0.6); }
 .hero-subtitle { font-size: 1.2rem;  color: rgba(255, 255, 255, 0.9); /* Soft white */ margin-bottom: 40px;  text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.4);}
  /* FIXED LOGO SIZE */
@@ -122,35 +77,13 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 @keyframes hero-float {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); }}
 .hero-title {font-size: clamp(2rem, 5vw, 4rem); /* Scales with screen size */ letter-spacing: 4px;  font-weight: 900;  margin: 10px 0; color: #ffffff !important; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);}
 .hero-subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 40px; }
-.scroll-hint { font-weight: bold;  animation: bounce 2s infinite;  margin-top: 20px;  color: var(--mbm-gold);}
+.scroll-hint { font-weight: bold; font-size: 2rem; animation: bounce 2s infinite;  margin-top: 10px;  color: var(--mbm-gold);}
 /* Info Section (Activities & Magazine) */
-.portal-info-section {
-  position: relative; 
-  z-index: 10; 
-  background: #f8fafc; 
-  padding: 80px 10%;
-  margin: 0;
-  box-shadow: 0 -20px 40px rgba(0,0,0,0.3); 
-  min-height: 100vh; 
-}
+.portal-info-section {position: relative;  z-index: 10;  background: #f8fafc;  padding: 80px 10%; margin: 0; box-shadow: 0 -20px 40px rgba(0,0,0,0.3);  min-height: 100vh; }
 .activity-card, .magazine-outlet {background: white; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid var(--mbm-blue);}
 .activity-card h3, .magazine-outlet h3 { color: var(--mbm-blue); margin-bottom: 15px; }
-/* Modal Tweaks for Landing Page */
 .close-x {position: absolute; top: 15px; right: 15px; width: 32px !important; height: 32px; background: #f1f5f9 !important; color: #64748b !important; border-radius: 50% !important; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;}
-.placeholder-view {
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  margin: 40px;
-  border-radius: 20px;
-  border: 2px dashed #cbd5e0;
-  color: #64748b;
-}
-
-/* Center everything on the screen with a nice background */
+.placeholder-view {min-height: 80vh; padding: 80px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; text-align: center; margin: 40px; border-radius: 20px; border: 2px dashed #cbd5e0; color: #64748b;}
 .landing-auth-container {height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top right, #262a6b, #1a1e4d);}
 .minimal-auth-card {background: white; padding: 50px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center;}
 .portal-logo {font-size: 2rem; color: #262a6b; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px;}
@@ -176,6 +109,8 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .secondary-btn {flex: 1; background-color: #262a6b; /* MBM Blue */ color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;}
 .full-width { width: 100%; }
 .subtitle { color: #64748b; margin-bottom: 25px; font-size: 0.9rem; }
+.explore-section {position: absolute; bottom: 20px; text-align: center; animation: fadeIn 2s ease-in;}
+.explore-section p {margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;}
 
 /* --- Sidebar Brand Styling --- */
 .sidebar-header-brand {display: flex; align-items: center; gap: 12px; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);}
@@ -364,7 +299,7 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .alert-card.read {opacity: 0.7; border-left-color: #ccc;}
 .tab-btn {position: relative; /* Essential for badge positioning */ padding: 10px 20px;}
 .notification-badge {position: absolute; top: -5px; right: -5px; background-color: #ff3f52; color: white; font-size: 0.7rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; /* Makes it pop against the button */ box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: bounce 0.5s ease-in-out;}
-@keyframes bounce {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); }}
+@keyframes bounce {0%, 20%, 50%, 80%, 100% {transform: translateY(0); } 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);}}
 .digest-item {display: flex; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid #eee;}
 .digest-tag {background: #eee; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; color: #666;}
 .digest-sub {font-size: 0.85rem; color: #888; margin-bottom: 15px;}

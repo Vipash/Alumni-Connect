@@ -233,12 +233,19 @@ const renderTabContent = () => {
           </div>
 
           {/* HERO SECTION */}
+          <main className="content-body">
+          {view === 'home' && (
+            <>
           <header className="hero-section">
             <div className="hero-content">
               <img src="/MBM_Logo.png" alt="Floating Logo" className="floating-logo" />
               <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
               <p className="hero-subtitle">Bridging Generations of Excellence</p>
-              <div className="scroll-hint">↓</div>
+              {/* EXPLORE SECTION AT VERY BOTTOM */}
+                  <div className="explore-section">
+                    <p>Explore MBM Alumni Connect</p>
+                    <div className="scroll-hint">↓</div>
+                  </div>
             </div>
           </header>
 
@@ -259,6 +266,15 @@ const renderTabContent = () => {
               </div>
             </div>
           </section>
+          </>
+          )}
+
+            {(view === 'about' || view === 'manual') && (
+            <div className="placeholder-view">
+              <h1>{view === 'about' ? 'About Us' : 'Instruction Manual'}</h1>
+              <p>This page is currently under construction. Please check back soon!</p>
+            </div>
+          )}
 
           {/* AUTH MODAL (POPS UP ON CLICK) */}
           {(view === 'login-choice' || view.startsWith('login-') || view.startsWith('reg-')) && (
@@ -358,7 +374,6 @@ const renderTabContent = () => {
                 {isMapOpen && (
           <div className="modal-overlay" style={{zIndex: 5000, background: 'rgba(0,0,0,0.7)'}}>
             <div className="modal-box" style={{maxWidth: '800px', width: '90%', height: '500px'}}>
-              {/* CRITICAL: This 'x' only closes the map, not the form! */}
               <button className="close-x" onClick={() => setIsMapOpen(false)}>×</button>
               <h3>Pin Your Location</h3>
               <div style={{height: '100%', marginTop: '10px'}}>
@@ -379,6 +394,7 @@ const renderTabContent = () => {
               </div>
             </div>
           )}
+          </main>
         </div>
       )}
     </div>
