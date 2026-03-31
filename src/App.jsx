@@ -242,10 +242,10 @@ const renderTabContent = () => {
               <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
               <p className="hero-subtitle">Bridging Generations of Excellence</p>
               {/* EXPLORE SECTION AT VERY BOTTOM */}
-                  <div className="explore-section">
-                    <p>Explore MBM Alumni Connect</p>
-                    <div className="scroll-hint">↓</div>
-                  </div>
+                  <div className="explore-container">
+                  <p className="explore-text">Explore MBM Alumni Connect</p>
+                  <div className="scroll-hint">↓</div>
+                </div>
             </div>
           </header>
 
