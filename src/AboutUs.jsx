@@ -44,10 +44,6 @@ const AboutUs = ({ setView }) => {
             <p>“To impart quality technical education to the students to make them globally competent engineers, contributing to the development of the nation and world at large”.</p>
           </div>
         </div>
-
-        <button className="primary-btn return-home" onClick={() => setView('home')}>
-          Return to Home
-        </button>
       </div>
     </div>
   );

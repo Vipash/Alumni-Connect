@@ -50,10 +50,6 @@ const InstructionManual = ({ setView }) => {
           <h2>5. Privacy & Security Guidelines</h2>
           <p>Sensitive contact info (Email, Mobile) is hidden by default and only visible to verified members. Always log out when using public terminals.</p>
         </section>
-
-        <button className="primary-btn return-home" onClick={() => setView('home')}>
-          Return to Home
-        </button>
       </div>
     </div>
   );
