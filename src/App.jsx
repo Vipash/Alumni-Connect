@@ -205,8 +205,10 @@ const renderTabContent = () => {
           </div>
         ) : (
         /* 2. PUBLIC LANDING PAGE (Logged Out) */
-        <div className="landing-page-container">
-          {/* TOP NAVBAR */}
+      <div className="landing-page-container">
+        
+        {/* FIXED HEADER: Stays visible for Home, About, and Manual */}
+        <div className="fixed-header-group">
           <nav className="portal-navbar">
             <div className="nav-logo">
               <img src="/MBM_Logo.png" alt="Logo" />
@@ -222,7 +224,6 @@ const renderTabContent = () => {
             </div>
           </nav>
 
-          {/* NEWS TICKER */}
           <div className="news-ticker">
             <div className="ticker-wrap">
               <div className="ticker-item">📢 Next Alumni Meet: December 2026</div>
@@ -231,48 +232,52 @@ const renderTabContent = () => {
               <div className="ticker-item">✨ 500+ New Placements in Computer Science</div>
             </div>
           </div>
+        </div>
 
-          {/* HERO SECTION */}
-          <main className="content-body">
+        <main className="content-body">
           {view === 'home' && (
             <>
-          <header className="hero-section">
-            <div className="hero-content">
-              <img src="/MBM_Logo.png" alt="Floating Logo" className="floating-logo" />
-              <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
-              <p className="hero-subtitle">Bridging Generations of Excellence</p>
-              {/* EXPLORE SECTION AT VERY BOTTOM */}
-                  <div className="explore-container">
+              {/* STATIC HERO: Background, Title, and Logo stay behind */}
+              <header className="hero-section fixed-hero">
+                <div className="hero-content">
+                  <img src="/MBM_Logo.png" alt="Floating Logo" className="floating-logo" />
+                  <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
+                  <p className="hero-subtitle">Bridging Generations of Excellence</p>
+                </div>
+                
+                {/* EXPLORE SECTION: Now perfectly centered and gold */}
+                <div className="explore-container">
                   <p className="explore-text">Explore MBM Alumni Connect</p>
                   <div className="scroll-hint">↓</div>
                 </div>
-            </div>
-          </header>
+              </header>
 
-          {/* ACTIVITIES SECTION */}
-          <section className="portal-info-section">
-            <div className="activity-card">
-              <h3>Recent University Activities</h3>
-              <p>Explore the latest updates from the campus, including technical fests, research breakthroughs, and infrastructure developments.</p>
-              <button className="secondary-btn" style={{width: 'auto'}}>View Gallery</button>
-            </div>
-            <div className="magazine-outlet">
-              <h3>Alumni E-Magazine</h3>
-              <div className="mag-preview">
-                <p>The "Alumni Association e-Magazine" March 2026 Edition is now live.</p>
-                <a href="/sfdsj.pdf" download="MBM_Magazine_March_2026.pdf">
-                  <button className="primary-btn" style={{width: 'auto'}}>Download PDF</button>
-                </a>
-              </div>
-            </div>
-          </section>
-          </>
+              {/* SCROLLING CONTENT: Slides OVER the hero */}
+              <section className="portal-info-section">
+                <div className="activity-card">
+                  <h3>Recent University Activities</h3>
+                  <p>Explore the latest updates from the campus...</p>
+                  <button className="secondary-btn" style={{width: 'auto'}}>View Gallery</button>
+                </div>
+                <div className="magazine-outlet">
+                  <h3>Alumni E-Magazine</h3>
+                  <div className="mag-preview">
+                    <p>The "Alumni Association e-Magazine" March 2026 Edition is now live.</p>
+                    <button className="primary-btn" onClick={downloadMagazine} style={{width: 'auto'}}>Download PDF</button>
+                  </div>
+                </div>
+              </section>
+            </>
           )}
 
-            {(view === 'about' || view === 'manual') && (
-            <div className="placeholder-view">
-              <h1>{view === 'about' ? 'About Us' : 'Instruction Manual'}</h1>
-              <p>This page is currently under construction. Please check back soon!</p>
+          {/* Placeholder Views with Proper Header context */}
+          {(view === 'about' || view === 'manual') && (
+            <div className="placeholder-view-container">
+              <div className="placeholder-card">
+                <h1>{view === 'about' ? 'About Us' : 'Instruction Manual'}</h1>
+                <p>This page is currently under construction. Information will be added soon.</p>
+                <button className="primary-btn" onClick={() => setView('home')} style={{width: 'auto'}}>Return to Home</button>
+              </div>
             </div>
           )}
 
