@@ -318,7 +318,7 @@ function App() {
 
           <main className="content-body">
             {/* VIEW: HOME */}
-            {view === 'home' && (
+            {(view === 'home' || view === 'login-choice' || view.startsWith('login-') || view.startsWith('reg-')) && (
               <>
                 <header className="hero-section">
                   <div className="hero-content">
