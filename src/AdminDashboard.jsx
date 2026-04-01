@@ -7,7 +7,17 @@ function AdminDashboard({ admin, setView }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [audience, setAudience] = useState('all');
-  const [searchTerm, setSearchTerm] = useState(''); // New Search State
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch('/api/admin/stats');
+      const data = await res.json();
+      setStats(data);
+    } catch (err) {
+      console.error("Stats error:", err);
+    }
+  };
 
   const getApiUrl = () => {
     if (activeTab === 'logs') return '/api/admin/logs';
@@ -34,6 +44,7 @@ function AdminDashboard({ admin, setView }) {
 
   useEffect(() => {
     fetchCurrentList();
+    fetchStats();
   }, [activeTab, statusFilter]);
 
   // Logic to filter the list based on search term
@@ -67,8 +78,48 @@ function AdminDashboard({ admin, setView }) {
     if (response.ok) {
       alert("Action successful!");
       fetchCurrentList();
+      fetchStats();
     }
   };
+
+  const ManageAdmins = () => {
+    const [formData, setFormData] = useState({ username: '', password: '', role: 'Moderator' });
+
+    const handleCreate = async (e) => {
+      e.preventDefault();
+      const response = await fetch('/api/admin/create-new', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // Pass creatorRole so server knows if we are GodMode
+        body: JSON.stringify({ ...formData, creatorRole: admin.role })
+      });
+      
+      if (response.ok) {
+        alert("New Administrator Added!");
+        e.target.reset();
+      } else {
+        const err = await response.json();
+        alert(err.message || "Failed to add admin");
+      }
+    };
+
+  return (
+    <div className="admin-card">
+      <h3>Add New Administrator</h3>
+      <p><small>Only accessible by GodMode accounts.</small></p>
+     <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <input required placeholder="Username" onChange={(e) => setFormData({...formData, username: e.target.value})} />
+          <input required type="password" placeholder="Temp Password" onChange={(e) => setFormData({...formData, password: e.target.value})} />
+          <select onChange={(e) => setFormData({...formData, role: e.target.value})}>
+            <option value="Moderator">Moderator</option>
+            <option value="Admin">Admin</option>
+            <option value="GodMode">GodMode</option>
+          </select>
+          <button type="submit" className="approve-btn">Create Account</button>
+        </form>
+    </div>
+  );
+};
 
   const handlePostAnnouncement = async (e) => {
     e.preventDefault();
@@ -131,6 +182,9 @@ function AdminDashboard({ admin, setView }) {
         <button className={activeTab === 'students' ? 'active' : ''} onClick={() => { setActiveTab('students'); setStatusFilter('pending'); }}>Students</button>
         <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => { setActiveTab('announcements'); setStatusFilter('post'); }}>Announcements</button>
         <button className={activeTab === 'logs' ? 'active' : ''} onClick={() => setActiveTab('logs')}>Security Logs</button>
+        {admin?.role === 'GodMode' && (
+        <button className={activeTab === 'manage-admins' ? 'active' : ''} onClick={() => setActiveTab('manage-admins')}>Manage Admins</button>
+        )}
       </div>
 
       {/* SEARCH BAR (Visible for User and Log tabs) */}
@@ -154,84 +208,90 @@ function AdminDashboard({ admin, setView }) {
       )}
 
       <div className="tab-content">
-        {activeTab === 'announcements' ? (
-          <div className="admin-announcement-container">
-            <div className="sub-tabs">
-              <button className={statusFilter === 'post' ? 'active-sub-tab' : ''} onClick={() => setStatusFilter('post')}>Post New</button>
-              <button className={statusFilter === 'history' ? 'active-sub-tab' : ''} onClick={() => setStatusFilter('history')}>History</button>
-            </div>
-
-            {statusFilter === 'post' ? (
-              <form onSubmit={handlePostAnnouncement} className="admin-announcement-form">
-                <input name="title" placeholder="Title" required />
-                <input name="subject" placeholder="Subject" required />
-                <textarea name="content" placeholder="Content..." rows="5" required />
-                <label>Audience:</label>
-                <select value={audience} onChange={(e) => setAudience(e.target.value)}>
-                  <option value="all">Everyone</option>
-                  <option value="students">Students Only</option>
-                  <option value="alumni">Alumni Only</option>
-                </select>
-                <button type="submit" className="approve-btn">Publish Announcement</button>
-              </form>
-            ) : (
-              <table>
-                <thead><tr><th>Date</th><th>Title</th><th>Actions</th></tr></thead>
-                <tbody>
-                  {listData.map(item => (
-                    <tr key={item._id}>
-                      <td>{new Date(item.date).toLocaleDateString()}</td>
-                      <td>{item.title}</td>
-                      <td><button className="delete-btn" onClick={() => handleAction(item._id, 'delete-announcement')}>Delete</button></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        ) : (
-          <div className="table-wrapper">
-            {loading ? <p style={{textAlign: 'center', padding: '20px'}}>Loading...</p> : (
-              <table>
-                <thead>
-                  {activeTab === 'logs' ? (
-                    <tr><th>Viewer</th><th>Alumni Viewed</th><th>IP Address</th><th>Time</th></tr>
-                  ) : (
-                    <tr><th>Name</th><th>Contact</th><th>Branch/Year</th><th>{activeTab === 'alumni' ? 'Company' : 'Roll No'}</th><th>Actions</th></tr>
-                  )}
-                </thead>
-                <tbody>
-                  {filteredData.length > 0 ? filteredData.map((item) => (
-                    <tr key={item._id}>
-                      {activeTab === 'logs' ? (
-                        <>
-                          <td>{item.viewerName || "Unknown"}</td>
-                          <td>{item.alumniName}</td>
-                          <td style={{ fontSize: '0.8rem', color: '#666' }}>{item.ipAddress || 'N/A'}</td>
-                          <td>{new Date(item.timestamp).toLocaleString('en-IN')}</td>
-                        </>
-                      ) : (
-                        <>
-                          <td><strong>{item.name}</strong><br/><small>@{item.displayName}</small></td>
-                          <td>{item.email}<br/><small>{item.mobile}</small></td>
-                          <td>{item.branch}<br/>{item.passoutYear}</td>
-                          <td>{activeTab === 'alumni' ? (item.company || 'N/A') : (item.rollNumber || 'N/A')}</td>
-                          <td>
-                            <div className="admin-action-btns">
-                              {statusFilter === 'pending' && <button className="approve-btn" onClick={() => handleAction(item._id, 'approve')}>Approve</button>}
-                              <button className="delete-btn" onClick={() => handleAction(item._id, 'reject')}>Delete</button>
-                            </div>
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  )) : <tr><td colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>No matches found.</td></tr>}
-                </tbody>
-              </table>
-            )}
-          </div>
-        )}
+  {/* 1. MANAGE ADMINS TAB */}
+  {activeTab === 'manage-admins' ? (
+    <ManageAdmins />
+  ) : 
+  /* 2. ANNOUNCEMENTS TAB */
+  activeTab === 'announcements' ? (
+    <div className="admin-announcement-container">
+      <div className="sub-tabs">
+        <button className={statusFilter === 'post' ? 'active-sub-tab' : ''} onClick={() => setStatusFilter('post')}>Post New</button>
+        <button className={statusFilter === 'history' ? 'active-sub-tab' : ''} onClick={() => setStatusFilter('history')}>History</button>
       </div>
+
+      {statusFilter === 'post' ? (
+        <form onSubmit={handlePostAnnouncement} className="admin-announcement-form">
+          <input name="title" placeholder="Title" required />
+          <input name="subject" placeholder="Subject" required />
+          <textarea name="content" placeholder="Content..." rows="5" required />
+          <label>Audience:</label>
+          <select value={audience} onChange={(e) => setAudience(e.target.value)}>
+            <option value="all">Everyone</option>
+            <option value="students">Students Only</option>
+            <option value="alumni">Alumni Only</option>
+          </select>
+          <button type="submit" className="approve-btn">Publish Announcement</button>
+        </form>
+      ) : (
+        <table>
+          <thead><tr><th>Date</th><th>Title</th><th>Actions</th></tr></thead>
+          <tbody>
+            {listData.map(item => (
+              <tr key={item._id}>
+                <td>{new Date(item.date).toLocaleDateString()}</td>
+                <td>{item.title}</td>
+                <td><button className="delete-btn" onClick={() => handleAction(item._id, 'delete-announcement')}>Delete</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  ) : (
+    /* 3. ALL OTHER TABS (Alumni, Students, Logs) */
+    <div className="table-wrapper">
+      {loading ? <p style={{textAlign: 'center', padding: '20px'}}>Loading...</p> : (
+        <table>
+          <thead>
+            {activeTab === 'logs' ? (
+              <tr><th>Viewer</th><th>Alumni Viewed</th><th>IP Address</th><th>Time</th></tr>
+            ) : (
+              <tr><th>Name</th><th>Contact</th><th>Branch/Year</th><th>{activeTab === 'alumni' ? 'Company' : 'Roll No'}</th><th>Actions</th></tr>
+            )}
+          </thead>
+          <tbody>
+            {filteredData.length > 0 ? filteredData.map((item) => (
+              <tr key={item._id}>
+                {activeTab === 'logs' ? (
+                  <>
+                    <td>{item.viewerName || "Unknown"}</td>
+                    <td>{item.alumniName}</td>
+                    <td style={{ fontSize: '0.8rem', color: '#666' }}>{item.ipAddress || 'N/A'}</td>
+                    <td>{new Date(item.timestamp).toLocaleString('en-IN')}</td>
+                  </>
+                ) : (
+                  <>
+                    <td><strong>{item.name}</strong><br/><small>@{item.displayName}</small></td>
+                    <td>{item.email}<br/><small>{item.mobile}</small></td>
+                    <td>{item.branch}<br/>{item.passoutYear}</td>
+                    <td>{activeTab === 'alumni' ? (item.company || 'N/A') : (item.rollNumber || 'N/A')}</td>
+                    <td>
+                      <div className="admin-action-btns">
+                        {statusFilter === 'pending' && <button className="approve-btn" onClick={() => handleAction(item._id, 'approve')}>Approve</button>}
+                        <button className="delete-btn" onClick={() => handleAction(item._id, 'reject')}>Delete</button>
+                      </div>
+                    </td>
+                  </>
+                )}
+              </tr>
+            )) : <tr><td colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>No matches found.</td></tr>}
+          </tbody>
+        </table>
+      )}
+    </div>
+  )}
+</div>
     </div>
   );
 }

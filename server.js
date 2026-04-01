@@ -1,4 +1,3 @@
-// --- IMPORTS ---
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,7 +8,7 @@ const SecurityLog = require('./SecurityLog');
 const noticeRoutes = require('./noticeRoutes');
 const connectionRoutes = require('./connectionRoutes');
 const notificationRoutes = require('./notificationRoutes');
-// Models
+const Admin = require('./Admin');
 const User = require('./alumni'); 
 const app = express();
 const router = express.Router();
@@ -43,6 +42,55 @@ app.get('/api/announcements', async (req, res) => {
   
   const announcements = await Announcement.find(query).sort({ date: -1 });
   res.json(announcements);
+});
+
+const isAdmin = async (req, res, next) => {
+  // In a real app, you'd use JWT. For now, check a header or role
+  const adminId = req.headers['admin-id']; 
+  if (!adminId) return res.status(403).send("Admin access required");
+  next();
+};
+
+app.post('/api/admin/login', async (req, res) => {
+  const { username, password } = req.body; // App.jsx sends {username, password}
+  try {
+    const admin = await Admin.findOne({ username });
+    if (!admin) return res.status(401).json({ message: "Invalid Admin Credentials" });
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) return res.status(401).json({ message: "Invalid Admin Credentials" });
+
+    // Send back the info needed for the dashboard (role is key!)
+    res.json({ 
+      username: admin.username, 
+      role: admin.role,
+      _id: admin._id 
+    });
+  } catch (err) {
+    console.error("Admin Login Error:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+app.post('/api/admin/create-new', async (req, res) => {
+  // If you haven't set up JWT/verifyToken yet, you can temporarily 
+  // bypass the middleware to test the creation from your frontend.
+  try {
+    const { username, password, role, creatorRole } = req.body;
+
+    // Only GodMode can create other admins
+    if (creatorRole !== 'GodMode') {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newAdmin = new Admin({ username, password: hashedPassword, role });
+    await newAdmin.save();
+    
+    res.status(201).json({ message: "New admin created successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Post new announcement (Admin only)
@@ -281,7 +329,7 @@ app.delete('/api/delete-user/:id', async (req, res) => {
 });
 
 // stats
-app.get('/api/admin/stats', async (req, res) => {
+app.get('/api/admin/stats', isAdmin, async (req, res) => {
   try {
     const totalAlumni = await User.countDocuments({ role: 'alumni', isVerified: true });
     const pendingAlumni = await User.countDocuments({ role: 'alumni', isVerified: false });
@@ -318,7 +366,7 @@ app.post('/api/log-interaction', async (req, res) => {
   }
 });
 
-app.get('/api/admin/logs', async (req, res) => {
+app.get('/api/admin/logs', isAdmin, async (req, res) => {
   try {
     const logs = await SecurityLog.find().sort({ timestamp: -1 });
     const formattedLogs = logs.map(log => ({
