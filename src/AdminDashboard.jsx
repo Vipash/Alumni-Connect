@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function AdminDashboard({ setView }) {
+function AdminDashboard({ admin, setView }) {
   const [activeTab, setActiveTab] = useState('alumni');
   const [statusFilter, setStatusFilter] = useState('pending');
   const [listData, setListData] = useState([]);
@@ -95,11 +95,19 @@ function AdminDashboard({ setView }) {
 
   return (
     <div className="admin-modal-content">
-      <div className="admin-header">
-        <h2>Admin Control Panel</h2>
+      <div className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2>Admin Control Panel</h2>
+          {/* NEW: Identity Display */}
+          <p style={{ margin: 0, fontSize: '0.9rem', color: '#666' }}>
+            Logged in as: <span style={{ fontWeight: 'bold', color: '#2c3e50' }}>
+              {admin?.username || admin?.email || 'System Admin'}
+            </span>
+          </p>
+        </div>
         <button className="back-btn" onClick={() => setView('home')}>Close Dashboard</button>
       </div>
-
+      
   {stats && (
         <div className="admin-stats-grid">
           <div className="stat-card">

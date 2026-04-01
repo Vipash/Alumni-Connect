@@ -29,6 +29,8 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 function App() {
   const [view, setView] = useState('home');
+  const [isPortalOpen, setIsPortalOpen] = useState(false);
+  const [portalStep, setPortalStep] = useState('login-choice');
   const [loggedInUser, setLoggedInUser] = useState(() => {
     const saved = localStorage.getItem('user');
     return saved ? JSON.parse(saved) : null;
@@ -40,6 +42,32 @@ function App() {
     const parsed = JSON.parse(saved);
     return parsed.isVerified ? 'approved' : 'pending';
   });
+
+  const [adminUser, setAdminUser] = useState(() => {
+  const savedAdmin = localStorage.getItem('admin');
+  return savedAdmin ? JSON.parse(savedAdmin) : null;
+});
+
+const handleAdminLogin = async (e) => {
+  e.preventDefault();
+  const username = e.target.adminUsername?.value; // Note: Ensure your AuthHome input has name="adminUsername"
+  const password = e.target.adminPassword?.value;
+
+  const res = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (res.ok) {
+    const data = await res.json(); 
+    localStorage.setItem('admin', JSON.stringify(data));
+    setAdminUser(data);
+    setView('admin-dash');
+  } else {
+    alert('Invalid Admin Credentials');
+  }
+};
 
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [activeTab, setActiveTab] = useState('profile');
@@ -57,12 +85,13 @@ function App() {
   });
 
   const handleLogout = () => {
-    localStorage.removeItem('user'); // 1. Clear the data
-    setLoggedInUser(null);           // 2. Clear state
-    setLoginStatus(null);            // 3. Reset status
-    setView('home');                 // 4. Go back to home
-    // window.location.reload();     // Optional, but the states above handle it
-  };
+  localStorage.removeItem('user');
+  localStorage.removeItem('admin');
+  setLoggedInUser(null);
+  setAdminUser(null); 
+  setLoginStatus(null);
+  setView('home');
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -110,10 +139,6 @@ function App() {
     } else {
       alert('Login failed.');
     }
-  };
-
-  const handleAdminLogin = () => {
-    setView('admin-dash');
   };
 
   const [unreadCount, setUnreadCount] = useState(0);
@@ -257,48 +282,41 @@ function App() {
           </main>
         </div>
       ) : view === 'admin-dash' ? (
-        <div className="modal-overlay">
+              <div className="modal-overlay">
           <div className="admin-fullscreen-wrapper">
-            <AdminDashboard setView={setView} />
+            <AdminDashboard 
+              admin={adminUser} 
+              setView={setView} 
+              onLogout={handleLogout}
+            />
           </div>
         </div>
       ) : (
         /* 2. PUBLIC LANDING PAGE (Logged Out) */
         <div className="landing-page-container">
-          {/* FIXED HEADER: This now stays visible for Home, About, and Manual */}
-          <div className="fixed-header-group">
-            <nav className="portal-navbar">
-              <div className="nav-logo">
-                <img src="/MBM_Logo.png" alt="Logo" />
-                <span>MBM University</span>
-              </div>
-              <div className="nav-links">
-                <button
-                  className={view === 'home' ? 'active-nav' : ''}
-                  onClick={() => setView('home')}
-                >
-                  Home
-                </button>
-                <button
-                  className={view === 'manual' ? 'active-nav' : ''}
-                  onClick={() => setView('manual')}
-                >
-                  Instruction Manual
-                </button>
-                <button
-                  className={view === 'about' ? 'active-nav' : ''}
-                  onClick={() => setView('about')}
-                >
-                  About Us
-                </button>
-                <button
-                  className="portal-access-btn"
-                  onClick={() => setView('login-choice')}
-                >
-                  Access Portal
-                </button>
-              </div>
-            </nav>
+  <div className="fixed-header-group">
+    <nav className="portal-navbar">
+      <div className="nav-logo">
+        <img src="/MBM_Logo.png" alt="Logo" />
+        <span>MBM University</span>
+      </div>
+      <div className="nav-links">
+        <button className={view === 'home' ? 'active-nav' : ''} onClick={() => setView('home')}>Home</button>
+        <button className={view === 'manual' ? 'active-nav' : ''} onClick={() => setView('manual')}>Instruction Manual</button>
+        <button className={view === 'about' ? 'active-nav' : ''} onClick={() => setView('about')}>About Us</button>
+        
+        {/* Update: Just open the portal, don't change the main 'view' */}
+        <button 
+          className="portal-access-btn" 
+          onClick={() => {
+            setPortalStep('login-choice'); 
+            setView('login-choice'); // This triggers the modal visibility in your JSX logic
+          }}
+        >
+          Access Portal
+        </button>
+      </div>
+    </nav>
 
             <div className="news-ticker">
               <div className="ticker-wrap">
@@ -386,8 +404,16 @@ function App() {
                 <div className="modal-box">
                   <button
                     className="close-x"
-                    onClick={() => setView('home')}
-                  >
+                    onClick={() => {
+                      // If the background was 'about', stay on 'about', otherwise go 'home'
+                      if (['about', 'manual'].includes(view)) {
+                          setView(view); 
+                      } else {
+                          setView('home');
+                      }
+                      setPortalStep('login-choice'); // reset for next time
+                    }}
+                    >
                     ×
                   </button>
                   <div
@@ -401,23 +427,20 @@ function App() {
                     />
                   </div>
 
-                  {view === 'login-choice' && (
+                  {portalStep === 'login-choice' && (
                     <AuthHome
-                      onLogin={(role) => setView(`login-${role}`)}
+                      onLogin={(role) => setPortalStep(`login-${role}`)}
                       onRegister={(role) => {
                         setFormData({ ...formData, role: role });
-                        setView(`reg-${role}`);
+                        setPortalStep(`reg-${role}`);
                       }}
                       onAdminLogin={handleAdminLogin}
                     />
                   )}
 
-                  {view.startsWith('login-') && view !== 'login-choice' && (
+                  {portalStep.startsWith('login-') && portalStep !== 'login-choice' && (
                     <form onSubmit={handleLogin} className="login-container">
-                      <button
-                        type="button"
-                        onClick={() => setView('login-choice')}
-                      >
+                      <button type="button" onClick={() => setPortalStep('login-choice')}>
                         ← Back
                       </button>
                       <h2>
@@ -441,10 +464,12 @@ function App() {
                       onSubmit={handleSubmit}
                       className="registration-form"
                     >
-                      <button
-                        type="button"
-                        onClick={() => setView('login-choice')}
-                      >
+                      </form>
+                  )}
+
+                  {portalStep.startsWith('reg-') && (
+                    <form onSubmit={handleSubmit} className="registration-form">
+                      <button type="button" onClick={() => setPortalStep('login-choice')}>
                         ← Back
                       </button>
                       <h2>

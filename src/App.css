@@ -185,6 +185,8 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .stat-card h4 { margin: 0 0 10px 0; color: #555; font-size: 0.9rem; }
 .stat-card p { margin: 5px 0; font-size: 1.1rem; }
 .pending-text { color: #d9534f; font-size: 0.85rem !important; font-weight: bold; }
+.current-admin-badge {background: #2c3e50; color: #ecf0f1; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;}
+.dot {height: 8px; width: 8px; background-color: #2ecc71; border-radius: 50%; display: inline-block;}
 
 /* Profile Page */
 .profile-header { display: flex; padding: 30px; background: #f8f9fa; align-items: center; gap: 25px; border-bottom: 1px solid #eee; }

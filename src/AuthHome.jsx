@@ -2,15 +2,22 @@ import { useState } from 'react';
 
 function AuthHome({ onLogin, onRegister, onAdminLogin }) {
   const [selectedRole, setSelectedRole] = useState('student');
+  // 1. Added username state
+  const [adminUsername, setAdminUsername] = useState('');
   const [adminPass, setAdminPass] = useState('');
 
-  const handleAdminSubmit = () => {
-  if (adminPass === "admin123") {
-    onAdminLogin();
-  } else {
-    alert("Incorrect Admin Password");
-  }
-};
+  const handleAdminSubmit = (e) => {
+    // 2. Wrap in an object to match what App.jsx expects
+    const adminData = {
+      target: {
+        adminUsername: { value: adminUsername },
+        adminPassword: { value: adminPass }
+      },
+      preventDefault: () => {} // Prevents errors if App.jsx calls e.preventDefault()
+    };
+    
+    onAdminLogin(adminData);
+  };
 
   return (
     <div className="minimalist-auth-content">
@@ -30,6 +37,14 @@ function AuthHome({ onLogin, onRegister, onAdminLogin }) {
       <div className="auth-actions">
         {selectedRole === 'admin' ? (
           <div style={{ width: '100%' }}>
+            {/* 3. Added Username Input */}
+            <input 
+              type="text" 
+              placeholder="Admin Username / Email" 
+              value={adminUsername}
+              onChange={(e) => setAdminUsername(e.target.value)}
+              style={{ marginBottom: '10px', padding: '12px', width: '100%', borderRadius: '8px', border: '2px solid #e2e8f0' }}
+            />
             <input 
               type="password" 
               placeholder="Enter Admin Password" 
