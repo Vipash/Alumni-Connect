@@ -8,7 +8,7 @@
 body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); color: #1a1a1a; }
 
 /* --- 2. LAYOUTS --- */
-.app-root { position: relative; min-height: 100vh; display: flex; flex-direction: column; width: 100%; }
+.app-root {width: 100%; min-height: 100vh; display: flex; flex-direction: column;}
 .auth-page-wrapper {min-height: 100vh; width: 100%; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/university-background.png'); background-size: cover; background-position: center; background-attachment: fixed; display: flex; justify-content: center; align-items: center;}
 .workspace-layout {display: flex; width: 100vw; height: 100vh; overflow: hidden;}
 .sidebar { width: 280px; background-color: #262a6b; color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
