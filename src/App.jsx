@@ -85,8 +85,7 @@ const handleAdminLogin = async (e) => {
   });
 
   const handleLogout = () => {
-  localStorage.removeItem('user');
-  localStorage.removeItem('admin');
+  localStorage.clear(); // Safest way to ensure no old IDs stay behind
   setLoggedInUser(null);
   setAdminUser(null); 
   setLoginStatus(null);
@@ -281,17 +280,13 @@ const handleAdminLogin = async (e) => {
             )}
           </main>
         </div>
-      ) : view === 'admin-dash' ? (
-              <div className="modal-overlay">
-          <div className="admin-fullscreen-wrapper">
-            <AdminDashboard 
-              admin={adminUser} 
-              setView={setView} 
-              onLogout={handleLogout}
-            />
-          </div>
-        </div>
-      ) : (
+     ) : view === 'admin-dash' ? (
+      <AdminDashboard 
+        admin={adminUser} 
+        setView={setView} 
+        onLogout={handleLogout}
+      />
+    ) : (
         /* 2. PUBLIC LANDING PAGE (Logged Out) */
         <div className="landing-page-container">
   <div className="fixed-header-group">
@@ -457,14 +452,6 @@ const handleAdminLogin = async (e) => {
                         Sign In
                       </button>
                     </form>
-                  )}
-
-                  {view.startsWith('reg-') && (
-                    <form
-                      onSubmit={handleSubmit}
-                      className="registration-form"
-                    >
-                      </form>
                   )}
 
                   {portalStep.startsWith('reg-') && (
