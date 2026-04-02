@@ -163,8 +163,12 @@ function AdminDashboard({ admin, setView }) {
         <div className="admin-stats-grid">
           <div className="stat-card">
             <h4>Alumni</h4>
-            <p>Verified: <strong>{stats.alumni.verified}</strong></p>
-            <p className="pending-text">Pending: {stats.alumni.pending}</p>
+            {stats ? (
+              <>
+                <p>Verified: <strong>{stats.alumni.verified}</strong></p>
+                <p className="pending-text">Pending: {stats.alumni.pending}</p>
+              </>
+            ) : <p>Loading stats...</p>}
           </div>
           <div className="stat-card">
             <h4>Students</h4>
@@ -176,6 +180,7 @@ function AdminDashboard({ admin, setView }) {
             <p>Today's Views: <strong>{listData.length && activeTab === 'logs' ? listData.length : '-'}</strong></p>
           </div>
         </div>
+        
       )}
       <div className="admin-tabs">
         <button className={activeTab === 'alumni' ? 'active' : ''} onClick={() => { setActiveTab('alumni'); setStatusFilter('pending'); }}>Alumni</button>
