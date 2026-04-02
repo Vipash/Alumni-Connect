@@ -9,13 +9,37 @@ function AdminDashboard({ admin, setView }) {
   const [audience, setAudience] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const adminData = JSON.parse(localStorage.getItem('admin')); 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/admin/stats');
+      const res = await fetch('https://alumni-connect-fegi.onrender.com/api/admin/stats', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'admin-id': adminData?._id // <--- THIS IS THE KEY CHANGE
+        }
+      });
+      
+      if (!res.ok) throw new Error("Failed to fetch stats");
       const data = await res.json();
       setStats(data);
     } catch (err) {
       console.error("Stats error:", err);
+    }
+  };
+
+  const fetchLogs = async () => {
+  try {
+   const res = await fetch('https://alumni-connect-fegi.onrender.com/api/admin/logs', {
+        method: 'GET',
+        headers: {
+          'admin-id': adminData?._id // <--- ADD THIS HERE TOO
+        }
+      });
+      const data = await res.json();
+      setListData(data);
+    } catch (err) {
+      console.error("Logs error:", err);
     }
   };
 
@@ -28,19 +52,24 @@ function AdminDashboard({ admin, setView }) {
   };
 
   const fetchCurrentList = async () => {
-    setLoading(true);
-    setSearchTerm(''); // Reset search when switching tabs
-    try {
-      const res = await fetch(getApiUrl());
-      const data = await res.json();
-      setListData(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setListData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  setSearchTerm('');
+  try {
+    const res = await fetch(getApiUrl(), {
+      method: 'GET',
+      headers: {
+        'admin-id': adminData?._id
+      }
+    });
+    const data = await res.json();
+    setListData(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setListData([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchCurrentList();
