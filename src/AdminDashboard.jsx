@@ -161,7 +161,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     <div className="admin-dashboard-page">
       <nav className="admin-navbar">
         <div className="nav-left">
-          <img src="/logo.png" alt="Portal Logo" className="nav-logo" />
+          <img src="/MBM_Logo.png" alt="Portal Logo" className="nav-logo" />
           <div className="nav-brand">
             <h1>Admin Dashboard</h1>
             <span>MBM Alumni Connect</span>
