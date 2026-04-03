@@ -3,7 +3,9 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import LocationPicker from './LocationPicker';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import './index.css';
 import './App.css';
+import './Portal.css';
 import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';
@@ -215,32 +217,38 @@ const handleAdminLogin = async (e) => {
 {loginStatus === 'approved' ? (
   <div className="portal-container">
     {/* --- NEW TOP HORIZONTAL NAV --- */}
-    <header className="portal-header">
-      <div className="header-brand">
-        <img src="/MBM_Logo.png" alt="Logo" className="header-logo" />
-        <span className="brand-text">Alumni Connect</span>
-      </div>
+    <header className="admin-navbar"> {/* Changed from portal-header */}
+  <div className="nav-left">
+    <img src="/MBM_Logo.png" alt="Logo" className="nav-logo" />
+    <div className="nav-brand">
+      <h1>MBM PORTAL</h1>
+      <span>{loggedInUser?.role === 'alumni' ? 'Alumni Edition' : 'Student Edition'}</span>
+    </div>
+  </div>
       
       {loggedInUser?.isProfileComplete && (
-        <nav className="header-tabs">
-          <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
-          <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Alumni Search</button>
-          <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
-          <button className={activeTab === 'inbox' ? 'active' : ''} onClick={handleInboxClick}>
-            Inbox {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
-          </button>
-          <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
-        </nav>
-      )}
+    <div className="nav-center"> {/* Use nav-center for horizontal tabs */}
+      <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>Profile</button>
+      <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Search</button>
+      <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
+      <button className={activeTab === 'inbox' ? 'active' : ''} onClick={handleInboxClick}>
+        Inbox {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
+      </button>
+      <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Notices</button>
+    </div>
+  )}
 
-      <div className="header-user-actions">
-        <span>Hi, <strong>{loggedInUser?.name}</strong></span>
-        <button className="logout-minimal-btn" onClick={handleLogout}>Logout</button>
-      </div>
-    </header>
+      <div className="nav-right">
+    <div className="admin-user-info">
+      <p className="u-name">{loggedInUser?.name}</p>
+      <p className="u-role">{loggedInUser?.branch}</p>
+    </div>
+    <button className="nav-logout-btn" onClick={handleLogout}>Logout</button>
+  </div>
+</header>
 
     {/* --- MAIN CONTENT AREA --- */}
-    <div className="portal-main-wrapper">
+    <div className="admin-dashboard-page">
       {/* LEFT SECTION: Search & Filters */}
       <aside className="content-sidebar">
         <div className="sidebar-sticky-content">
@@ -274,7 +282,7 @@ const handleAdminLogin = async (e) => {
       </aside>
 
       {/* RIGHT SECTION: The actual Tab Functionality */}
-      <main className="tab-content-area">
+      <main className="admin-content-wrapper"> {/* Standardized content wrapper */}
         {!loggedInUser?.isProfileComplete ? (
           <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
         ) : (
