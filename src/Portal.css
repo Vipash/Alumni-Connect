@@ -1,6 +1,7 @@
 .portal-container {display: flex; flex-direction: column; height: 100vh; width: 100vw; overflow: hidden;}
 /* Header Styling */
 .portal-header {display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; min-height: 65px; background: #1a1a1a; color: white; z-index: 100; border-bottom: 1px solid #333;}
+.portal-layout-root {display: flex; flex-direction: column; height: 100vh; overflow: hidden;}
 .header-logo { height: 40px; margin-right: 10px; }
 .header-tabs { display: flex; gap: 5px; height: 100%; }
 .header-tabs button {background: transparent; border: none; border-bottom: 3px solid transparent; color: #999; border-radius: 0; padding: 0 15px; height: 65px; cursor: pointer;}
@@ -35,6 +36,8 @@
 .loading { animation: pulse 1.5s infinite; }
 .map-fancy-container {border: 4px solid var(--mbm-blue); border-radius: 16px; overflow: hidden; box-shadow: 0 0 20px rgba(38, 42, 107, 0.2); margin-bottom: 25px;}
 .map-page-wrapper {padding: 20px; max-width: 1200px; position: relative; margin: 0 auto;}
+.map-container-wrapper, 
+.leaflet-container {height: 100% !important; width: 100% !important;}
 .bookmark-toggle-btn {position: absolute; top: 15px; right: 15px; z-index: 1100; background: white; border: 2px solid var(--mbm-gold); color: var(--mbm-blue); padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;}
 .bookmark-toggle-btn:hover {transform: scale(1.05);}
 .leaflet-popup-content-wrapper {border-radius: 12px; padding: 5px;}
@@ -110,7 +113,7 @@
 .bookmark-sidebar {position: absolute; top: 85px; right: 35px; width: 300px; max-height: 450px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1200; display: flex; flex-direction: column; overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border: 1px solid rgba(38, 42, 107, 0.1);}
 .bookmark-sidebar.open {opacity: 1; visibility: visible; transform: translateY(0);}
 .sidebar-header {padding: 12px 15px; background: var(--mbm-blue); color: white; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;}
-.sidebar-header h3 {margin: 0; font-size: 1rem;}
+.sidebar-header h3 {margin: 0; color: #003366; font-size: 1rem;}
 .close-sidebar {background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;}
 .sidebar-content {padding: 5px 0; overflow-y: auto; flex-grow: 1;}
 .bookmark-item {padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: white; transition: background 0.2s;}
@@ -201,6 +204,8 @@
 .alert-card {display: flex; align-items: center; gap: 15px; padding: 15px; background: #fdfdfd; border-left: 4px solid var(--mbm-blue); margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
 .alert-card.read {opacity: 0.7; border-left-color: #ccc;}
 .tab-btn {position: relative; /* Essential for badge positioning */ padding: 10px 20px;}
+.tab-pane {height: 100%; width: 100%;}
+.tab-pane:not(:has(.leaflet-container)) {padding: 30px;}
 .notification-badge {position: absolute; top: -5px; right: -5px; background-color: #ff3f52; color: white; font-size: 0.7rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; /* Makes it pop against the button */ box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: bounce 0.5s ease-in-out;}
 @keyframes bounce {0%, 20%, 50%, 80%, 100% {transform: translateY(0); } 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);}}
 .digest-item {display: flex; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid #eee;}
@@ -240,17 +245,25 @@
 
 /* Admin Dashboard Tables */
 /* Main Page Container */
-.admin-dashboard-page {width: 100%; min-height: 100vh; background-color: #f4f7f6; /* Light professional grey */ display: flex; flex-direction: column;}
+.admin-dashboard-page {width: 100%; min-height: 100vh; background-color: #f4f7f6; display: flex; flex-direction: column; flex: 1; overflow: hidden;}
 /* Content Area - centered with max-width for readability */
-.admin-content-wrapper {flex: 1; width: 100%; max-width: 1600px; margin: 0 auto; padding: 20px; box-sizing: border-box;}
+.admin-content-wrapper.full-bleed {flex: 1; position: relative; overflow-y: auto; background: #ebeef2; padding: 0;}
 .admin-navbar {display: flex; justify-content: space-between; align-items: center; background: white; padding: 0 30px; height: 70px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 1000;}
 .nav-left { display: flex; align-items: center; gap: 15px; }
 .nav-logo { height: 45px; width: auto; }
 .nav-brand h1 { font-size: 1.2rem; margin: 0; color: #2c3e50; }
 .nav-brand span { font-size: 0.8rem; color: #7f8c8d; }
+.sub-nav-tabs {background: #ffffff; border-bottom: 1px solid #e0e0e0; display: flex; padding: 0 20px; gap: 15px; z-index: 10;}
+.sub-nav-tabs button {padding: 12px 20px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 500; color: #666; transition: all 0.2s;}
+.sub-nav-tabs button.active {color: #003366; /* MBM Blue */ border-bottom-color: #003366;}
 .admin-tab-btn {background: transparent; color: var(--mbm-blue); border: 2px solid var(--mbm-blue); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;}
 .admin-tab-btn.active {background: var(--mbm-blue); color: white; /* Only white text when the background is blue */}
 .status-btn-unselected {background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;}
+
+.dynamic-sidebar {width: 280px; background: white; border-right: 1px solid #e0e0e0; padding: 20px; display: flex; flex-direction: column; gap: 15px; animation: slideIn 0.3s ease-out;}
+@keyframes slideIn {from { transform: translateX(-100%); } to { transform: translateX(0); }}
+.filter-group input, .filter-group select {width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;}
+
 /* Center Tabs as Buttons */
 .nav-center { display: flex; gap: 5px; }
 .nav-center button {background: transparent; border: none; padding: 10px 18px; font-weight: 500; color: #636e72; cursor: pointer; transition: all 0.2s; border-radius: 6px;}

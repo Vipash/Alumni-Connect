@@ -215,74 +215,69 @@ const handleAdminLogin = async (e) => {
       {/* 1. DASHBOARD VIEW (Logged In) */}
       {/* 1. DASHBOARD VIEW (Logged In) */}
 {loginStatus === 'approved' ? (
-  <div className="portal-container">
-    {/* --- NEW TOP HORIZONTAL NAV --- */}
-    <header className="admin-navbar"> {/* Changed from portal-header */}
-  <div className="nav-left">
-    <img src="/MBM_Logo.png" alt="Logo" className="nav-logo" />
-    <div className="nav-brand">
-      <h1>MBM PORTAL</h1>
-      <span>{loggedInUser?.role === 'alumni' ? 'Alumni Edition' : 'Student Edition'}</span>
-    </div>
-  </div>
-      
-      {loggedInUser?.isProfileComplete && (
-    <div className="nav-center"> {/* Use nav-center for horizontal tabs */}
-      <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>Profile</button>
-      <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Search</button>
-      <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
-      <button className={activeTab === 'inbox' ? 'active' : ''} onClick={handleInboxClick}>
-        Inbox {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
-      </button>
-      <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Notices</button>
-    </div>
-  )}
-
-      <div className="nav-right">
-    <div className="admin-user-info">
-      <p className="u-name">{loggedInUser?.name}</p>
-      <p className="u-role">{loggedInUser?.branch}</p>
-    </div>
-    <button className="nav-logout-btn" onClick={handleLogout}>Logout</button>
-  </div>
-</header>
-
-    {/* --- MAIN CONTENT AREA --- */}
-    <div className="admin-dashboard-page">
-      {/* LEFT SECTION: Search & Filters */}
-      <aside className="content-sidebar">
-        <div className="sidebar-sticky-content">
-          <h3>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Filters</h3>
-          <p className="sidebar-hint">Narrow down your results</p>
-          
-          {/* Dynamic Search Fields based on Active Tab */}
-          {activeTab === 'map' && (
-            <div className="filter-group">
-              <input type="text" placeholder="Search by Name..." />
-              <select><option>All Batches</option></select>
-              <input type="text" placeholder="Search Company..." />
-            </div>
-          )}
-          
-          {activeTab === 'connect' && (
-            <div className="filter-group">
-              <input type="text" placeholder="Job Title / Skill..." />
-              <select><option>Opportunity Type</option></select>
-            </div>
-          )}
-
-          {activeTab === 'profile' && (
-            <div className="sidebar-info">
-              <p>Keep your professional info up to date to help alumni find you.</p>
-            </div>
-          )}
-          
-          <button className="apply-filter-btn">Search / Update</button>
+  <div className="portal-layout-root"> {/* New Root for scrolling control */}
+    
+    {/* --- ROW 1: TOP BRANDING BAR --- */}
+    <header className="admin-navbar">
+      <div className="nav-left">
+        <img src="/MBM_Logo.png" alt="Logo" className="nav-logo" />
+        <div className="nav-brand">
+          <h1>MBM PORTAL</h1>
+          <span>{loggedInUser?.role === 'alumni' ? 'Alumni Edition' : 'Student Edition'}</span>
         </div>
-      </aside>
+      </div>
+      <div className="nav-right">
+        <div className="admin-user-info">
+          <p className="u-name">{loggedInUser?.name}</p>
+          <p className="u-role">{loggedInUser?.branch}</p>
+        </div>
+        <button className="nav-logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
+    </header>
 
-      {/* RIGHT SECTION: The actual Tab Functionality */}
-      <main className="admin-content-wrapper"> {/* Standardized content wrapper */}
+    {/* --- ROW 2: SUB-NAV TAB BAR --- */}
+    {loggedInUser?.isProfileComplete && (
+      <nav className="sub-nav-tabs">
+        <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
+        <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Alumni Search</button>
+        <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
+        <button className={activeTab === 'inbox' ? 'active' : ''} onClick={handleInboxClick}>
+          Inbox {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
+        </button>
+        <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Notice Board</button>
+      </nav>
+    )}
+
+    {/* --- MAIN BODY: SIDEBAR + CONTENT --- */}
+    <div className="admin-dashboard-page">
+      
+      {/* DYNAMIC SIDEBAR: Only shows for Map or Connect */}
+      {(activeTab === 'map' || activeTab === 'connect') && (
+        <aside className="dynamic-sidebar">
+          <h3>{activeTab === 'map' ? 'Search Alumni' : 'Filter Opportunities'}</h3>
+          <div className="filter-group">
+            {activeTab === 'map' ? (
+              <>
+                <input type="text" placeholder="Name or Company..." />
+                <select><option>All Branches</option></select>
+                <input type="number" placeholder="Batch Year" />
+              </>
+            ) : (
+              <>
+                <input type="text" placeholder="Role (e.g. SDE)..." />
+                <select>
+                  <option>Full-Time</option>
+                  <option>Internship</option>
+                </select>
+              </>
+            )}
+            <button className="apply-filter-btn">Apply Filters</button>
+          </div>
+        </aside>
+      )}
+
+      {/* SCROLLABLE CONTENT AREA */}
+      <main className="admin-content-wrapper">
         {!loggedInUser?.isProfileComplete ? (
           <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
         ) : (
