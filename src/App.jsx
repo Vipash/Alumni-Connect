@@ -211,76 +211,79 @@ const handleAdminLogin = async (e) => {
   return (
     <div className="app-root">
       {/* 1. DASHBOARD VIEW (Logged In) */}
-      {loginStatus === 'approved' ? (
-        <div className="workspace-layout">
-          <aside className="sidebar">
-            <div className="sidebar-header-brand">
-              <img
-                src="/MBM_Logo.png"
-                alt="University Logo"
-                className="sidebar-logo"
-              />
-              <h2 className="brand-text">Alumni Connect</h2>
-              <p>
-                Welcome, <strong>{loggedInUser?.name}</strong>
-              </p>
-            </div>
-            {loggedInUser?.isProfileComplete ? (
-              <nav className="sidebar-nav">
-                <button
-                  className={activeTab === 'profile' ? 'active' : ''}
-                  onClick={() => setActiveTab('profile')}
-                >
-                  My Profile
-                </button>
-                <button
-                  className={activeTab === 'map' ? 'active' : ''}
-                  onClick={() => setActiveTab('map')}
-                >
-                  Alumni Search
-                </button>
-                <button
-                  className={activeTab === 'connect' ? 'active' : ''}
-                  onClick={() => setActiveTab('connect')}
-                >
-                  Connect Hub
-                </button>
-                <button
-                  className={activeTab === 'inbox' ? 'active' : ''}
-                  onClick={handleInboxClick}
-                >
-                  Inbox
-                </button>
-                <button
-                  className={activeTab === 'announcements' ? 'active' : ''}
-                  onClick={() => setActiveTab('announcements')}
-                >
-                  Announcements
-                </button>
-              </nav>
-            ) : (
-              <div className="onboarding-notice">
-                <p>Please complete your profile setup.</p>
-              </div>
-            )}
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </aside>
+      {/* 1. DASHBOARD VIEW (Logged In) */}
+{loginStatus === 'approved' ? (
+  <div className="portal-container">
+    {/* --- NEW TOP HORIZONTAL NAV --- */}
+    <header className="portal-header">
+      <div className="header-brand">
+        <img src="/MBM_Logo.png" alt="Logo" className="header-logo" />
+        <span className="brand-text">Alumni Connect</span>
+      </div>
+      
+      {loggedInUser?.isProfileComplete && (
+        <nav className="header-tabs">
+          <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>My Profile</button>
+          <button className={activeTab === 'map' ? 'active' : ''} onClick={() => setActiveTab('map')}>Alumni Search</button>
+          <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => setActiveTab('connect')}>Connect Hub</button>
+          <button className={activeTab === 'inbox' ? 'active' : ''} onClick={handleInboxClick}>
+            Inbox {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
+          </button>
+          <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => setActiveTab('announcements')}>Announcements</button>
+        </nav>
+      )}
 
-          <main className="dashboard-content">
-            {!loggedInUser?.isProfileComplete ? (
-              <Profile
-                user={loggedInUser}
-                setUser={setLoggedInUser}
-                forceSetup={true}
-              />
-            ) : (
-              renderTabContent()
-            )}
-          </main>
+      <div className="header-user-actions">
+        <span>Hi, <strong>{loggedInUser?.name}</strong></span>
+        <button className="logout-minimal-btn" onClick={handleLogout}>Logout</button>
+      </div>
+    </header>
+
+    {/* --- MAIN CONTENT AREA --- */}
+    <div className="portal-main-wrapper">
+      {/* LEFT SECTION: Search & Filters */}
+      <aside className="content-sidebar">
+        <div className="sidebar-sticky-content">
+          <h3>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Filters</h3>
+          <p className="sidebar-hint">Narrow down your results</p>
+          
+          {/* Dynamic Search Fields based on Active Tab */}
+          {activeTab === 'map' && (
+            <div className="filter-group">
+              <input type="text" placeholder="Search by Name..." />
+              <select><option>All Batches</option></select>
+              <input type="text" placeholder="Search Company..." />
+            </div>
+          )}
+          
+          {activeTab === 'connect' && (
+            <div className="filter-group">
+              <input type="text" placeholder="Job Title / Skill..." />
+              <select><option>Opportunity Type</option></select>
+            </div>
+          )}
+
+          {activeTab === 'profile' && (
+            <div className="sidebar-info">
+              <p>Keep your professional info up to date to help alumni find you.</p>
+            </div>
+          )}
+          
+          <button className="apply-filter-btn">Search / Update</button>
         </div>
-     ) : view === 'admin-dash' ? (
+      </aside>
+
+      {/* RIGHT SECTION: The actual Tab Functionality */}
+      <main className="tab-content-area">
+        {!loggedInUser?.isProfileComplete ? (
+          <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
+        ) : (
+          renderTabContent()
+        )}
+      </main>
+    </div>
+  </div>
+) : view === 'admin-dash' ? (
       <AdminDashboard 
         admin={adminUser} 
         setView={setView} 

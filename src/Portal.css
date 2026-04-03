@@ -1,0 +1,71 @@
+.portal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Header Styling */
+.portal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  min-height: 65px;
+  background: #1a1a1a;
+  color: white;
+  z-index: 100;
+  border-bottom: 1px solid #333;
+}
+
+.header-logo { height: 40px; margin-right: 10px; }
+
+.header-tabs { display: flex; gap: 5px; height: 100%; }
+
+.header-tabs button {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #999;
+  border-radius: 0;
+  padding: 0 15px;
+  height: 65px;
+  cursor: pointer;
+}
+
+.header-tabs button.active {
+  color: #646cff;
+  border-bottom: 3px solid #646cff;
+  background: rgba(100, 108, 255, 0.1);
+}
+
+/* Layout Wrapper */
+.portal-main-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden; /* Crucial for internal scrolling */
+}
+
+/* Sidebar Search Section */
+.content-sidebar {
+  width: 320px;
+  background: #f4f4f4;
+  border-right: 1px solid #ddd;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+/* Main Content Section */
+.tab-content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  background: #ffffff;
+}
+
+/* Dark Mode Overrides (Optional) */
+@media (prefers-color-scheme: dark) {
+  .content-sidebar { background: #252525; border-color: #444; }
+  .tab-content-area { background: #1a1a1a; }
+}
