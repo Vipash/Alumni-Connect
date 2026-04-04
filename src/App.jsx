@@ -156,6 +156,14 @@ const handleAdminLogin = async (e) => {
     }
   }, [loggedInUser, activeTab]);
 
+  useEffect(() => {
+  if (loginStatus === 'approved') {
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 150);
+  }
+}, [activeTab, loginStatus]);
+
   const handleInboxClick = () => {
     setActiveTab('inbox');
     setUnreadCount(0);
@@ -215,8 +223,7 @@ const handleAdminLogin = async (e) => {
       {/* 1. DASHBOARD VIEW (Logged In) */}
       {/* 1. DASHBOARD VIEW (Logged In) */}
 {loginStatus === 'approved' ? (
-  <div className="portal-layout-root"> {/* New Root for scrolling control */}
-    
+  <div className="portal-layout-root">
     {/* --- ROW 1: TOP BRANDING BAR --- */}
     <header className="admin-navbar">
       <div className="nav-left">
@@ -248,41 +255,66 @@ const handleAdminLogin = async (e) => {
       </nav>
     )}
 
-    {/* --- MAIN BODY: SIDEBAR + CONTENT --- */}
-    <div className="admin-dashboard-page">
+    {/* --- MAIN BODY: THE TWO-PART PARTITION --- */}
+    <div className="portal-main-partition">
       
-      {/* DYNAMIC SIDEBAR: Only shows for Map or Connect */}
-      {(activeTab === 'map' || activeTab === 'connect') && (
-        <aside className="dynamic-sidebar">
-          <h3>{activeTab === 'map' ? 'Search Alumni' : 'Filter Opportunities'}</h3>
-          <div className="filter-group">
-            {activeTab === 'map' ? (
-              <>
-                <input type="text" placeholder="Name or Company..." />
-                <select><option>All Branches</option></select>
-                <input type="number" placeholder="Batch Year" />
-              </>
-            ) : (
-              <>
-                <input type="text" placeholder="Role (e.g. SDE)..." />
-                <select>
-                  <option>Full-Time</option>
-                  <option>Internship</option>
-                </select>
-              </>
-            )}
-            <button className="apply-filter-btn">Apply Filters</button>
-          </div>
-        </aside>
-      )}
+      {/* LEFT PARTITION: Integrated Search & Controls */}
+      <aside className="partition-left">
+        <div className="partition-header">
+          <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
+          <p className="subtitle">Filters & Tools</p>
+        </div>
 
-      {/* SCROLLABLE CONTENT AREA */}
-      <main className="admin-content-wrapper">
-        {!loggedInUser?.isProfileComplete ? (
-          <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
-        ) : (
-          renderTabContent()
-        )}
+        <div className="partition-controls">
+          {activeTab === 'map' && (
+            <div className="search-box-group">
+              <label>Name or Company</label>
+              <input type="text" placeholder="Search..." className="partition-input" />
+              <label>Branch</label>
+              <select className="partition-input"><option>All Branches</option></select>
+              <label>Batch Year</label>
+              <input type="number" placeholder="2024" className="partition-input" />
+              <button className="apply-filter-btn">Search Map</button>
+            </div>
+          )}
+
+          {activeTab === 'connect' && (
+            <div className="search-box-group">
+              <label>Job Search</label>
+              <input type="text" placeholder="Keywords..." className="partition-input" />
+              <label>Category</label>
+              <select className="partition-input">
+                <option>Full-Time</option>
+                <option>Internship</option>
+              </select>
+              <button className="apply-filter-btn">Filter Hub</button>
+            </div>
+          )}
+
+          {activeTab === 'profile' && (
+            <div className="sidebar-hint-box">
+              <p>Keep your contact details updated so alumni can reach out to you.</p>
+              <button className="apply-filter-btn">Edit Profile</button>
+            </div>
+          )}
+
+          {activeTab === 'inbox' && (
+            <div className="sidebar-hint-box">
+              <p>You have {unreadCount} new messages.</p>
+            </div>
+          )}
+        </div>
+      </aside>
+
+      {/* RIGHT PARTITION: The View (Map/Content) */}
+      <main className="partition-right">
+        <div className="tab-render-container">
+          {!loggedInUser?.isProfileComplete ? (
+            <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
+          ) : (
+            renderTabContent()
+          )}
+        </div>
       </main>
     </div>
   </div>
