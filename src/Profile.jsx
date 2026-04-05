@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import EditProfile from './EditProfile';
 
-// Helper function moved outside to prevent re-creation on every render
 const getProfileStatus = (user) => {
   const fieldMapping = {
     displayName: 'Display Name', bio: 'Professional Bio', mobile: 'Mobile Number',
@@ -62,7 +61,7 @@ function Profile({ user, setUser }) {
 
   return (
     <div className="portal-main-partition">
-      {/* --- LEFT PARTITION --- */}
+      {/* --- LEFT PARTITION: SIDEBAR --- */}
       <div className="partition-left">
         <div className="partition-header">
           <h2>User Profile</h2>
@@ -87,7 +86,7 @@ function Profile({ user, setUser }) {
           )}
         </div>
 
-        <div className="progress-container sidebar-progress" style={{ marginTop: '30px' }}>
+       <div className="progress-container sidebar-progress" style={{ marginTop: '30px' }}>
           <div className="progress-label">Completion: {status.percentage}%</div>
           <div className="progress-bar-bg">
             <div className="progress-bar-fill" style={{ width: `${status.percentage}%` }}></div>
@@ -97,13 +96,13 @@ function Profile({ user, setUser }) {
 
       {/* --- RIGHT PARTITION --- */}
       <div className="partition-right">
-        <div className="tab-render-container" style={{ overflowY: 'auto', padding: '2rem' }}>
-          
-          {isOnboarding ? (
-            <div className="onboarding-wrapper">
-              <div className="onboarding-header"><h2>Finish Your Profile</h2></div>
-              <form ref={formRef} onSubmit={handleOnboardingSubmit} className="onboarding-form">
-                <div className="form-grid">
+  <div className="tab-render-container" style={{ overflowY: 'auto', padding: '2rem' }}>
+    
+    {isOnboarding ? (
+      <div className="onboarding-wrapper">
+        <div className="onboarding-header"><h2>Finish Your Profile</h2></div>
+        <form ref={formRef} onSubmit={handleOnboardingSubmit} className="onboarding-form">
+          <div className="form-grid">
                   <div className="form-group">
                     <label>Father's Name</label>
                     <input required value={onboardData.fatherName} onChange={e => setOnboardData({...onboardData, fatherName: e.target.value})} />
@@ -136,63 +135,66 @@ function Profile({ user, setUser }) {
               <label>Personal Hobbies (comma separated)</label>
               <input value={onboardData.hobbiesPersonal} onChange={e => setOnboardData({...onboardData, hobbiesPersonal: e.target.value})} />
             </div>
-          </div>
-       </form>
+         </div>
+        </form>
       </div>
-   ) : isEditing ? (
+    ) : isEditing ? (
             <EditProfile 
-              user={user} 
-              formRef={formRef} 
-              onCancel={() => setIsEditing(false)} 
-              onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} 
-            />
-          ) : (
-            /* VIEW MODE: Standard Profile Card */
-            <div className="profile-card">
-              <div className="profile-header">
-                <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="Profile" />
-                <div className="header-text">
-                  <h1>{user.displayName || user.name}</h1>
-                  <p className="user-role-tag">{user.role.toUpperCase()}</p>
-                </div>
-              </div>
-              <div className="profile-body">
-        {/* ROW 1: ABOUT */}
-        <section className="profile-row-group">
-          <h4 className="row-title">Professional Bio</h4>
-          <p className="bio-text">{user.bio || "No bio added yet."}</p>
-        </section>
+        user={user} 
+        formRef={formRef} 
+        onCancel={() => setIsEditing(false)} 
+        onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} 
+      />
+    ) : (
+      <div className="profile-card">
+        <div className="profile-header">
+          <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="Profile" />
+          <div className="header-text">
+            <h1>{user.displayName || user.name}</h1>
+            <p className="user-role-tag">{user.role.toUpperCase()}</p>
+          </div>
+        </div>
+        
+        <div className="profile-body">
+          <section className="profile-row-group">
+            <h4 className="row-title">Professional Bio</h4>
+            <p className="bio-text">{user.bio || "No bio added yet."}</p>
+          </section>
 
         {/* ROW 2: CORE DETAILS */}
         <section className="profile-row-group">
-          <h4 className="row-title">Basic Information</h4>
-          <div className="grid-info">
-            <div className="info-item"><label>Email</label><span>{user.email}</span></div>
-            <div className="info-item"><label>Mobile</label><span>{user.mobile || 'N/A'}</span></div>
-            <div className="info-item"><label>Branch</label><span>{user.branch}</span></div>
-            <div className="info-item"><label>Batch</label><span>{user.passoutYear}</span></div>
-            <div className="info-item"><label>Father's Name</label><span>{user.fatherName}</span></div>
-            <div className="info-item"><label>DOB</label><span>{user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'}</span></div>
-          </div>
-        </section>
+            <h4 className="row-title">Basic Information</h4>
+            <div className="grid-info">
+              <div className="info-item"><label>Email</label><span>{user.email}</span></div>
+              <div className="info-item"><label>Mobile</label><span>{user.mobile || 'N/A'}</span></div>
+              <div className="info-item"><label>Branch</label><span>{user.branch}</span></div>
+              <div className="info-item"><label>Batch</label><span>{user.passoutYear}</span></div>
+              <div className="info-item"><label>Father's Name</label><span>{user.fatherName}</span></div>
+              <div className="info-item"><label>DOB</label><span>{user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'}</span></div>
+            </div>
+          </section>
+        
 
         {/* ROW 3: ACADEMIC HISTORY */}
         <section className="profile-row-group">
-          <h4 className="row-title">Academic History</h4>
-          <div className="grid-info">
-            <div className="info-item"><label>10th Passout Year</label><span>{user.tenthYear}</span></div>
-            <div className="info-item"><label>12th Passout Year</label><span>{user.twelfthYear}</span></div>
-          </div>
-        </section>
+            <h4 className="row-title">Academic History</h4>
+            <div className="grid-info">
+              <div className="info-item"><label>10th Year</label><span>{user.tenthYear}</span></div>
+              <div className="info-item"><label>12th Year</label><span>{user.twelfthYear}</span></div>
+            </div>
+          </section>
 
         {/* ROW 4: ADDRESSES */}
         <section className="profile-row-group">
-                  <h4 className="row-title">Professional Bio</h4>
-                  <p className="bio-text">{user.bio || "No bio added yet."}</p>
-                </section>
-              </div>
+            <h4 className="row-title">Addresses</h4>
+            <div className="grid-info">
+              <div className="info-item"><label>Current</label><span>{user.currentAddress || 'N/A'}</span></div>
+              <div className="info-item"><label>Permanent</label><span>{user.permanentAddress || 'N/A'}</span></div>
             </div>
-          )}
+          </section>
+        </div>
+      </div>
+    )}
         </div>
       </div>
     </div>
