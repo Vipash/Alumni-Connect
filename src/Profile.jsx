@@ -1,11 +1,23 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import EditProfile from './EditProfile';
+
+// Helper function moved outside to prevent re-creation on every render
+const getProfileStatus = (user) => {
+  const fieldMapping = {
+    displayName: 'Display Name', bio: 'Professional Bio', mobile: 'Mobile Number',
+    linkedin: 'LinkedIn Link', resumeUrl: 'Resume File', profilePhoto: 'Profile Photo',
+    fatherName: 'Father\'s Name', dob: 'Date of Birth', tenthYear: '10th Year',
+    twelfthYear: '12th Year', currentAddress: 'Current Address', permanentAddress: 'Permanent Address'
+  };
+  const missing = Object.keys(fieldMapping).filter(field => !user[field] || user[field] === "");
+  const completion = Math.round(((Object.keys(fieldMapping).length - missing.length) / Object.keys(fieldMapping).length) * 100);
+  return { percentage: completion, missingNames: missing.map(key => fieldMapping[key]) };
+};
 
 function Profile({ user, setUser }) {
   const [isEditing, setIsEditing] = useState(false);
-
-  // If the user hasn't completed the mandatory onboarding, force the "Complete Profile" form
   const [isOnboarding, setIsOnboarding] = useState(!user.isProfileComplete);
+  const formRef = useRef(null);
 
   const [onboardData, setOnboardData] = useState({
     dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : '',
@@ -37,33 +49,69 @@ function Profile({ user, setUser }) {
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setIsOnboarding(false);
-        alert("Profile verified and completed! Full access granted.");
+        alert("Profile completed!");
       }
     } catch (err) {
-      alert("Error completing profile. Please try again.");
+      alert("Error completing profile.");
     }
   };
 
   if (!user) return <div className="profile-container">Loading...</div>;
 
-  // --- VIEW 1: ONBOARDING / MANDATORY SETUP ---
-  if (isOnboarding) {
-    return (
-      <div className="onboarding-wrapper">
-        <div className="onboarding-header">
-          <h2>Finish Your Professional Profile</h2>
-          <p>Complete these mandatory fields to unlock all features of the MBM Alumni Connect.</p>
+  const status = getProfileStatus(user);
+
+  return (
+    <div className="portal-main-partition">
+      {/* --- LEFT PARTITION --- */}
+      <div className="partition-left">
+        <div className="partition-header">
+          <h2>User Profile</h2>
         </div>
-        <form onSubmit={handleOnboardingSubmit} className="onboarding-form">
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Father's Name</label>
-              <input required value={onboardData.fatherName} onChange={e => setOnboardData({...onboardData, fatherName: e.target.value})} />
-            </div>
-            <div className="form-group">
-              <label>Date of Birth</label>
-              <input type="date" required value={onboardData.dob} onChange={e => setOnboardData({...onboardData, dob: e.target.value})} />
-            </div>
+
+        <div className="sidebar-action-group">
+          {!isEditing && !isOnboarding ? (
+            <button className="edit-profile-btn" onClick={() => setIsEditing(true)}>
+              Edit Profile
+            </button>
+          ) : (
+            <>
+              <button className="update-btn" onClick={() => formRef.current?.requestSubmit()}>
+                {isOnboarding ? "Verify & Save" : "Update Changes"}
+              </button>
+              {!isOnboarding && (
+                <button className="cancel-btn" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="progress-container sidebar-progress" style={{ marginTop: '30px' }}>
+          <div className="progress-label">Completion: {status.percentage}%</div>
+          <div className="progress-bar-bg">
+            <div className="progress-bar-fill" style={{ width: `${status.percentage}%` }}></div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- RIGHT PARTITION --- */}
+      <div className="partition-right">
+        <div className="tab-render-container" style={{ overflowY: 'auto', padding: '2rem' }}>
+          
+          {isOnboarding ? (
+            <div className="onboarding-wrapper">
+              <div className="onboarding-header"><h2>Finish Your Profile</h2></div>
+              <form ref={formRef} onSubmit={handleOnboardingSubmit} className="onboarding-form">
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Father's Name</label>
+                    <input required value={onboardData.fatherName} onChange={e => setOnboardData({...onboardData, fatherName: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" required value={onboardData.dob} onChange={e => setOnboardData({...onboardData, dob: e.target.value})} />
+                  </div>
             <div className="form-group">
               <label>10th Pass-out Year</label>
               <input type="number" required value={onboardData.tenthYear} onChange={e => setOnboardData({...onboardData, tenthYear: e.target.value})} />
@@ -89,117 +137,26 @@ function Profile({ user, setUser }) {
               <input value={onboardData.hobbiesPersonal} onChange={e => setOnboardData({...onboardData, hobbiesPersonal: e.target.value})} />
             </div>
           </div>
-          <button type="submit" className="complete-profile-btn">Unlock All Features</button>
-        </form>
+       </form>
       </div>
-    );
-  }
-
-  const calculateCompletion = (user) => {
-  const fields = [
-    'displayName', 'bio', 'mobile', 'linkedin', 'resumeUrl', 
-    'profilePhoto', 'fatherName', 'dob', 'tenthYear', 'twelfthYear', 
-    'currentAddress', 'permanentAddress'
-  ];
-  const filledFields = fields.filter(field => user[field] && user[field] !== "");
-  return Math.round((filledFields.length / fields.length) * 100);
-};
-
-  // --- VIEW 2: EDITING MODE ---
-  if (isEditing) {
-    return (
-      <EditProfile 
-        user={user} 
-        onCancel={() => setIsEditing(false)} 
-        onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} 
-      />
-    );
-  }
-
-  // --- VIEW 3: STANDARD PROFILE VIEW ---
-const getProfileStatus = (user) => {
-    const fieldMapping = {
-      displayName: 'Display Name',
-      bio: 'Professional Bio',
-      mobile: 'Mobile Number',
-      linkedin: 'LinkedIn Link',
-      resumeUrl: 'Resume File',
-      profilePhoto: 'Profile Photo',
-      fatherName: 'Father\'s Name',
-      dob: 'Date of Birth',
-      tenthYear: '10th Year',
-      twelfthYear: '12th Year',
-      currentAddress: 'Current Address',
-      permanentAddress: 'Permanent Address'
-    };
-    
-    const missing = Object.keys(fieldMapping).filter(field => !user[field] || user[field] === "");
-    const completion = Math.round(((Object.keys(fieldMapping).length - missing.length) / Object.keys(fieldMapping).length) * 100);
-    
-    return { 
-      percentage: completion, 
-      missingNames: missing.map(key => fieldMapping[key]) 
-    };
-  };
-
-  const status = getProfileStatus(user);
-
-  return (
-    <div className="profile-card">
-      <div className="profile-header">
-        <div className="avatar-wrapper">
-          <img 
-            src={user.profilePhoto || "/default-avatar.png"} 
-            alt="Profile" 
-            onError={(e) => { e.target.src = "/default-avatar.png"; }}
-            className="profile-avatar"
-          />
-        </div>
-        <div className="header-text">
-          <h1>{user.displayName || user.name}</h1>
-          <p className="user-role-tag">{user.role.toUpperCase()}</p>
-          
-          {/* Progress Bar with Hover Info */}
-          <div className="progress-container" title={status.missingNames.length > 0 ? `Missing: ${status.missingNames.join(', ')}` : "Profile Complete!"}>
-            <div className="progress-label">
-              Profile Completion: {status.percentage}% 
-              <span className="info-icon"> ⓘ</span>
-            </div>
-            <div className="progress-bar-bg">
-              <div className="progress-bar-fill" style={{ width: `${status.percentage}%` }}></div>
-            </div>
-            {status.missingNames.length > 0 && (
-               <div className="missing-fields-tooltip">
-                 <strong>To reach 100%, add:</strong>
-                 <ul>{status.missingNames.slice(0, 3).map(name => <li key={name}>{name}</li>)}</ul>
-                 {status.missingNames.length > 3 && <li>...and {status.missingNames.length - 3} more</li>}
-               </div>
-            )}
-          </div>
-
-          <div className="social-links" style={{marginTop: '15px'}}>
-            {user.linkedin && (
-              <a href={user.linkedin} target="_blank" rel="noreferrer" className="social-icon linkedin">
-                LinkedIn 🔗
-              </a>
-            )}
-            {user.resumeUrl && (
-              <a href={user.resumeUrl} target="_blank" rel="noopener noreferrer" className="social-icon resume">
-                View Resume
-              </a>
-            )}
-            {user.resumeUrl ? (
-              <a href={user.resumeUrl} download target="_blank" rel="noopener noreferrer" className="social-icon resume-btn">
-                Download Resume 📄
-              </a>
-            ) : (
-              <span className="social-icon disabled">No Resume Uploaded</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="profile-body">
+   ) : isEditing ? (
+            <EditProfile 
+              user={user} 
+              formRef={formRef} 
+              onCancel={() => setIsEditing(false)} 
+              onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} 
+            />
+          ) : (
+            /* VIEW MODE: Standard Profile Card */
+            <div className="profile-card">
+              <div className="profile-header">
+                <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="Profile" />
+                <div className="header-text">
+                  <h1>{user.displayName || user.name}</h1>
+                  <p className="user-role-tag">{user.role.toUpperCase()}</p>
+                </div>
+              </div>
+              <div className="profile-body">
         {/* ROW 1: ABOUT */}
         <section className="profile-row-group">
           <h4 className="row-title">Professional Bio</h4>
@@ -230,43 +187,13 @@ const getProfileStatus = (user) => {
 
         {/* ROW 4: ADDRESSES */}
         <section className="profile-row-group">
-          <h4 className="row-title">Contact Addresses</h4>
-          <div className="address-grid">
-            <div className="info-item">
-              <label>Current Address</label>
-              <p className="address-text">{user.currentAddress}</p>
-            </div>
-            <div className="info-item">
-              <label>Permanent Address</label>
-              <p className="address-text">{user.permanentAddress}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* ROW 5: HOBBIES */}
-        <section className="profile-row-group" style={{borderBottom: 'none'}}>
-          <h4 className="row-title">Interests & Skills</h4>
-          <div className="hobbies-container">
-            <div className="hobby-block">
-              <label>Technical Hobbies</label>
-              <div className="tags">
-                {user.hobbiesTechnical?.map(h => <span key={h} className="tag tech-tag">{h}</span>)}
+                  <h4 className="row-title">Professional Bio</h4>
+                  <p className="bio-text">{user.bio || "No bio added yet."}</p>
+                </section>
               </div>
             </div>
-            <div className="hobby-block" style={{marginTop: '10px'}}>
-              <label>Personal Hobbies</label>
-              <div className="tags">
-                {user.hobbiesPersonal?.map(h => <span key={h} className="tag personal-tag">{h}</span>)}
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div className="profile-footer" style={{textAlign: 'center', padding: '20px'}}>
-        <button className="complete-profile-btn" style={{width: 'auto', padding: '12px 40px'}} onClick={() => setIsEditing(true)}>
-          Edit Profile Details
-        </button>
+          )}
+        </div>
       </div>
     </div>
   );
