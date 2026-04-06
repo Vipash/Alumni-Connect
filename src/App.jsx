@@ -166,14 +166,6 @@ const handleAdminLogin = async (e) => {
     }
   }, [loggedInUser, activeTab]);
 
-  useEffect(() => {
-  if (loginStatus === 'approved') {
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-    }, 150);
-  }
-}, [activeTab, loginStatus]);
-
   const handleInboxClick = () => {
     setActiveTab('inbox');
     setUnreadCount(0);
@@ -186,13 +178,14 @@ const handleAdminLogin = async (e) => {
 
   const [isMapOpen, setIsMapOpen] = useState(false);
 
-  useEffect(() => {
-    if (isMapOpen) {
-      setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
-      }, 200);
-    }
-  }, [isMapOpen]);
+ useEffect(() => {
+  if (activeTab === 'map' || isMapOpen) {
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 400);
+    return () => clearTimeout(timer);
+  }
+}, [activeTab, isMapOpen, loginStatus]);
 
   const downloadMagazine = () => {
     const link = document.createElement('a');
