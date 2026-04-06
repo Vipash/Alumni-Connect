@@ -144,6 +144,16 @@ const handleAdminLogin = async (e) => {
 
   const [unreadCount, setUnreadCount] = useState(0);
 
+  useEffect(() => {
+  if (activeTab === 'map') {
+    // Small delay to ensure the DOM has updated and flexbox has calculated
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 300); 
+    return () => clearTimeout(timer);
+  }
+}, [activeTab]);
+
   // Fetch unread count on load and periodically
   useEffect(() => {
     if (loggedInUser) {

@@ -5,7 +5,7 @@
   --bg-light: #bccaff;
   --white: #ffffff;
   --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);}
-body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); color: #1a1a1a; }
+body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1a1a1a; }
 
 /* --- 2. LAYOUTS --- */
 .app-root {width: 100%; min-height: 100vh; display: flex; flex-direction: column;}
@@ -22,7 +22,7 @@ tr:hover { background-color: #f9f9f9;}
 .no-scroll {overflow: hidden; height: 100vh;}
 
 /* --- 3. MODALS & OVERLAYS --- */
-.modal-overlay {position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center;  z-index: 5000; background: rgba(13, 17, 43, 0.7); backdrop-filter: blur(6px); overflow-y: auto;  padding: 20px 0;}
+.modal-overlay {position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center;  z-index: 9999; background: rgba(13, 17, 43, 0.7); backdrop-filter: blur(6px); overflow-y: auto;  padding: 20px 0;}
 .modal-box {background: white; padding: 40px; border-radius: 24px; width: 90%; max-width: 420px;  position: relative;  z-index: 5001; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; animation: modalPop 0.3s ease-out;}
 .modal-box::-webkit-scrollbar {width: 6px;}
 .modal-box::-webkit-scrollbar-thumb {background: var(--mbm-gold); border-radius: 10px;}
@@ -32,8 +32,8 @@ tr:hover { background-color: #f9f9f9;}
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* --- 5. UI ELEMENTS --- */
-button { padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s ease; width: 100%; margin-bottom: 10px; }
 button:hover { transform: translateY(-2px); filter: brightness(1.1);}
+.auth-form button, .modal-box button {width: 100%;  margin-bottom: 10px; }
 .submit-btn { background-color: var(--mbm-gold); color: white;}
 .admin-btn { border: 2px solid var(--mbm-blue); background: transparent; color: var(--mbm-blue);}
 .nav-btn { background-color: var(--mbm-blue); color: white;}
@@ -50,7 +50,7 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1);}
 .nav-links button { background: none; color: white; width: auto; margin: 0; font-size: 0.8rem; padding: 5px 12px;}
 .active-nav {color: var(--mbm-gold) !important; border-bottom: 2px solid var(--mbm-gold);}
 .portal-access-btn { background: var(--mbm-gold) !important;  color: var(--mbm-blue) !important; border-radius: 30px !important;  font-weight: 800 !important;}
-.fixed-header-group {position: fixed; top: 0; left: 0; width: 100%; z-index: 3000;}
+.fixed-header-group {position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;}
 /* News Ticker */
 .news-ticker {background: var(--mbm-gold); color: var(--mbm-blue); height: 22px; line-height: 22px; font-size: 0.75rem; font-weight: bold; overflow: hidden;}
 .ticker-wrap {display: inline-flex; white-space: nowrap; animation: ticker-scrolling 30s linear infinite;}
@@ -145,8 +145,23 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1);}
 .vm-card p {font-style: italic; font-size: 0.95rem; color: #334155;}
 @media (max-width: 768px) {.vision-mission-grid { grid-template-columns: 1fr; }}
 
-input, select, textarea { width: 100%; padding: 14px 16px; margin-bottom: 20px; border: 1.5px solid #dcdde1; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; outline: none; box-sizing: border-box;}
-input:focus { border-color: var(--mbm-blue); box-shadow: 0 0 0 3px rgba(38, 42, 107, 0.15);}
+.modal-box button, 
+.registration-form button:not(.location-btn), 
+.login-container button:not(.back-btn) { 
+    width: 100%; 
+    margin-bottom: 10px; 
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;input:focus { border-color: var(--mbm-blue); box-shadow: 0 0 0 3px rgba(38, 42, 107, 0.15);}}
+
+    .modal-box input, 
+.modal-box select, 
+.registration-form input { 
+    width: 100%; 
+    padding: 14px 16px; 
+    margin-bottom: 20px; 
+    box-sizing: border-box;
+}
 
 /* Typography */
 h1, h2 { color: var(--mbm-blue); }
