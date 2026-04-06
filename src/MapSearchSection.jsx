@@ -286,8 +286,20 @@ function MapSearchSection({ setSidebarContent }) {
         <div className="modal-overlay">
           <div className="modal-box">
             <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-              <img src={selectedAlumni.photo || '/default-avatar.png'} alt="Profile" className="profile-img-modal" />
-              <div>
+                <img 
+                  src={selectedAlumni.photo || '/default-avatar.png'} 
+                  alt="Profile" 
+                  style={{ 
+                    width: '80px',
+                    height: '80px',
+                    minWidth: '80px',
+                    borderRadius: '50%', 
+                    objectFit: 'cover', 
+                    border: '2px solid var(--mbm-gold)',
+                    flexShrink: 0
+                  }} 
+                />              
+                <div>
                 <h2>{selectedAlumni.name}</h2>
                 <p>{selectedAlumni.company}</p>
               </div>
