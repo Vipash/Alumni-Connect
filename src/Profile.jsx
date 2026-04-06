@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import EditProfile from './EditProfile';
 
 const getProfileStatus = (user) => {
@@ -13,7 +13,7 @@ const getProfileStatus = (user) => {
   return { percentage: completion, missingNames: missing.map(key => fieldMapping[key]) };
 };
 
-function Profile({ user, setUser }) {
+function Profile({ user, setUser, setSidebarContent }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(!user.isProfileComplete);
   const formRef = useRef(null);
@@ -28,6 +28,48 @@ function Profile({ user, setUser }) {
     hobbiesTechnical: user.hobbiesTechnical?.join(', ') || '',
     hobbiesPersonal: user.hobbiesPersonal?.join(', ') || '',
   });
+
+  // This useEffect updates the Sidebar (Left Partition) dynamically
+  useEffect(() => {
+    const status = getProfileStatus(user);
+
+    setSidebarContent(
+      <div className="sidebar-action-group">
+        <div className="partition-header">
+          <h2>User Profile</h2>
+        </div>
+
+        <div className="vertical-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
+          {!isEditing && !isOnboarding ? (
+            <button className="edit-profile-btn" onClick={() => setIsEditing(true)}>
+              Edit Profile
+            </button>
+          ) : (
+            <>
+              <button className="update-btn" onClick={() => formRef.current?.requestSubmit()}>
+                {isOnboarding ? "Verify & Save" : "Update Changes"}
+              </button>
+              {!isOnboarding && (
+                <button className="cancel-btn" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="progress-container sidebar-progress" style={{ marginTop: '30px' }}>
+          <div className="progress-label">Completion: {status.percentage}%</div>
+          <div className="progress-bar-bg">
+            <div className="progress-bar-fill" style={{ width: `${status.percentage}%` }}></div>
+          </div>
+        </div>
+      </div>
+    );
+
+    // Clean up when component unmounts
+    return () => setSidebarContent(null);
+  }, [isEditing, isOnboarding, user, setSidebarContent]);
 
   const handleOnboardingSubmit = async (e) => {
     e.preventDefault();
@@ -48,47 +90,26 @@ function Profile({ user, setUser }) {
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setIsOnboarding(false);
-        alert("Profile completed!");
+        setIsEditing(false);
+        alert("Profile updated!");
       }
     } catch (err) {
-      alert("Error completing profile.");
+      alert("Error saving profile.");
     }
   };
 
   if (!user) return <div className="profile-container">Loading...</div>;
 
-  // Render logic for the actual content
   return (
     <div className="profile-content-container">
-      {/* STYLING NOTE: This container will now sit cleanly inside 
-          the App's 'partition-right'. 
-      */}
-      
-      <div className="profile-action-header" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-end' }}>
-        {!isEditing && !isOnboarding ? (
-          <button className="edit-profile-btn" onClick={() => setIsEditing(true)}>
-            Edit Profile
-          </button>
-        ) : (
-          <div className="action-buttons">
-            <button className="update-btn" onClick={() => formRef.current?.requestSubmit()}>
-              {isOnboarding ? "Verify & Save" : "Update Changes"}
-            </button>
-            {!isOnboarding && (
-              <button className="cancel-btn" style={{ marginLeft: '10px' }} onClick={() => setIsEditing(false)}>
-                Cancel
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+      {/* Note: The Action Header is removed from here because it's now in the sidebar */}
 
       {isOnboarding ? (
         <div className="onboarding-wrapper">
           <div className="onboarding-header"><h2>Finish Your Profile</h2></div>
           <form ref={formRef} onSubmit={handleOnboardingSubmit} className="onboarding-form">
             <div className="form-grid">
-              <div className="form-group">
+               <div className="form-group">
                 <label>Father's Name</label>
                 <input required value={onboardData.fatherName} onChange={e => setOnboardData({ ...onboardData, fatherName: e.target.value })} />
               </div>
@@ -111,14 +132,6 @@ function Profile({ user, setUser }) {
               <div className="form-group full-width">
                 <label>Permanent Address</label>
                 <textarea required value={onboardData.permanentAddress} onChange={e => setOnboardData({ ...onboardData, permanentAddress: e.target.value })} />
-              </div>
-              <div className="form-group">
-                <label>Technical Hobbies (comma separated)</label>
-                <input value={onboardData.hobbiesTechnical} onChange={e => setOnboardData({ ...onboardData, hobbiesTechnical: e.target.value })} />
-              </div>
-              <div className="form-group">
-                <label>Personal Hobbies (comma separated)</label>
-                <input value={onboardData.hobbiesPersonal} onChange={e => setOnboardData({ ...onboardData, hobbiesPersonal: e.target.value })} />
               </div>
             </div>
           </form>

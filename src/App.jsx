@@ -143,6 +143,7 @@ const handleAdminLogin = async (e) => {
   };
 
   const [unreadCount, setUnreadCount] = useState(0);
+  const [sidebarContent, setSidebarContent] = useState(null);
 
   useEffect(() => {
   if (activeTab === 'map') {
@@ -200,7 +201,7 @@ const handleAdminLogin = async (e) => {
     let content;
     switch (activeTab) {
       case 'profile':
-        content = <Profile user={loggedInUser} setUser={setLoggedInUser} />;
+        content = <Profile user={loggedInUser} setUser={setLoggedInUser} setSidebarContent={setSidebarContent} />;
         break;
       case 'map':
         content = <MapSearchSection />;
@@ -263,62 +264,71 @@ const handleAdminLogin = async (e) => {
       
       {/* LEFT PARTITION: Integrated Search & Controls */}
       <aside className="partition-left">
-        <div className="partition-header">
-          <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
-          <p className="subtitle">Filters & Tools</p>
-        </div>
+  {/* If Profile (or any other tab) has sent custom content, show it. 
+      Otherwise, show the standard headers and filters. */}
+  {sidebarContent ? (
+    sidebarContent
+  ) : (
+    <>
+      <div className="partition-header">
+        <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
+        <p className="subtitle">Filters & Tools</p>
+      </div>
 
-        <div className="partition-controls">
-          {activeTab === 'map' && (
-            <div className="search-box-group">
-              <label>Name or Company</label>
-              <input type="text" placeholder="Search..." className="partition-input" />
-              <label>Branch</label>
-              <select className="partition-input"><option>All Branches</option></select>
-              <label>Batch Year</label>
-              <input type="number" placeholder="2024" className="partition-input" />
-              <button className="apply-filter-btn">Search Map</button>
-            </div>
-          )}
+      <div className="partition-controls">
+        {activeTab === 'map' && (
+          <div className="search-box-group">
+            <label>Name or Company</label>
+            <input type="text" placeholder="Search..." className="partition-input" />
+            <label>Branch</label>
+            <select className="partition-input"><option>All Branches</option></select>
+            <label>Batch Year</label>
+            <input type="number" placeholder="2024" className="partition-input" />
+            <button className="apply-filter-btn">Search Map</button>
+          </div>
+        )}
 
-          {activeTab === 'connect' && (
-            <div className="search-box-group">
-              <label>Job Search</label>
-              <input type="text" placeholder="Keywords..." className="partition-input" />
-              <label>Category</label>
-              <select className="partition-input">
-                <option>Full-Time</option>
-                <option>Internship</option>
-              </select>
-              <button className="apply-filter-btn">Filter Hub</button>
-            </div>
-          )}
+        {activeTab === 'connect' && (
+          <div className="search-box-group">
+            <label>Job Search</label>
+            <input type="text" placeholder="Keywords..." className="partition-input" />
+            <label>Category</label>
+            <select className="partition-input">
+              <option>Full-Time</option>
+              <option>Internship</option>
+            </select>
+            <button className="apply-filter-btn">Filter Hub</button>
+          </div>
+        )}
 
-          {activeTab === 'profile' && (
-            <div className="sidebar-hint-box">
-              <p>Keep your contact details updated so alumni can reach out to you.</p>
-              <button className="apply-filter-btn">Edit Profile</button>
-            </div>
-          )}
+        {/* Note: I removed the static 'profile' hint box from here 
+            because Profile.jsx will now handle its own sidebar via state */}
 
-          {activeTab === 'inbox' && (
-            <div className="sidebar-hint-box">
-              <p>You have {unreadCount} new messages.</p>
-            </div>
-          )}
-        </div>
-      </aside>
+        {activeTab === 'inbox' && (
+          <div className="sidebar-hint-box">
+            <p>You have {unreadCount} new messages.</p>
+          </div>
+        )}
+      </div>
+    </>
+  )}
+</aside>
 
       {/* RIGHT PARTITION: The View (Map/Content) */}
       <main className="partition-right">
-        <div className="tab-render-container">
-          {!loggedInUser?.isProfileComplete ? (
-            <Profile user={loggedInUser} setUser={setLoggedInUser} forceSetup={true} />
-          ) : (
-            renderTabContent()
-          )}
-        </div>
-      </main>
+  <div className="tab-render-container">
+    {!loggedInUser?.isProfileComplete ? (
+      <Profile 
+        user={loggedInUser} 
+        setUser={setLoggedInUser} 
+        setSidebarContent={setSidebarContent} // Add this
+        forceSetup={true} 
+      />
+    ) : (
+      renderTabContent()
+    )}
+  </div>
+</main>
     </div>
   </div>
 ) : view === 'admin-dash' ? (
