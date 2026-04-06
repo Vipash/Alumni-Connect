@@ -9,7 +9,6 @@ function FlyToMarker({ position }) {
   return null;
 }
 
-const [visibleContactId, setVisibleContactId] = useState(null);
 const searchIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -41,6 +40,7 @@ function MapSearchSection({ setSidebarContent }) {
   const [showContact, setShowContact] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [bookmarkedAlumni, setBookmarkedAlumni] = useState([]);
+  const [visibleContactId, setVisibleContactId] = useState(null);
 
   // --- Logic Functions ---
 
@@ -115,33 +115,33 @@ function MapSearchSection({ setSidebarContent }) {
   };
 
   const handleViewContact = async (alumnus) => {
-  const storedUser = JSON.parse(localStorage.getItem('user'));
-  if (!storedUser?._id) return alert("Session expired. Please log in.");
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (!storedUser?._id) return alert("Session expired. Please log in.");
 
-  if (window.confirm("NOTICE: This request will be logged for security. Continue?")) {
-    try {
-      const response = await fetch('/api/log-interaction', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          alumniId: alumnus._id,
-          alumniName: alumnus.name,
-          studentId: storedUser._id,
-          studentName: storedUser.name || "Student"
-        })
-      });
-      
-      if (response.ok) {
-        // Instead of a boolean, set the specific ID that is now "unlocked"
-        setVisibleContactId(alumnus._id); 
-      } else {
-        alert("Server error logging interaction.");
+    if (window.confirm("NOTICE: This request will be logged for security. Continue?")) {
+      try {
+        const response = await fetch('/api/log-interaction', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            alumniId: alumnus._id,
+            alumniName: alumnus.name,
+            studentId: storedUser._id,
+            studentName: storedUser.name || "Student"
+          })
+        });
+        
+        if (response.ok) {
+          // FIX 2: Set the specific ID to unlock the UI
+          setVisibleContactId(alumnus._id); 
+        } else {
+          alert("Server error logging interaction.");
+        }
+      } catch (error) {
+        alert("Network error.");
       }
-    } catch (error) {
-      alert("Network error.");
     }
-  }
-};
+  };
 
   // --- Effects ---
 
@@ -217,12 +217,10 @@ function MapSearchSection({ setSidebarContent }) {
 
   return (
     <div className="map-page-wrapper">
-      {/* Floating Bookmark Button */}
       <button className="bookmark-toggle-btn" onClick={() => setShowBookmarks(!showBookmarks)}>
         🔖 {user.bookmarks?.length || 0} Saved
       </button>
 
-      {/* Slide-out Bookmarks Sidebar */}
       <div className={`bookmark-sidebar ${showBookmarks ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h3>My Bookmarks</h3>
@@ -247,7 +245,6 @@ function MapSearchSection({ setSidebarContent }) {
         </div>
       </div>
 
-      {/* Main Map Area */}
       <div className="map-fancy-container">
         <MapContainer center={[26.2389, 73.0243]} zoom={5} style={{ height: '500px', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -261,49 +258,45 @@ function MapSearchSection({ setSidebarContent }) {
           {searchPos && <Marker position={searchPos} icon={searchIcon}><Popup>Search Point</Popup></Marker>}
           
           {alumni.map(item => (
-          <Marker key={item._id} position={[item.location.coordinates[1], item.location.coordinates[0]]}>
-            <Popup maxWidth={300} minWidth={250}>
-              <div style={{ textAlign: 'center', padding: '10px' }}>
-                {/* Adjusted Image Size */}
-                <img 
-                  src={item.photo || '/default-avatar.png'} 
-                  alt="Profile" 
-                  style={{ 
-                    width: '60px', 
-                    height: '60px', 
-                    borderRadius: '50%', 
-                    objectFit: 'cover',
-                    marginBottom: '10px',
-                    border: '2px solid var(--mbm-gold)' 
-                  }} 
-                />
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}>{item.name}</h3>
-                <p style={{ margin: '0 0 10px 0', color: '#666' }}>{item.company}</p>
-                
-                {/* CONTACT REVEAL LOGIC */}
-        <div style={{ background: '#f8f9fa', padding: '10px', borderRadius: '8px', marginBottom: '10px' }}>
-          {visibleContactId === item._id ? (
-            <div style={{ animation: 'fadeIn 0.3s ease' }}>
-              <p style={{ margin: '0', fontSize: '0.9rem' }}>📧 {item.email}</p>
-              <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem' }}>📞 {item.mobile || 'Not Provided'}</p>
-            </div>
-          ) : (
-            <button className="nav-btn" style={{ fontSize: '0.8rem', width: '100%' }} onClick={() => handleViewContact(item)}>
-              🔓 View Contact Details
-            </button>
-          )}
-        </div>
+            <Marker key={item._id} position={[item.location.coordinates[1], item.location.coordinates[0]]}>
+              <Popup maxWidth={300} minWidth={250}>
+                <div style={{ textAlign: 'center', padding: '10px' }}>
+                  <img 
+                    src={item.photo || '/default-avatar.png'} 
+                    alt="Profile" 
+                    style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', marginBottom: '10px', border: '2px solid var(--mbm-gold)' }} 
+                  />
+                  <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}>{item.name}</h3>
+                  <p style={{ margin: '0 0 10px 0', color: '#666' }}>{item.company}</p>
+                  
+                  <div style={{ background: '#f0f0f0', padding: '10px', borderRadius: '5px', fontSize: '0.8rem', marginBottom: '10px' }}>
+                    <p><strong>Role:</strong> {item.role || 'Alumni'}</p>
+                    <p><strong>Batch:</strong> {item.batch || 'N/A'}</p>
+                  </div>
 
-        <button className="admin-btn" style={{ fontSize: '0.8rem', width: '100%' }} onClick={() => toggleBookmark(item._id)}>
-          {user.bookmarks?.includes(item._id) ? '🔖 Saved' : '🔖 Bookmark'}
-        </button>
-      </div>
-    </Popup>
-  </Marker>
-))}
+                  {/* FIX 3: Conditionally render contact info or button based on visibleContactId */}
+                  <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    {visibleContactId === item._id ? (
+                      <div style={{ padding: '10px', background: '#e8f5e9', borderRadius: '5px', fontSize: '0.85rem', border: '1px solid #4caf50' }}>
+                        <p><strong>📧</strong> {item.email}</p>
+                        <p><strong>📞</strong> {item.mobile || 'N/A'}</p>
+                      </div>
+                    ) : (
+                      <button className="nav-btn" style={{ fontSize: '0.8rem' }} onClick={() => handleViewContact(item)}>
+                        🔓 View Contact
+                      </button>
+                    )}
+                    
+                    <button className="admin-btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleBookmark(item._id)}>
+                      {user.bookmarks?.includes(item._id) ? '🔖 Saved' : '🔖 Bookmark'}
+                    </button>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
         </MapContainer>
 
-        {/* Nearby List Table */}
         {closest && (
           <div className="nearby-list" style={{ marginTop: '20px' }}>
             <h4>Nearby Alumni</h4>
@@ -317,37 +310,6 @@ function MapSearchSection({ setSidebarContent }) {
           </div>
         )}
       </div>
-
-      {/* Profile Modal */}
-      {selectedAlumni && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-              <img src={selectedAlumni.photo || '/default-avatar.png'} alt="Profile" className="profile-img-modal" />
-              <div>
-                <h2>{selectedAlumni.name}</h2>
-                <p>{selectedAlumni.company}</p>
-              </div>
-            </div>
-            <div className="contact-box">
-              {!showContact ? (
-                <button className="nav-btn" onClick={() => handleViewContact(selectedAlumni)}>🔓 View Contact</button>
-              ) : (
-                <div>
-                  <p><strong>Email:</strong> {selectedAlumni.email}</p>
-                  <p><strong>Phone:</strong> {selectedAlumni.mobile || 'N/A'}</p>
-                </div>
-              )}
-            </div>
-            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-              <button className="admin-btn" onClick={() => toggleBookmark(selectedAlumni._id)}>
-                {user.bookmarks?.includes(selectedAlumni._id) ? '🔖 Saved' : '🔖 Bookmark'}
-              </button>
-              <button className="nav-btn" onClick={() => setSelectedAlumni(null)}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
