@@ -9,6 +9,7 @@ function FlyToMarker({ position }) {
   return null;
 }
 
+const [visibleContactId, setVisibleContactId] = useState(null);
 const searchIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -113,28 +114,34 @@ function MapSearchSection({ setSidebarContent }) {
     }
   };
 
-  const handleViewContact = async (alumni) => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (!storedUser?._id) return alert("Session expired. Please log in.");
+  const handleViewContact = async (alumnus) => {
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+  if (!storedUser?._id) return alert("Session expired. Please log in.");
 
-    if (window.confirm("NOTICE: This request will be logged for security. Continue?")) {
-      try {
-        const response = await fetch('/api/log-interaction', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            alumniId: alumni._id,
-            alumniName: alumni.name,
-            studentId: storedUser._id,
-            studentName: storedUser.name || "Student"
-          })
-        });
-        if (response.ok) setShowContact(true);
-      } catch (error) {
-        alert("Network error.");
+  if (window.confirm("NOTICE: This request will be logged for security. Continue?")) {
+    try {
+      const response = await fetch('/api/log-interaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          alumniId: alumnus._id,
+          alumniName: alumnus.name,
+          studentId: storedUser._id,
+          studentName: storedUser.name || "Student"
+        })
+      });
+      
+      if (response.ok) {
+        // Instead of a boolean, set the specific ID that is now "unlocked"
+        setVisibleContactId(alumnus._id); 
+      } else {
+        alert("Server error logging interaction.");
       }
+    } catch (error) {
+      alert("Network error.");
     }
-  };
+  }
+};
 
   // --- Effects ---
 
@@ -273,23 +280,27 @@ function MapSearchSection({ setSidebarContent }) {
                 <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}>{item.name}</h3>
                 <p style={{ margin: '0 0 10px 0', color: '#666' }}>{item.company}</p>
                 
-                <div style={{ background: '#f0f0f0', padding: '10px', borderRadius: '5px', fontSize: '0.9rem' }}>
-                  <p><strong>Role:</strong> {item.role || 'Alumni'}</p>
-                  <p><strong>Batch:</strong> {item.batch || 'N/A'}</p>
-                </div>
+                {/* CONTACT REVEAL LOGIC */}
+        <div style={{ background: '#f8f9fa', padding: '10px', borderRadius: '8px', marginBottom: '10px' }}>
+          {visibleContactId === item._id ? (
+            <div style={{ animation: 'fadeIn 0.3s ease' }}>
+              <p style={{ margin: '0', fontSize: '0.9rem' }}>📧 {item.email}</p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem' }}>📞 {item.mobile || 'Not Provided'}</p>
+            </div>
+          ) : (
+            <button className="nav-btn" style={{ fontSize: '0.8rem', width: '100%' }} onClick={() => handleViewContact(item)}>
+              🔓 View Contact Details
+            </button>
+          )}
+        </div>
 
-                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                  <button className="nav-btn" style={{ fontSize: '0.8rem' }} onClick={() => handleViewContact(item)}>
-                    🔓 View Contact
-                  </button>
-                  <button className="admin-btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleBookmark(item._id)}>
-                    {user.bookmarks?.includes(item._id) ? '🔖 Saved' : '🔖 Bookmark'}
-                  </button>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <button className="admin-btn" style={{ fontSize: '0.8rem', width: '100%' }} onClick={() => toggleBookmark(item._id)}>
+          {user.bookmarks?.includes(item._id) ? '🔖 Saved' : '🔖 Bookmark'}
+        </button>
+      </div>
+    </Popup>
+  </Marker>
+))}
         </MapContainer>
 
         {/* Nearby List Table */}
