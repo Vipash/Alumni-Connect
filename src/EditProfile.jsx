@@ -160,8 +160,6 @@ function EditProfile({ user, onCancel, onUpdate }) {
           </div>
 
           <div className="form-actions" style={{ marginTop: '30px', display: 'flex', gap: '10px' }}>
-            <button type="submit" className="submit-btn">Save All Changes</button>
-            <button type="button" className="admin-btn" onClick={onCancel}>Cancel</button>
           </div>
         </div>
       </form>
