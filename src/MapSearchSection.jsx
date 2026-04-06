@@ -254,16 +254,42 @@ function MapSearchSection({ setSidebarContent }) {
           {searchPos && <Marker position={searchPos} icon={searchIcon}><Popup>Search Point</Popup></Marker>}
           
           {alumni.map(item => (
-            <Marker key={item._id} position={[item.location.coordinates[1], item.location.coordinates[0]]}>
-              <Popup>
-                <div style={{ textAlign: 'center' }}>
-                  <strong>{item.name}</strong>
-                  <p>{item.company}</p>
-                  <button className="nav-btn" onClick={() => { setSelectedAlumni(item); setShowContact(false); }}>View Profile</button>
+          <Marker key={item._id} position={[item.location.coordinates[1], item.location.coordinates[0]]}>
+            <Popup maxWidth={300} minWidth={250}>
+              <div style={{ textAlign: 'center', padding: '10px' }}>
+                {/* Adjusted Image Size */}
+                <img 
+                  src={item.photo || '/default-avatar.png'} 
+                  alt="Profile" 
+                  style={{ 
+                    width: '60px', 
+                    height: '60px', 
+                    borderRadius: '50%', 
+                    objectFit: 'cover',
+                    marginBottom: '10px',
+                    border: '2px solid var(--mbm-gold)' 
+                  }} 
+                />
+                <h3 style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}>{item.name}</h3>
+                <p style={{ margin: '0 0 10px 0', color: '#666' }}>{item.company}</p>
+                
+                <div style={{ background: '#f0f0f0', padding: '10px', borderRadius: '5px', fontSize: '0.9rem' }}>
+                  <p><strong>Role:</strong> {item.role || 'Alumni'}</p>
+                  <p><strong>Batch:</strong> {item.batch || 'N/A'}</p>
                 </div>
-              </Popup>
-            </Marker>
-          ))}
+
+                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <button className="nav-btn" style={{ fontSize: '0.8rem' }} onClick={() => handleViewContact(item)}>
+                    🔓 View Contact
+                  </button>
+                  <button className="admin-btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleBookmark(item._id)}>
+                    {user.bookmarks?.includes(item._id) ? '🔖 Saved' : '🔖 Bookmark'}
+                  </button>
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
         </MapContainer>
 
         {/* Nearby List Table */}
@@ -286,20 +312,8 @@ function MapSearchSection({ setSidebarContent }) {
         <div className="modal-overlay">
           <div className="modal-box">
             <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-                <img 
-                  src={selectedAlumni.photo || '/default-avatar.png'} 
-                  alt="Profile" 
-                  style={{ 
-                    width: '80px',
-                    height: '80px',
-                    minWidth: '80px',
-                    borderRadius: '50%', 
-                    objectFit: 'cover', 
-                    border: '2px solid var(--mbm-gold)',
-                    flexShrink: 0
-                  }} 
-                />              
-                <div>
+              <img src={selectedAlumni.photo || '/default-avatar.png'} alt="Profile" className="profile-img-modal" />
+              <div>
                 <h2>{selectedAlumni.name}</h2>
                 <p>{selectedAlumni.company}</p>
               </div>
