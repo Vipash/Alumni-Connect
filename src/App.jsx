@@ -204,7 +204,7 @@ const handleAdminLogin = async (e) => {
         content = <Profile user={loggedInUser} setUser={setLoggedInUser} setSidebarContent={setSidebarContent} />;
         break;
       case 'map':
-        content = <MapSearchSection />;
+        content = <MapSearchSection setSidebarContent={setSidebarContent} />;
         break;
       case 'connect':
         content = <ConnectHub user={loggedInUser} />;

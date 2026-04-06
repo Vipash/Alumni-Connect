@@ -8,6 +8,7 @@ function FlyToMarker({ position }) {
   useEffect(() => { if (position) map.flyTo(position, 13); }, [position]);
   return null;
 }
+
 const searchIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -17,403 +18,301 @@ const searchIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-function MapSearchSection() {
+function MapClickHandler({ isPicking, onPick }) {
+  useMapEvents({
+    click(e) {
+      if (isPicking) onPick(e.latlng);
+    },
+  });
+  return null;
+}
+
+function MapSearchSection({ setSidebarContent }) {
   const [alumni, setAlumni] = useState([]);
   const [companySearch, setCompanySearch] = useState('');
   const [cityQuery, setCityQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [searchPos, setSearchPos] = useState(null);
   const [closest, setClosest] = useState(null);
-  const [filtered, setFiltered] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-const [isPicking, setIsPicking] = useState(false);
-const useCurrentLocation = () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const { latitude, longitude } = pos.coords;
-      setSearchPos([latitude, longitude]);
-      findClosest(latitude, longitude);
-    });
-  } else {
-    alert("Geolocation is not supported by this browser.");
-  }
-};
+  const [isPicking, setIsPicking] = useState(false);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || {});
+  const [selectedAlumni, setSelectedAlumni] = useState(null);
+  const [showContact, setShowContact] = useState(false);
+  const [showBookmarks, setShowBookmarks] = useState(false);
+  const [bookmarkedAlumni, setBookmarkedAlumni] = useState([]);
+
+  // --- Logic Functions ---
 
   const getDistance = (lat1, lon1, lat2, lon2) => {
-  const R = 6371; // km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-};
-
-const findClosest = (lat, lng) => {
-  const withDistances = alumni
-    .filter(a => a.location?.coordinates)
-    .map(a => ({
-      ...a,
-      dist: getDistance(lat, lng, a.location.coordinates[1], a.location.coordinates[0])
-    }))
-    .sort((a, b) => a.dist - b.dist);
-
-  setClosest(withDistances.slice(0, 3));
-};
-
-function MapClickHandler({ isPicking, onPick }) {
-  useMapEvents({
-    click(e) {
-      if (isPicking) {
-        onPick(e.latlng);
-      }
-    },
-  });
-  return null;
-}
-
-const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || {});
-
-const toggleBookmark = async (alumniId) => {
-  if (!user._id) return alert("Please log in to bookmark alumni.");
-
-  try {
-    const res = await fetch('/api/bookmarks/toggle', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user._id, alumniId })
-    });
-    
-    if (res.ok) {
-      const updatedBookmarks = await res.json();
-      const updatedUser = { ...user, bookmarks: updatedBookmarks };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    }
-  } catch (err) {
-    console.error("Bookmark error:", err);
-  }
-};
-
-  // 1. Fetch data
-  useEffect(() => {
-    fetch('/api/get-alumni').then(res => res.json()).then(setAlumni);
-  }, []);
-
-  // 2. Company Search logic
-  const handleCompanySearch = () => {
-    const matches = alumni.filter(a => a.company?.toLowerCase().includes(companySearch.toLowerCase()));
-    setFiltered(matches);
-    setCurrentIndex(0);
-    if (matches.length > 0) {
-    const coords = [matches[0].location.coordinates[1], matches[0].location.coordinates[0]];
-    setSearchPos(coords);
-  }
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  // 3. City Search (Nominatim)
+  const findClosest = (lat, lng) => {
+    const withDistances = alumni
+      .filter(a => a.location?.coordinates)
+      .map(a => ({
+        ...a,
+        dist: getDistance(lat, lng, a.location.coordinates[1], a.location.coordinates[0])
+      }))
+      .sort((a, b) => a.dist - b.dist);
+    setClosest(withDistances.slice(0, 3));
+  };
+
+  const useCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setSearchPos([latitude, longitude]);
+        findClosest(latitude, longitude);
+      });
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const handleCompanySearch = () => {
+    const matches = alumni.filter(a => a.company?.toLowerCase().includes(companySearch.toLowerCase()));
+    if (matches.length > 0) {
+      const coords = [matches[0].location.coordinates[1], matches[0].location.coordinates[0]];
+      setSearchPos(coords);
+    }
+  };
+
   const fetchSuggestions = async (q) => {
     setCityQuery(q);
-    if (q.length < 3) return;
+    if (q.length < 3) {
+      setSuggestions([]);
+      return;
+    }
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
     setSuggestions(await res.json());
   };
 
-const [selectedAlumni, setSelectedAlumni] = useState(null); // For the details pop-up
-const [showContact, setShowContact] = useState(false); // To toggle phone/email
-
-const handleViewContact = async (alumni) => {
-  // 1. Get user from storage (now that App.jsx is saving it)
-  const storedUser = JSON.parse(localStorage.getItem('user'));
-
-  if (!storedUser || !storedUser._id) {
-    alert("Session expired. Please log in again.");
-    return;
-  }
-
-  const confirmMsg = "NOTICE: Your request to view contact details will be logged for security purposes. Continue?";
-  
-  if (window.confirm(confirmMsg)) {
+  const toggleBookmark = async (alumniId) => {
+    if (!user._id) return alert("Please log in to bookmark alumni.");
     try {
-      const response = await fetch('/api/log-interaction', {
+      const res = await fetch('/api/bookmarks/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          alumniId: alumni._id,
-          alumniName: alumni.name,
-          studentId: storedUser._id, 
-          studentName: storedUser.name || storedUser.displayName || "Student" // Match server.js key
-        })
+        body: JSON.stringify({ userId: user._id, alumniId })
       });
-
-      if (response.ok) {
-        setShowContact(true);
-      } else {
-        alert("Server error logging interaction.");
+      if (res.ok) {
+        const updatedBookmarks = await res.json();
+        const updatedUser = { ...user, bookmarks: updatedBookmarks };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
       }
-    } catch (error) {
-      alert("Network error. Please try again.");
+    } catch (err) {
+      console.error("Bookmark error:", err);
     }
-  }
-};
+  };
 
-const [showBookmarks, setShowBookmarks] = useState(false);
-const [bookmarkedAlumni, setBookmarkedAlumni] = useState([]);
+  const handleViewContact = async (alumni) => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (!storedUser?._id) return alert("Session expired. Please log in.");
 
-// Fetch details when sidebar opens
-useEffect(() => {
-  if (showBookmarks && user.bookmarks?.length > 0) {
-    fetch('/api/bookmarks/details', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids: user.bookmarks })
-    })
-    .then(res => res.json())
-    .then(data => setBookmarkedAlumni(data));
-  }
-}, [showBookmarks, user.bookmarks]);
+    if (window.confirm("NOTICE: This request will be logged for security. Continue?")) {
+      try {
+        const response = await fetch('/api/log-interaction', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            alumniId: alumni._id,
+            alumniName: alumni.name,
+            studentId: storedUser._id,
+            studentName: storedUser.name || "Student"
+          })
+        });
+        if (response.ok) setShowContact(true);
+      } catch (error) {
+        alert("Network error.");
+      }
+    }
+  };
 
-  return (
-    <div className="map-page-wrapper">
-      <button 
-  className="bookmark-toggle-btn" 
-  onClick={(e) => {
-    e.stopPropagation();
-    setShowBookmarks(!showBookmarks);
-  }}
->
-  🔖 {user.bookmarks?.length || 0} Saved
-</button>
+  // --- Effects ---
 
-    {/* 2. THE SIDEBAR */}
-    <div className={`bookmark-sidebar ${showBookmarks ? 'open' : ''}`}>
-      <div className="sidebar-header">
-        <h3>My Bookmarks</h3>
-        <button className="close-sidebar" onClick={() => setShowBookmarks(false)}>×</button>
-      </div>
-      <div className="sidebar-content">
-        {bookmarkedAlumni.length > 0 ? (
-          bookmarkedAlumni.map(alumnus => (
-  <div key={alumnus._id} className="bookmark-item" style={{ position: 'relative' }}>
-    <div onClick={() => {
-      setSearchPos([alumnus.location.coordinates[1], alumnus.location.coordinates[0]]);
-      setSelectedAlumni(alumnus); 
-      setShowBookmarks(false);
-    }}>
-      <strong>{alumnus.name}</strong>
-      <p>{alumnus.company} • {alumnus.branch}</p>
-    </div>
-    
-    {/* NEW DELETE BUTTON */}
-    <button 
-      className="delete-bookmark-small"
-      onClick={(e) => {
-        e.stopPropagation(); // Prevents clicking the alumni
-        toggleBookmark(alumnus._id); // Re-uses your existing toggle logic to remove it
-      }}
-    >
-      ×
-    </button>
-  </div>
-))
-        ) : (
-          <p className="empty-msg" style={{padding:'20px', textAlign:'center', color:'#888'}}>No bookmarks yet!</p>
-        )}
-      </div>
-    </div>
-      <div className="map-fancy-container">
-          <MapContainer 
-              center={[26.2389, 73.0243]} 
-              zoom={5} 
-              style={{ height: '400px', width: '100%' }}
-            > 
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-           {searchPos && <FlyToMarker position={searchPos} />}
-           <MapClickHandler isPicking={isPicking} onPick={(ll) => {
-             setSearchPos([ll.lat, ll.lng]);
-             findClosest(ll.lat, ll.lng);
-             setIsPicking(false);
-           }} />
-           {searchPos && !companySearch && (
-    <Marker position={searchPos} icon={searchIcon}>
-      <Popup>Search Location</Popup>
-    </Marker>
-  )}
-           {alumni.map(alumniItem => (
-  <Marker 
-    key={alumniItem._id} 
-    position={[alumniItem.location.coordinates[1], alumniItem.location.coordinates[0]]}
-  >
-    <Popup>
-      <div style={{ textAlign: 'center' }}>
-        <strong style={{ fontSize: '1.1rem' }}>{alumniItem.name}</strong>
-        <p style={{ margin: '5px 0', color: '#666' }}>{alumniItem.company}</p>
+  useEffect(() => {
+    fetch('/api/get-alumni').then(res => res.json()).then(setAlumni);
+  }, []);
+
+  useEffect(() => {
+    if (showBookmarks && user.bookmarks?.length > 0) {
+      fetch('/api/bookmarks/details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: user.bookmarks })
+      })
+      .then(res => res.json())
+      .then(data => setBookmarkedAlumni(data));
+    }
+  }, [showBookmarks, user.bookmarks]);
+
+  // Inject Search UI into the Shared Sidebar
+  useEffect(() => {
+    if (!setSidebarContent) return;
+    setSidebarContent(
+      <div className="search-sidebar-container" style={{ padding: '20px' }}>
+        <h3 style={{ color: 'var(--mbm-blue)', marginBottom: '20px' }}>Alumni Explorer</h3>
         
-        <div className="popup-btn-group">
-          <button className="nav-btn" onClick={() => {
-            setSelectedAlumni(alumniItem);
-            setShowContact(false); 
-          }}>
-            View Full Profile
-          </button>
-          <button 
-            className="admin-btn" 
-            style={{ 
-              borderColor: user.bookmarks?.includes(alumniItem._id) ? 'var(--mbm-gold)' : '#ccc', 
-              color: user.bookmarks?.includes(alumniItem._id) ? 'var(--mbm-gold)' : '#666',
-              marginTop: '5px'
-            }}
-            onClick={() => toggleBookmark(alumniItem._id)}
-          >
-            {user.bookmarks?.includes(alumniItem._id) ? '🔖 Bookmarked' : '🔖 Bookmark'}
-          </button>
-        </div>
-      </div>
-    </Popup>
-  </Marker>
-))}
-        </MapContainer>
-      </div>
-
-      {/* SEARCH PANEL */}
-      <div className="search-panel">
-        
-        {/* 1. Company Search: Label ON TOP */}
-        <div className="company-search-container">
-          <label htmlFor="company-input">Company Search</label>
+        <div style={{ marginBottom: '25px' }}>
+          <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Company</label>
           <input 
-            id="company-input" // Associates with the label
-            name="company-name" // Helps browser autofill
-            autoComplete="organization" // Tells browser this is a company field
-            placeholder="Input Company Name... eg. GulGul" 
+            className="partition-input" 
+            placeholder="Search Company..." 
+            value={companySearch}
             onChange={e => setCompanySearch(e.target.value)} 
           />
-          <button className="nav-btn" onClick={handleCompanySearch}>Search Company</button>
+          <button className="nav-btn" style={{ width: '100%', marginTop: '10px' }} onClick={handleCompanySearch}>
+            Search Company
+          </button>
         </div>
 
-        {/* 2. City Search */}
         <div className="location-search-container">
-          <label htmlFor="city-input">Location Search</label>
-          <div className="location-search-wrapper">
-            <input 
-              id="city-input"
-              name="city-query"
-              autoComplete="address-level2"
-              value={cityQuery} 
-              placeholder="Type City Name... eg. Narayanpur Tatwara" 
-              onChange={(e) => {
-                const val = e.target.value;
-                setCityQuery(val);
-                if (val.length >= 3) fetchSuggestions(val);
-                else setSuggestions([]);
-              }} 
-            />
-            {suggestions.length > 0 && (
-              <ul className="suggestions-list">
-                {suggestions.map(s => (
-                  <li key={s.place_id} onClick={() => { 
-                    const lat = parseFloat(s.lat);
-                    const lon = parseFloat(s.lon);
-                    setSearchPos([lat, lon]); 
-                    findClosest(lat, lon); 
-                    setSuggestions([]); 
-                    setCityQuery(s.display_name);
-                  }}>{s.display_name}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* 3. Location Buttons: 50/50 Split */}
-          <div className="button-row">
-            <button className="nav-btn" onClick={useCurrentLocation}>📍 Use My Current Location</button>
-            <button 
-              className={isPicking ? 'admin-btn' : 'nav-btn'}
-              onClick={() => setIsPicking(!isPicking)} 
-            >
-              {isPicking ? 'Click map to place...' : '📍 Pick on Map'}
+          <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Location</label>
+          <input 
+            className="partition-input"
+            value={cityQuery} 
+            placeholder="Search City..." 
+            onChange={(e) => fetchSuggestions(e.target.value)} 
+          />
+          {suggestions.length > 0 && (
+            <ul className="suggestions-list">
+              {suggestions.map(s => (
+                <li key={s.place_id} onClick={() => { 
+                  const lat = parseFloat(s.lat);
+                  const lon = parseFloat(s.lon);
+                  setSearchPos([lat, lon]); 
+                  findClosest(lat, lon); 
+                  setSuggestions([]); 
+                  setCityQuery(s.display_name);
+                }}>{s.display_name}</li>
+              ))}
+            </ul>
+          )}
+          <div style={{ display: 'flex', gap: '5px', marginTop: '10px' }}>
+            <button className="nav-btn" style={{ flex: 1 }} onClick={useCurrentLocation}>📍 Current</button>
+            <button className={isPicking ? 'admin-btn' : 'nav-btn'} style={{ flex: 1 }} onClick={() => setIsPicking(!isPicking)}>
+              {isPicking ? 'Cancel' : '📍 Pick'}
             </button>
           </div>
         </div>
-
-        {/* 4. Nearby Alumni List */}
-        {closest && closest.length > 0 && (
-          <div className="nearby-list">
-            <h4>Nearby Alumni</h4>
-            {closest.map((item, index) => (
-              <div key={index} className="nearby-item">
-                <strong>{item.name}</strong> - {item.company} 
-                <span style={{float: 'right'}}>{item.dist.toFixed(1)} km</span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
-      {selectedAlumni && (
-  <div className="modal-overlay" style={{ zIndex: 1000 }}>
-    <div className="modal-box" style={{ textAlign: 'left', maxWidth: '400px' }}>
-      <h2 style={{ borderBottom: `2px solid var(--mbm-gold)`, paddingBottom: '10px' }}>
-        Alumni Profile
-      </h2>
-      <div style={{ margin: '15px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px', textAlign: 'left' }}>
-        <img 
-  /* 1. Try 'photo', then 'profilePic', then the local default-avatar */
-  src={selectedAlumni.photo || selectedAlumni.profilePic || '/default-avatar.png'} 
-  alt="Profile" 
-  style={{ 
-    width: '80px', 
-    height: '80px', 
-    borderRadius: '50%', 
-    objectFit: 'cover', 
-    border: '2px solid var(--mbm-gold)',
-    backgroundColor: '#f0f0f0' 
-  }}
-  /* 2. Emergency fallback if the URL exists but is a 404/broken link */
-  onError={(e) => { 
-    e.target.onerror = null; 
-    e.target.src = '/default-avatar.png'; 
-  }}
-/>
-        <div>
-          <h2 style={{ margin: 0, color: 'var(--mbm-blue)' }}>{selectedAlumni.name}</h2>
-          <p style={{ margin: 0, color: '#666' }}>{selectedAlumni.company}</p>
+    );
+    return () => setSidebarContent(null);
+  }, [companySearch, cityQuery, suggestions, isPicking, setSidebarContent]);
+
+  return (
+    <div className="map-page-wrapper">
+      {/* Floating Bookmark Button */}
+      <button className="bookmark-toggle-btn" onClick={() => setShowBookmarks(!showBookmarks)}>
+        🔖 {user.bookmarks?.length || 0} Saved
+      </button>
+
+      {/* Slide-out Bookmarks Sidebar */}
+      <div className={`bookmark-sidebar ${showBookmarks ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <h3>My Bookmarks</h3>
+          <button className="close-sidebar" onClick={() => setShowBookmarks(false)}>×</button>
+        </div>
+        <div className="sidebar-content">
+          {bookmarkedAlumni.length > 0 ? (
+            bookmarkedAlumni.map(alumnus => (
+              <div key={alumnus._id} className="bookmark-item">
+                <div onClick={() => {
+                  setSearchPos([alumnus.location.coordinates[1], alumnus.location.coordinates[0]]);
+                  setSelectedAlumni(alumnus);
+                  setShowBookmarks(false);
+                }}>
+                  <strong>{alumnus.name}</strong>
+                  <p>{alumnus.company}</p>
+                </div>
+                <button className="delete-bookmark-small" onClick={() => toggleBookmark(alumnus._id)}>×</button>
+              </div>
+            ))
+          ) : <p className="empty-msg">No bookmarks yet!</p>}
         </div>
       </div>
-      <div style={{ textAlign: 'left', marginBottom: '20px' }}>
-        <p><strong>Role:</strong> {selectedAlumni.role || 'Senior Consultant'}</p>
-        <p><strong>Batch:</strong> {selectedAlumni.batch || '2020'}</p>
-      </div>
-      </div>
 
-      <div style={{ background: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
-        {!showContact ? (
-          <button className="nav-btn" onClick={() => handleViewContact(selectedAlumni)}>
-            🔓 Display Contact Details
-          </button>
-        ) : (
-          <div className="loading" style={{ animation: 'none' }}>
-            <p style={{ margin: '0', color: 'var(--mbm-blue)' }}><strong>Email:</strong> {selectedAlumni.email}</p>
-            <p style={{ margin: '5px 0 0 0', color: 'var(--mbm-blue)' }}><strong>Phone:</strong> {selectedAlumni.mobile ? `+91 ${selectedAlumni.mobile}` : '+91 XXXXX XXXXX'}</p>
+      {/* Main Map Area */}
+      <div className="map-fancy-container">
+        <MapContainer center={[26.2389, 73.0243]} zoom={5} style={{ height: '500px', width: '100%' }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {searchPos && <FlyToMarker position={searchPos} />}
+          <MapClickHandler isPicking={isPicking} onPick={(ll) => {
+            setSearchPos([ll.lat, ll.lng]);
+            findClosest(ll.lat, ll.lng);
+            setIsPicking(false);
+          }} />
+          
+          {searchPos && <Marker position={searchPos} icon={searchIcon}><Popup>Search Point</Popup></Marker>}
+          
+          {alumni.map(item => (
+            <Marker key={item._id} position={[item.location.coordinates[1], item.location.coordinates[0]]}>
+              <Popup>
+                <div style={{ textAlign: 'center' }}>
+                  <strong>{item.name}</strong>
+                  <p>{item.company}</p>
+                  <button className="nav-btn" onClick={() => { setSelectedAlumni(item); setShowContact(false); }}>View Profile</button>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+
+        {/* Nearby List Table */}
+        {closest && (
+          <div className="nearby-list" style={{ marginTop: '20px' }}>
+            <h4>Nearby Alumni</h4>
+            <div className="nearby-items-grid">
+              {closest.map((item, i) => (
+                <div key={i} className="nearby-item" onClick={() => setSearchPos([item.location.coordinates[1], item.location.coordinates[0]])}>
+                  <strong>{item.name}</strong> • {item.company} <span style={{ float: 'right' }}>{item.dist.toFixed(1)} km</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
-     <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-  <button 
-    className="admin-btn" 
-    style={{ flex: 1, borderColor: '#d4af37', color: '#d4af37' }}
-    onClick={() => toggleBookmark(selectedAlumni._id)}
-  >
-    {user.bookmarks?.includes(selectedAlumni._id) ? '🔖 Saved' : '🔖 Bookmark'}
-  </button>
-  <button className="admin-btn" style={{ flex: 1 }} onClick={() => setSelectedAlumni(null)}>
-    Close Window
-  </button>
-</div>
-    </div>
-  </div>
-)}
+
+      {/* Profile Modal */}
+      {selectedAlumni && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+              <img src={selectedAlumni.photo || '/default-avatar.png'} alt="Profile" className="profile-img-modal" />
+              <div>
+                <h2>{selectedAlumni.name}</h2>
+                <p>{selectedAlumni.company}</p>
+              </div>
+            </div>
+            <div className="contact-box">
+              {!showContact ? (
+                <button className="nav-btn" onClick={() => handleViewContact(selectedAlumni)}>🔓 View Contact</button>
+              ) : (
+                <div>
+                  <p><strong>Email:</strong> {selectedAlumni.email}</p>
+                  <p><strong>Phone:</strong> {selectedAlumni.mobile || 'N/A'}</p>
+                </div>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <button className="admin-btn" onClick={() => toggleBookmark(selectedAlumni._id)}>
+                {user.bookmarks?.includes(selectedAlumni._id) ? '🔖 Saved' : '🔖 Bookmark'}
+              </button>
+              <button className="nav-btn" onClick={() => setSelectedAlumni(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 export default MapSearchSection;
