@@ -222,9 +222,12 @@ useEffect(() => {
       </div>
     </div>
       <div className="map-fancy-container">
-        <MapContainer center={[26.2389, 73.0243]} zoom={5} style={{ height: '400px', width: '100%' }}>
-           <MapContainer style={{ height: "400px", width: "100%" }}></MapContainer>
-           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <MapContainer 
+              center={[26.2389, 73.0243]} 
+              zoom={5} 
+              style={{ height: '400px', width: '100%' }}
+            > 
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
            {searchPos && <FlyToMarker position={searchPos} />}
            <MapClickHandler isPicking={isPicking} onPick={(ll) => {
              setSearchPos([ll.lat, ll.lng]);
