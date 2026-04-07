@@ -34,7 +34,7 @@
 .edit-profile-actions {display: none !important;}
 .sidebar-progress .progress-label {color: #666; font-size: 0.7rem;}
 /* 1. The Container must have a fixed height relative to the viewport */
-.portal-main-partition {display: flex; flex: 1;  height: calc(100vh - 65px); width: 100%;  background: #f8f9fa;  overflow: hidden;}
+.portal-main-partition {display: flex; flex: 1;  height: calc(100vh - 65px); width: 100%; max-width: 100vw; margin: 0; background: #f8f9fa;  overflow: hidden;}
 /* 2. LEFT PARTITION (Fixed width, internal scrolling) */
 .partition-left { width: 350px; background: #ffffff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; padding: 2rem; overflow-y: auto;}
 .partition-header h2 {color: #003366; margin-bottom: 0.5rem;}
@@ -155,7 +155,7 @@
 /* --- NOTICE BOARD LAYOUT --- */
 .notice-board-container {padding: 20px; width: 100%; box-sizing: border-box;}
 .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-.notice-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin:0; gap: 20px; width: 100%;}
+.notice-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)) !important; margin: 0 !important; gap: 20px; width: 100% !important;}
 .notice-card {background: white;  border-radius: 12px; box-sizing: border-box;  padding: 20px;  border-left: 5px solid var(--mbm-blue);  box-shadow: 0 4px 12px rgba(0,0,0,0.08);  position: relative;  transition: transform 0.2s; min-width: 0; word-wrap: break-word;}
 .notice-card:hover { transform: translateY(-5px); }
 .notice-badge {position: absolute; top: 15px; right: 15px; background: #f1f4f9; color: var(--mbm-blue); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;}
@@ -182,7 +182,7 @@
 .hub-tabs button:hover {transform: none; /* Disable the standard button jump for tabs */ background: rgba(38, 42, 107, 0.02);}
 .hub-scroll-area {flex: 1; overflow-y: auto; width: 100%; overflow-x: hidden; padding: 20px;}
 /* History Section Table Adjustments */
-.history-section {background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
+.history-section {background: white; padding: 20px; border-radius: 12px; min-width: 0 !important; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
 .badge-pill {padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: #e1f5fe; color: #01579b; text-transform: uppercase;}
 /* Notice Form Modal Tweaks */
 .notice-form-modal {max-width: 600px !important; text-align: left !important;}
@@ -332,3 +332,17 @@
 .admin-table thead tr {background-color: #f8f9fa;}
 .admin-table th {font-weight: 600; color: #2c3e50; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;}
 .ip-text {font-family: 'Courier New', Courier, monospace; color: #95a5a6; font-size: 0.85rem;}
+
+/*override section*/
+.portal-container, 
+.portal-container *, 
+.portal-container *::before, 
+.portal-container *::after {
+    box-sizing: border-box !important;
+}
+.dashboard-content {
+    padding: 0 !important; /* The portal handles its own padding internally */
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+}
