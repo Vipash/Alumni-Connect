@@ -167,19 +167,25 @@ function ConnectHub({ user, setSidebarContent }) {
   }, [searchQuery, filterType, activeSubTab, selectedNotice, setSidebarContent]);
 
   return (
-    <div className="connect-hub-container">
-      <div className="hub-header">
-        <div className="hub-tabs">
-          <button className={activeSubTab === 'bulletin' ? 'active' : ''} onClick={() => {setActiveSubTab('bulletin'); setSelectedNotice(null);}}>Bulletin Board</button>
-          <button className={activeSubTab === 'history' ? 'active' : ''} onClick={() => setActiveSubTab('history')}>Connection History</button>
-          {user.role === 'alumni' && (
-            <button className={activeSubTab === 'myposts' ? 'active' : ''} onClick={() => setActiveSubTab('myposts')}>My Posts</button>
-          )}
-        </div>
-        {user.role === 'alumni' && <button className="add-notice-btn" onClick={() => setShowForm(true)}>+ Post Notice</button>}
+  <div className="connect-hub-container">
+    <div className="hub-header">
+      <div className="hub-tabs">
+        <button className={activeSubTab === 'bulletin' ? 'active' : ''} onClick={() => {setActiveSubTab('bulletin'); setSelectedNotice(null);}}>Bulletin Board</button>
+        <button className={activeSubTab === 'history' ? 'active' : ''} onClick={() => setActiveSubTab('history')}>Connection History</button>
+        {user.role === 'alumni' && (
+          <button className={activeSubTab === 'myposts' ? 'active' : ''} onClick={() => setActiveSubTab('myposts')}>My Posts</button>
+        )}
       </div>
+      {user.role === 'alumni' && <button className="add-notice-btn" onClick={() => setShowForm(true)}>+ Post Notice</button>}
+      
+      {/* Keeping these inside the fixed header */}
+      <h3 style={{ marginTop: '15px' }}>Available Opportunities</h3>
+      <p style={{ marginBottom: '10px' }}>Showing results for: {searchQuery || "All"}</p>
+    </div>
 
-      <div className="hub-content-body" style={{ marginTop: '20px' }}>
+    {/* NEW: Scroll area wrapper */}
+    <div className="hub-scroll-area">
+      <div className="hub-content-body">
         {activeSubTab === 'bulletin' && (
           <>
             {!selectedNotice ? (
@@ -282,6 +288,7 @@ function ConnectHub({ user, setSidebarContent }) {
             </div>
           </div>
         )}
+      </div>
       </div>
 
       {viewProfile && (

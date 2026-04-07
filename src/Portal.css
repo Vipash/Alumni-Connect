@@ -155,8 +155,8 @@
 /* --- NOTICE BOARD LAYOUT --- */
 .notice-board-container {padding: 20px; width: 100%; box-sizing: border-box;}
 .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-.notice-grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));  gap: 20px; width: 100%;}
-.notice-card {background: white;  border-radius: 12px;  padding: 20px;  border-left: 5px solid var(--mbm-blue);  box-shadow: 0 4px 12px rgba(0,0,0,0.08);  position: relative;  transition: transform 0.2s; min-width: 0; word-wrap: break-word;}
+.notice-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; width: 100%;}
+.notice-card {background: white;  border-radius: 12px; box-sizing: border-box;  padding: 20px;  border-left: 5px solid var(--mbm-blue);  box-shadow: 0 4px 12px rgba(0,0,0,0.08);  position: relative;  transition: transform 0.2s; min-width: 0; word-wrap: break-word;}
 .notice-card:hover { transform: translateY(-5px); }
 .notice-badge {position: absolute; top: 15px; right: 15px; background: #f1f4f9; color: var(--mbm-blue); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;}
 .company-tag { color: #666; font-size: 0.9rem; margin: 5px 0 15px 0; }
@@ -171,14 +171,16 @@
 .notice-card:has(.notice-badge:contains('Full-time')) { border-left-color: #f1c40f; }
 .delete-btn-small {background: #fff0f0 !important; color: #ff3f52 !important; border: 1px solid #ffccd2 !important; width: 35px !important; height: 35px !important; padding: 0 !important; display: flex !important; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; margin: 0 !important; transition: all 0.2s ease;}
 .delete-btn-small:hover {background: #ff3f52 !important; color: white !important; transform: scale(1.05);}
+@media (max-width: 480px) {.notice-grid {grid-template-columns: 1fr;}}
 
 /* --- 9. CONNECT HUB SPECIFIC STYLES --- */
-.connect-hub-container {display: flex; flex-direction: column; gap: 20px; max-width: 100%; overflow-x: hidden;}
-.hub-header {display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
+.connect-hub-container {display: flex; flex-direction: column; height: 100%; gap: 20px; max-width: 100%; overflow: hidden;}
+.hub-header {display: flex; justify-content: space-between; align-items: center; background: white; border-bottom: 1px solid #eee; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
 .hub-tabs {display: flex; gap: 10px;}
 .hub-tabs button {width: auto !important; margin: 0 !important; background: transparent; color: #666; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 20px;}
 .hub-tabs button.active {color: var(--mbm-blue); border-bottom: 3px solid var(--mbm-gold); background: rgba(38, 42, 107, 0.05);}
 .hub-tabs button:hover {transform: none; /* Disable the standard button jump for tabs */ background: rgba(38, 42, 107, 0.02);}
+.hub-scroll-area {flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px;}
 /* History Section Table Adjustments */
 .history-section {background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
 .badge-pill {padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: #e1f5fe; color: #01579b; text-transform: uppercase;}
@@ -224,6 +226,9 @@
 .filled-tag {background: #000; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; margin-left: 5px;}
 .card-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .card-footer-tags { display: flex; align-items: center; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px; }
+.partition-input {width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;}
+.apply-filter-btn {margin-top: 10px; background-color: #004a99; /* MBM Blue */ color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; transition: background 0.3s;}
+.apply-filter-btn:hover {background-color: #003366;}
 
 /*Inbox*/
 .topic-pills {display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;}

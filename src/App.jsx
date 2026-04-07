@@ -86,6 +86,9 @@ const handleAdminLogin = async (e) => {
     displayName: '',
   });
 
+  const [hubSearch, setHubSearch] = useState('');
+  const [hubCategory, setHubCategory] = useState('All');
+
   const handleLogout = () => {
   localStorage.clear(); // Safest way to ensure no old IDs stay behind
   setLoggedInUser(null);
@@ -207,7 +210,7 @@ const handleAdminLogin = async (e) => {
         content = <MapSearchSection setSidebarContent={setSidebarContent} />;
         break;
       case 'connect':
-        content = <ConnectHub user={loggedInUser} />;
+        content = <ConnectHub user={loggedInUser} searchQuery={hubSearch} category={hubCategory} />;
         break;
       case 'inbox':
         content = <Inbox user={loggedInUser} setUser={setLoggedInUser} />;
@@ -289,17 +292,35 @@ const handleAdminLogin = async (e) => {
         )}
 
         {activeTab === 'connect' && (
-          <div className="search-box-group">
-            <label>Job Search</label>
-            <input type="text" placeholder="Keywords..." className="partition-input" />
-            <label>Category</label>
-            <select className="partition-input">
-              <option>Full-Time</option>
-              <option>Internship</option>
-            </select>
-            <button className="apply-filter-btn">Filter Hub</button>
-          </div>
-        )}
+  <div className="search-box-group">
+    <label>Job Search</label>
+    <input 
+      type="text" 
+      placeholder="Keywords..." 
+      className="partition-input" 
+      value={hubSearch}
+      onChange={(e) => setHubSearch(e.target.value)}
+    />
+    <label>Category</label>
+    <select 
+      className="partition-input"
+      value={hubCategory}
+      onChange={(e) => setHubCategory(e.target.value)}
+    >
+      <option value="All">All Categories</option>
+      <option value="Full-Time">Full-Time</option>
+      <option value="Internship">Internship</option>
+      <option value="Project">Project</option>
+      <option value="Scholarship">Scholarship</option>
+      <option value="Referral">Referral</option>
+
+
+    </select>
+    <button className="apply-filter-btn" onClick={() => {/* Trigger fetch if needed */}}>
+      Filter Hub
+    </button>
+  </div>
+)}
 
         {/* Note: I removed the static 'profile' hint box from here 
             because Profile.jsx will now handle its own sidebar via state */}
