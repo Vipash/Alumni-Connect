@@ -116,55 +116,69 @@ function ConnectHub({ user, setSidebarContent }) {
 
   const myPosts = notices.filter(n => (n.postedBy?._id || n.postedBy) === user._id);
 
+  const HubSidebar = ({ searchQuery, setSearchQuery, filterType, setFilterType }) => (
+  <div className="search-sidebar-container" style={{ padding: '20px' }}>
+    <h3 style={{ color: 'var(--mbm-blue)', marginBottom: '20px' }}>Connect Hub</h3>
+    <div style={{ marginBottom: '25px' }}>
+      <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Search</label>
+      <input 
+        className="partition-input" 
+        type="text" 
+        placeholder="Role or Company..." 
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)} 
+      />
+    </div>
+    <div style={{ marginBottom: '25px' }}>
+      <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Opportunity Type</label>
+      <select 
+        className="partition-input"
+        value={filterType}
+        onChange={(e) => setFilterType(e.target.value)}
+        style={{ width: '100%', cursor: 'pointer' }}
+      >
+        <option value="All">All Types</option>
+        <option value="Internship">Internship</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Referral">Referral</option>
+        <option value="Project">Project</option>
+        <option value="Scholarship">Scholarship</option>
+      </select>
+    </div>
+    <button 
+      className="nav-btn" 
+      style={{ width: '100%', marginTop: '10px' }} 
+      onClick={() => { setSearchQuery(''); setFilterType('All'); }}
+    >
+      Clear Filters
+    </button>
+  </div>
+);
+
   useEffect(() => {
-    if (!setSidebarContent) return;
-    if (activeSubTab === 'bulletin' && !selectedNotice) {
-      setSidebarContent(
-        <div className="search-sidebar-container" style={{ padding: '20px' }}>
-          <h3 style={{ color: 'var(--mbm-blue)', marginBottom: '20px' }}>Connect Hub</h3>
-          <div style={{ marginBottom: '25px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Search</label>
-            <input 
-              className="partition-input" 
-              type="text" 
-              placeholder="Role or Company..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} 
-            />
-          </div>
-          <div style={{ marginBottom: '25px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Opportunity Type</label>
-            <select 
-              className="partition-input"
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              style={{ width: '100%', cursor: 'pointer' }}
-            >
-              <option value="All">All Types</option>
-              <option value="Internship">Internship</option>
-              <option value="Full-time">Full-time</option>
-              <option value="Referral">Referral</option>
-              <option value="Project">Project</option>
-              <option value="Scholarship">Scholarship</option>
-            </select>
-          </div>
-          <button className="nav-btn" style={{ width: '100%', marginTop: '10px' }} onClick={() => { setSearchQuery(''); setFilterType('All'); }}>Clear Filters</button>
-        </div>
-      );
-    } else {
-      setSidebarContent(
-        <div style={{ padding: '20px' }}>
-          <h3 style={{ color: 'var(--mbm-blue)' }}>Connect Hub</h3>
-          <p style={{ fontSize: '0.9rem', color: '#666' }}>
-            {activeSubTab === 'history' ? "Viewing your connection history." : 
-             activeSubTab === 'myposts' ? "Managing your posted opportunities." : 
-             "Viewing opportunity details."}
-          </p>
-        </div>
-      );
-    }
-    return () => setSidebarContent(null);
-  }, [searchQuery, filterType, activeSubTab, selectedNotice, setSidebarContent]);
+  if (!setSidebarContent) return;
+
+  if (activeSubTab === 'bulletin' && !selectedNotice) {
+    // Pass the component and the CURRENT state values
+    setSidebarContent(
+      <HubSidebar 
+        searchQuery={searchQuery} 
+        setSearchQuery={setSearchQuery}
+        filterType={filterType}
+        setFilterType={setFilterType}
+      />
+    );
+  } else {
+    setSidebarContent(
+      <div style={{ padding: '20px' }}>
+        <h3 style={{ color: 'var(--mbm-blue)' }}>Connect Hub</h3>
+        <p style={{ fontSize: '0.9rem', color: '#666' }}>
+          {activeSubTab === 'history' ? "Viewing history..." : "Managing posts..."}
+        </p>
+      </div>
+    );
+  }
+}, [searchQuery, filterType, activeSubTab, selectedNotice]);
 
   return (
   <div className="connect-hub-container">
@@ -180,7 +194,6 @@ function ConnectHub({ user, setSidebarContent }) {
       
       {/* Keeping these inside the fixed header */}
       <h3 style={{ marginTop: '15px' }}>Available Opportunities</h3>
-      <p style={{ marginBottom: '10px' }}>Showing results for: {searchQuery || "All"}</p>
     </div>
 
     {/* NEW: Scroll area wrapper */}
