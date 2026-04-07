@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 
-function ConnectHub({ user, setSidebarContent }) {
+function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filterType, setFilterType }) {
   const [activeSubTab, setActiveSubTab] = useState('bulletin');
   const [notices, setNotices] = useState([]);
   const [history, setHistory] = useState([]);
   const [selectedNotice, setSelectedNotice] = useState(null); 
   const [viewProfile, setViewProfile] = useState(null); 
   const [showForm, setShowForm] = useState(false);
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('All');
 
   useEffect(() => {
     fetch('/api/notices').then(res => res.json()).then(setNotices);

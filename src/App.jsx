@@ -201,7 +201,7 @@ const handleAdminLogin = async (e) => {
   };
 
   const renderTabContent = () => {
-    let content;
+    let content;  
     switch (activeTab) {
       case 'profile':
         content = <Profile user={loggedInUser} setUser={setLoggedInUser} setSidebarContent={setSidebarContent} />;
@@ -210,8 +210,17 @@ const handleAdminLogin = async (e) => {
         content = <MapSearchSection setSidebarContent={setSidebarContent} />;
         break;
       case 'connect':
-        content = <ConnectHub user={loggedInUser} searchQuery={hubSearch} category={hubCategory} />;
-        break;
+  content = (
+    <ConnectHub 
+      user={loggedInUser}
+      searchQuery={hubSearch}
+      setSearchQuery={setHubSearch}
+      filterType={hubCategory} 
+      setFilterType={setHubCategory} 
+      setSidebarContent={setSidebarContent} 
+    />
+  );
+  break;
       case 'inbox':
         content = <Inbox user={loggedInUser} setUser={setLoggedInUser} />;
         break;
@@ -267,8 +276,6 @@ const handleAdminLogin = async (e) => {
       
       {/* LEFT PARTITION: Integrated Search & Controls */}
       <aside className="partition-left">
-  {/* If Profile (or any other tab) has sent custom content, show it. 
-      Otherwise, show the standard headers and filters. */}
   {sidebarContent ? (
     sidebarContent
   ) : (

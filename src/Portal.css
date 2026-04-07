@@ -155,7 +155,7 @@
 /* --- NOTICE BOARD LAYOUT --- */
 .notice-board-container {padding: 20px; width: 100%; box-sizing: border-box;}
 .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-.notice-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; width: 100%;}
+.notice-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; width: 100%;}
 .notice-card {background: white;  border-radius: 12px; box-sizing: border-box;  padding: 20px;  border-left: 5px solid var(--mbm-blue);  box-shadow: 0 4px 12px rgba(0,0,0,0.08);  position: relative;  transition: transform 0.2s; min-width: 0; word-wrap: break-word;}
 .notice-card:hover { transform: translateY(-5px); }
 .notice-badge {position: absolute; top: 15px; right: 15px; background: #f1f4f9; color: var(--mbm-blue); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;}
@@ -174,13 +174,13 @@
 @media (max-width: 480px) {.notice-grid {grid-template-columns: 1fr;}}
 
 /* --- 9. CONNECT HUB SPECIFIC STYLES --- */
-.connect-hub-container {display: flex; flex-direction: column; height: 100%; gap: 20px; max-width: 100%; overflow: hidden;}
-.hub-header {display: flex; justify-content: space-between; align-items: center; background: white; border-bottom: 1px solid #eee; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
+.connect-hub-container {display: flex; flex-direction: column; height: 100%; width: 100%; gap: 20px; max-width: 100%; overflow: hidden; box-sizing: border-box;}
+.hub-header {display: flex; flex-shrink: 0; flex-direction: column; justify-content: space-between; align-items: flex-start !important; background: white; border-bottom: 1px solid #eee; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
 .hub-tabs {display: flex; gap: 10px;}
 .hub-tabs button {width: auto !important; margin: 0 !important; background: transparent; color: #666; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 20px;}
 .hub-tabs button.active {color: var(--mbm-blue); border-bottom: 3px solid var(--mbm-gold); background: rgba(38, 42, 107, 0.05);}
 .hub-tabs button:hover {transform: none; /* Disable the standard button jump for tabs */ background: rgba(38, 42, 107, 0.02);}
-.hub-scroll-area {flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px;}
+.hub-scroll-area {flex: 1; overflow-y: auto; width: 100%; overflow-x: hidden; padding: 20px;}
 /* History Section Table Adjustments */
 .history-section {background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
 .badge-pill {padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: #e1f5fe; color: #01579b; text-transform: uppercase;}
