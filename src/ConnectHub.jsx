@@ -190,7 +190,11 @@ function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filt
       {user.role === 'alumni' && <button className="add-notice-btn" onClick={() => setShowForm(true)}>+ Post Notice</button>}
       
       {/* Keeping these inside the fixed header */}
-      <h3 style={{ marginTop: '15px' }}>Available Opportunities</h3>
+      <h3 style={{ marginTop: '15px' }}>
+        {activeSubTab === 'bulletin' ? "Available Opportunities" : 
+        activeSubTab === 'history' ? "Your Connection History" : 
+        "Manage Your Posts"}
+      </h3>
     </div>
 
     {/* NEW: Scroll area wrapper */}
