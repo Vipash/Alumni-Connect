@@ -158,17 +158,19 @@ function App() {
   };
 
   // --- EFFECTS ---
-  useEffect(() => {
-  // Trigger a window resize event multiple times to ensure 
-  // Leaflet catches the container at its final expanded size.
+ useEffect(() => {
   if (activeTab === 'map' || isMapOpen) {
-    const timers = [100, 300, 600].map(delay => 
-      setTimeout(() => window.dispatchEvent(new Event('resize')), delay)
+    // We trigger multiple resizes because flexbox layouts 
+    // often take ~300ms to finish their "growth" animation.
+    const intervals = [50, 200, 500].map(delay => 
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, delay)
     );
-    
-    return () => timers.forEach(t => clearTimeout(t));
+
+    return () => intervals.forEach(t => clearTimeout(t));
   }
-}, [activeTab, isMapOpen]);;
+}, [activeTab, isMapOpen]);
 
   useEffect(() => {
     if (loggedInUser) {
