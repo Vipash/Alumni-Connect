@@ -159,11 +159,16 @@ function App() {
 
   // --- EFFECTS ---
   useEffect(() => {
-    if (activeTab === 'map' || isMapOpen) {
-      const timer = setTimeout(() => window.dispatchEvent(new Event('resize')), 400);
-      return () => clearTimeout(timer);
-    }
-  }, [activeTab, isMapOpen, loginStatus]);
+  // Trigger a window resize event multiple times to ensure 
+  // Leaflet catches the container at its final expanded size.
+  if (activeTab === 'map' || isMapOpen) {
+    const timers = [100, 300, 600].map(delay => 
+      setTimeout(() => window.dispatchEvent(new Event('resize')), delay)
+    );
+    
+    return () => timers.forEach(t => clearTimeout(t));
+  }
+}, [activeTab, isMapOpen]);;
 
   useEffect(() => {
     if (loggedInUser) {
