@@ -10,9 +10,9 @@ body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
 /* --- 2. LAYOUTS --- */
 .app-root {width: 100%; min-height: 100vh; display: flex; flex-direction: column;}
 .auth-page-wrapper {min-height: 100vh; width: 100%; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/university-background.png'); background-size: cover; background-position: center; background-attachment: fixed; display: flex; justify-content: center; align-items: center;}
-.workspace-layout {display: flex; width: 100vw; height: 100vh; overflow: hidden;}
+.workspace-layout {display: flex; width: 100%; height: 100vh; overflow: hidden;}
 .sidebar { width: 280px; background-color: #262a6b; color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
-.dashboard-content {flex: 1;  background-color: #c0deff;  padding: 40px;  overflow-y: auto;  box-sizing: border-box; display: flex; flex-direction: column; width: 100%;}
+.dashboard-content {flex: 1;  background-color: #c0deff;  padding: 40px;  overflow-y: auto; overflow-x: hidden; box-sizing: border-box; display: flex; flex-direction: column; width: 100%; min-width: 0;}
 html, body {overflow-x: hidden; width: 100%;}
 
 table { width: 100%; border-collapse: collapse; min-width: 600px; }

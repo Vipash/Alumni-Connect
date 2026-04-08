@@ -199,7 +199,7 @@ function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filt
 
     {/* NEW: Scroll area wrapper */}
     <div className="hub-scroll-area">
-      <div className="hub-content-body">
+     <div className="hub-content-body" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
         {activeSubTab === 'bulletin' && (
           <>
             {!selectedNotice ? (
