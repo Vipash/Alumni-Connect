@@ -296,20 +296,52 @@ function MapSearchSection({ setSidebarContent }) {
             </Marker>
           ))}
         </MapContainer>
-
-        {closest && (
-          <div className="nearby-list" style={{ marginTop: '20px' }}>
-            <h4>Nearby Alumni</h4>
-            <div className="nearby-items-grid">
-              {closest.map((item, i) => (
-                <div key={i} className="nearby-item" onClick={() => setSearchPos([item.location.coordinates[1], item.location.coordinates[0]])}>
-                  <strong>{item.name}</strong> • {item.company} <span style={{ float: 'right' }}>{item.dist.toFixed(1)} km</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* RESULTS SECTION - Moved OUTSIDE the map-fancy-container */}
+      {closest && (
+        <div className="alumni-results-section" style={{ marginTop: '30px', animation: 'fadeIn 0.5s ease' }}>
+          <h3 style={{ color: 'var(--mbm-blue)', borderBottom: '2px solid var(--mbm-gold)', display: 'inline-block', paddingBottom: '5px', marginBottom: '20px' }}>
+            Nearest Alumni Results
+          </h3>
+          <div className="table-wrapper">
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: '#f8f9fa', textAlign: 'left' }}>
+                  <th style={{ padding: '12px' }}>Name</th>
+                  <th style={{ padding: '12px' }}>Company</th>
+                  <th style={{ padding: '12px' }}>Batch</th>
+                  <th style={{ padding: '12px' }}>Distance</th>
+                  <th style={{ padding: '12px' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {closest.map((item, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={{ padding: '12px' }}><strong>{item.name}</strong></td>
+                    <td style={{ padding: '12px' }}>{item.company}</td>
+                    <td style={{ padding: '12px' }}>{item.batch || 'N/A'}</td>
+                    <td style={{ padding: '12px' }}>
+                      <span className="badge-pill" style={{ background: '#e3f2fd', color: '#1976d2' }}>
+                        {item.dist.toFixed(1)} km
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <button 
+                        className="nav-btn" 
+                        style={{ padding: '5px 10px', fontSize: '0.75rem' }}
+                        onClick={() => setSearchPos([item.location.coordinates[1], item.location.coordinates[0]])}
+                      >
+                        View on Map
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -97,6 +97,7 @@ const handleAdminLogin = async (e) => {
   setView('home');
 };
 
+  const [announcementSearch, setAnnouncementSearch] = useState('');
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -224,9 +225,10 @@ const handleAdminLogin = async (e) => {
       case 'inbox':
         content = <Inbox user={loggedInUser} setUser={setLoggedInUser} />;
         break;
+        
       case 'announcements':
-        content = <AnnouncementsSection />;
-        break;
+      content = <AnnouncementsSection searchQuery={announcementSearch} />;
+      break;
       default:
         content = <h2>Select a section</h2>;
     }
@@ -333,10 +335,60 @@ const handleAdminLogin = async (e) => {
             because Profile.jsx will now handle its own sidebar via state */}
 
         {activeTab === 'inbox' && (
-          <div className="sidebar-hint-box">
-            <p>You have {unreadCount} new messages.</p>
-          </div>
-        )}
+  <div className="alerts-controls">
+    <div className="partition-header">
+      <h2>My Alerts</h2>
+      <span className="badge-pill" style={{ 
+        background: unreadCount > 0 ? '#ff3f52' : '#eee', 
+        color: unreadCount > 0 ? 'white' : '#666',
+        padding: '2px 8px',
+        borderRadius: '10px',
+        fontSize: '0.8rem'
+      }}>
+        {unreadCount} New
+      </span>
+    </div>
+    <div className="partition-controls" style={{ marginTop: '20px' }}>
+      <button 
+        className="apply-filter-btn" 
+        style={{ width: '100%' }} 
+        onClick={handleInboxClick}
+        disabled={unreadCount === 0}
+      >
+        Mark All as Read
+      </button>
+    </div>
+  </div>
+)}
+
+{activeTab === 'announcements' && (
+  <div className="search-box-group">
+    <div className="partition-header">
+      <h2>Notices</h2>
+    </div>
+    <label>Search Announcements</label>
+    <input 
+      type="text" 
+      placeholder="Keyword or company..." 
+      className="partition-input"
+      value={announcementSearch}
+      onChange={(e) => setAnnouncementSearch(e.target.value)}
+    />
+  </div>
+)}
+
+{(activeTab === 'digest' || activeTab === 'preferences') && (
+  <div className="sidebar-hint-box">
+    <div className="partition-header">
+      <h2>{activeTab === 'digest' ? 'Daily Digest' : 'Preferences'}</h2>
+    </div>
+    <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '10px' }}>
+      {activeTab === 'digest' 
+        ? "Your curated summary of the latest opportunities." 
+        : "Manage your notification and privacy settings."}
+    </p>
+  </div>
+)}
       </div>
     </>
   )}

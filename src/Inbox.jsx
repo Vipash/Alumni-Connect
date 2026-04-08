@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function Inbox({ user, setUser }) {
+function Inbox({ user, setUser, searchQuery }) {
   const [activeTab, setActiveTab] = useState('alerts');
   const [notifications, setNotifications] = useState([]);
   const [recentMatches, setRecentMatches] = useState([]);
@@ -12,6 +12,20 @@ function Inbox({ user, setUser }) {
 
   const availableCategories = ['Internship', 'Full-time', 'Referral', 'Project', 'Scholarship'];
 
+  const query = searchQuery?.toLowerCase() || "";
+  
+  const filteredDigest = notices
+    .filter(n => new Date(n.createdAt) > new Date(Date.now() - 24*60*60*1000))
+    .filter(n => 
+      n.title?.toLowerCase().includes(query) || 
+      n.company?.toLowerCase().includes(query)
+    );
+
+  const filteredMatches = recentMatches.filter(m => 
+    m.title?.toLowerCase().includes(query) || 
+    m.company?.toLowerCase().includes(query)
+  );
+  
   // Sync state if the user prop changes (e.g., after a refresh)
   useEffect(() => {
     if (user?.interests) {

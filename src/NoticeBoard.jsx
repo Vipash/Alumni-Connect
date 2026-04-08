@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
 
-function NoticeBoard({ user }) {
+function NoticeBoard({ user, searchQuery }) {
   const [notices, setNotices] = useState([]);
   const [filter, setFilter] = useState('All');
   const [showForm, setShowForm] = useState(false);
+
+  const query = searchQuery?.toLowerCase() || "";
+  const filteredNotices = notices
+    .filter(n => filter === 'All' || n.opportunityType === filter)
+    .filter(n => 
+      n.title?.toLowerCase().includes(query) || 
+      n.company?.toLowerCase().includes(query) ||
+      n.details?.toLowerCase().includes(query)
+    );
 
   // 1. Fetch notices from backend when component loads
   useEffect(() => {
@@ -22,7 +31,13 @@ function NoticeBoard({ user }) {
   // 2. Handle the "Connect" action
   /* --- Inside NoticeBoard.jsx --- */
 const handleConnect = async (notice) => {
-  const message = `Hi ${notice.postedBy.name}, I'm ${user.name}...`;
+    // Safety check
+    if (!notice.postedBy) {
+      alert("Contact information no longer available.");
+      return;
+    }
+
+    const message = `Hi ${notice.postedBy.name}, I'm ${user.name} from MBM. I saw your post regarding ${notice.title} at ${notice.company} and would love to connect.`;
   
   // 1. Log to Database
   try {
@@ -39,12 +54,17 @@ const handleConnect = async (notice) => {
   } catch (err) { console.error("Log error", err); }
 
   // 2. Open WhatsApp/Email
-  let url = notice.contactMethod === 'WhatsApp' 
-    ? `https://wa.me/${notice.postedBy.mobile}?text=${encodeURIComponent(message)}`
-    : `mailto:${notice.postedBy.email}?subject=Inquiry&body=${encodeURIComponent(message)}`;
-    
-  window.open(url, '_blank');
-};
+  let url = "";
+    if (notice.contactMethod === 'WhatsApp') {
+       url = `https://wa.me/${notice.postedBy.mobile}?text=${encodeURIComponent(message)}`;
+    } else if (notice.contactMethod === 'Email') {
+       url = `mailto:${notice.postedBy.email}?subject=Inquiry: ${notice.title}&body=${encodeURIComponent(message)}`;
+    } else {
+       // Fallback for LinkedIn or others
+       url = notice.postedBy.linkedin || "#";
+    }
+    window.open(url, '_blank');
+  };
   
   // 3. Handle Form Submission
   const handleSubmitNotice = async (e) => {
