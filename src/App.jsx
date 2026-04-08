@@ -225,7 +225,7 @@ const handleAdminLogin = async (e) => {
       case 'inbox':
         content = <Inbox user={loggedInUser} setUser={setLoggedInUser} />;
         break;
-        
+
       case 'announcements':
       content = <AnnouncementsSection searchQuery={announcementSearch} />;
       break;
@@ -275,56 +275,51 @@ const handleAdminLogin = async (e) => {
 
     {/* --- MAIN BODY: THE TWO-PART PARTITION --- */}
     <div className="portal-main-partition">
+  {/* Conditionally render the left sidebar based on the active tab */}
+  {activeTab === 'inbox' && <InboxSidebar />}
+  {activeTab === 'announcements' && <AnnouncementsSidebar />}
+  {activeTab === 'connecthub' && <ConnectHubSidebar />}
       
       {/* LEFT PARTITION: Integrated Search & Controls */}
       <aside className="partition-left">
-  {sidebarContent ? (
-    sidebarContent
-  ) : (
-    <>
-      <div className="partition-header">
-        <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
-        <p className="subtitle">Filters & Tools</p>
-      </div>
+    {activeTab === 'inbox' ? (
+      <InboxSidebar />
+    ) : activeTab === 'announcements' ? (
+      <AnnouncementsSidebar />
+    ) : sidebarContent ? (
+      sidebarContent
+    ) : (
+      <>
+        {/* DEFAULT FALLBACK (Connect Hub / Generic) */}
+        <div className="partition-header">
+          <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
+          <p className="subtitle">Filters & Tools</p>
+        </div>
 
-      <div className="partition-controls">
-        {activeTab === 'map' && (
-          <div className="search-box-group">
-            <label>Name or Company</label>
-            <input type="text" placeholder="Search..." className="partition-input" />
-            <label>Branch</label>
-            <select className="partition-input"><option>All Branches</option></select>
-            <label>Batch Year</label>
-            <input type="number" placeholder="2024" className="partition-input" />
-            <button className="apply-filter-btn">Search Map</button>
-          </div>
-        )}
-
-        {activeTab === 'connect' && (
-  <div className="search-box-group">
-    <label>Job Search</label>
-    <input 
-      type="text" 
-      placeholder="Keywords..." 
-      className="partition-input" 
-      value={hubSearch}
-      onChange={(e) => setHubSearch(e.target.value)}
-    />
-    <label>Category</label>
-    <select 
-      className="partition-input"
-      value={hubCategory}
-      onChange={(e) => setHubCategory(e.target.value)}
-    >
-      <option value="All">All Categories</option>
-      <option value="Full-Time">Full-Time</option>
-      <option value="Internship">Internship</option>
-      <option value="Project">Project</option>
-      <option value="Scholarship">Scholarship</option>
-      <option value="Referral">Referral</option>
-
-
-    </select>
+        <div className="partition-controls">
+          {activeTab === 'connect' && (
+            <div className="search-box-group">
+              <label>Job Search</label>
+              <input 
+                type="text" 
+                placeholder="Keywords..." 
+                className="partition-input" 
+                value={hubSearch}
+                onChange={(e) => setHubSearch(e.target.value)}
+              />
+              <label>Category</label>
+              <select 
+                className="partition-input"
+                value={hubCategory}
+                onChange={(e) => setHubCategory(e.target.value)}
+              >
+                <option value="All">All Categories</option>
+                <option value="Full-Time">Full-Time</option>
+                <option value="Internship">Internship</option>
+                <option value="Project">Project</option>
+                <option value="Scholarship">Scholarship</option>
+                <option value="Referral">Referral</option>
+              </select>
     <button className="apply-filter-btn" onClick={() => {/* Trigger fetch if needed */}}>
       Filter Hub
     </button>
@@ -396,20 +391,20 @@ const handleAdminLogin = async (e) => {
 
       {/* RIGHT PARTITION: The View (Map/Content) */}
       <main className="partition-right">
-  <div className="tab-render-container">
-    {!loggedInUser?.isProfileComplete ? (
-      <Profile 
-        user={loggedInUser} 
-        setUser={setLoggedInUser} 
-        setSidebarContent={setSidebarContent} // Add this
-        forceSetup={true} 
-      />
-    ) : (
-      renderTabContent()
-    )}
-  </div>
-</main>
+    <div className="tab-render-container">
+      {!loggedInUser?.isProfileComplete ? (
+        <Profile 
+          user={loggedInUser} 
+          setUser={setLoggedInUser} 
+          setSidebarContent={setSidebarContent}
+          forceSetup={true} 
+        />
+      ) : (
+        renderTabContent()
+      )}
     </div>
+  </main>
+</div>
   </div>
 ) : view === 'admin-dash' ? (
       <AdminDashboard 
