@@ -156,7 +156,6 @@ function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filt
   if (!setSidebarContent) return;
 
   if (activeSubTab === 'bulletin' && !selectedNotice) {
-    // Pass the component and the CURRENT state values
     setSidebarContent(
       <HubSidebar 
         searchQuery={searchQuery} 
@@ -175,6 +174,9 @@ function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filt
       </div>
     );
   }
+return () => {
+    setSidebarContent(null); 
+  };
 }, [searchQuery, filterType, activeSubTab, selectedNotice]);
 
   return (
