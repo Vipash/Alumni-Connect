@@ -238,15 +238,7 @@ function MapSearchSection({ setSidebarContent }) {
       </div>
 
       {/* Main Map Container with Forced Height and Width */}
-      <div className="map-fancy-container" style={{ 
-        flex: '1', 
-        minHeight: '500px', 
-        width: '100%', 
-        position: 'relative',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        border: '1px solid #ddd'
-      }}>
+      <div className="map-fancy-container" style={{ height: '500px', flexShrink: 0 }}>
         <MapContainer 
           center={[26.2389, 73.0243]} 
           zoom={5} 

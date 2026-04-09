@@ -200,7 +200,6 @@ return () => {
     </div>
 
     {/* NEW: Scroll area wrapper */}
-    <div className="hub-scroll-area">
      <div className="hub-content-body" style={{ width: '100%', height: 'auto', display: 'block', maxWidth: '100%', boxSizing: 'border-box' }}>
         {activeSubTab === 'bulletin' && (
           <>
@@ -305,7 +304,6 @@ return () => {
           </div>
         )}
       </div>
-      </div>
 
       {viewProfile && (
         <div className="modal-overlay">
@@ -360,7 +358,7 @@ return () => {
           </div>
         </div>
       )}
-    </div>
+      </div>
   );
 }
 
