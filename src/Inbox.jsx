@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
-function Inbox({ user, setUser, searchQuery }) {
+// Added onNavigateToNotice to props
+function Inbox({ user, setUser, searchQuery, onNavigateToNotice }) {
   const [activeTab, setActiveTab] = useState('alerts');
   const [notifications, setNotifications] = useState([]);
   const [recentMatches, setRecentMatches] = useState([]);
@@ -10,22 +11,7 @@ function Inbox({ user, setUser, searchQuery }) {
   const [isSaving, setIsSaving] = useState(false);
 
   const availableCategories = ['Internship', 'Full-time', 'Referral', 'Project', 'Scholarship', 'Volunteer'];
-
   const query = searchQuery?.toLowerCase() || "";
-  
-  // Filtering for Daily Digest
-  const filteredDigest = notices
-    .filter(n => new Date(n.createdAt) > new Date(Date.now() - 24*60*60*1000))
-    .filter(n => 
-      n.title?.toLowerCase().includes(query) || 
-      n.company?.toLowerCase().includes(query)
-    );
-
-  // Filtering for My Alerts
-  const filteredMatches = recentMatches.filter(m => 
-    m.title?.toLowerCase().includes(query) || 
-    m.company?.toLowerCase().includes(query)
-  );
   
   useEffect(() => {
     if (user?.interests) {
@@ -33,6 +19,24 @@ function Inbox({ user, setUser, searchQuery }) {
     }
   }, [user]);
 
+  // Unified click handler for both actual notifications and recent matches
+  const handleItemClick = async (item, isNotification = true) => {
+    if (isNotification) {
+      if (!item.read) {
+        await markAsRead(item._id);
+      }
+      // Navigate using the linked noticeId
+      if (item.noticeId && onNavigateToNotice) {
+        onNavigateToNotice(item.noticeId);
+      }
+    } else {
+      // For recent matches, we use the ID of the notice itself
+      if (onNavigateToNotice) {
+        onNavigateToNotice(item._id);
+      }
+    }
+  };
+  
   const markAsRead = async (notificationId) => {
     try {
       const res = await fetch(`/api/notifications/read/${notificationId}`, {
@@ -42,6 +46,7 @@ function Inbox({ user, setUser, searchQuery }) {
         setNotifications(prev => 
           prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
         );
+        // Refresh local user state to update the global unread count
         if (setUser) setUser({ ...user }); 
       }
     } catch (err) {
@@ -59,7 +64,6 @@ function Inbox({ user, setUser, searchQuery }) {
         .then(res => res.json())
         .then(allNotices => {
           setNotices(allNotices);
-          
           if (user.interests) {
             const matches = allNotices.filter(notice => 
               user.interests.includes(notice.opportunityType) &&
@@ -112,27 +116,32 @@ function Inbox({ user, setUser, searchQuery }) {
             </div>
 
             <div className="alerts-list">
+              {/* Actual Notifications (Blue dot if unread, Grey if read) */}
               {notifications.map(n => (
                 <div 
                   key={n._id} 
-                  className={`alert-card-soft ${n.read ? 'read' : 'unread'}`}
-                  onClick={() => !n.read && markAsRead(n._id)}
-                  style={{ cursor: n.read ? 'default' : 'pointer' }}
+                  className={`alert-card-soft ${n.read ? 'read-status-grey' : 'unread-status-blue'}`}
+                  onClick={() => handleItemClick(n, true)}
+                  style={{ cursor: 'pointer' }}
                 >
-                  {!n.read && <div className="alert-dot"></div>}
+                  <div className={n.read ? "alert-dot-grey" : "alert-dot-blue"}></div>
                   <div className="alert-text">
                     <p>{n.message}</p>
-                    <span className="timestamp">New Alert • {new Date(n.createdAt).toLocaleDateString()}</span>
+                    <span className="timestamp">Alert • {new Date(n.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               ))}
               
-              {/* Backfilled Matches (This will now include Volunteer matches) */}
               {recentMatches.length > 0 && (
                 <>
                   <div className="backfill-divider">Recent matches from the past week</div>
                   {recentMatches.map(m => (
-                    <div key={m._id} className="alert-card-soft backfill">
+                    <div 
+                      key={m._id} 
+                      className="alert-card-soft read-status-grey"
+                      onClick={() => handleItemClick(m, false)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <div className="alert-dot-grey"></div>
                       <div className="alert-text">
                         <p>Opportunity found: <strong>{m.opportunityType}</strong> at {m.company}</p>
@@ -145,7 +154,7 @@ function Inbox({ user, setUser, searchQuery }) {
 
               {notifications.length === 0 && recentMatches.length === 0 && (
                 <div className="empty-state-muted">
-                  <p>No alerts or recent matches found for your current interests.</p>
+                  <p>No alerts or recent matches found.</p>
                 </div>
               )}
             </div>
@@ -186,7 +195,7 @@ function Inbox({ user, setUser, searchQuery }) {
             </div>
             <div className="digest-list">
               {notices.filter(n => new Date(n.createdAt) > new Date(Date.now() - 24*60*60*1000)).map(n => (
-                <div key={n._id} className="digest-card-detailed">
+                <div key={n._id} className="digest-card-detailed" onClick={() => handleItemClick(n, false)} style={{cursor:'pointer'}}>
                   <div className="digest-main">
                     <span className={`type-tag ${n.opportunityType.toLowerCase().replace(' ', '-')}`}>{n.opportunityType}</span>
                     <div className="digest-body">

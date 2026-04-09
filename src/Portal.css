@@ -619,3 +619,31 @@
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.unread-status-blue {
+    background: #f0f7ff; /* Very light blue tint */
+    border-left: 4px solid #3498db;
+}
+
+.alert-dot-blue {
+    width: 10px;
+    height: 10px;
+    background-color: #3498db; /* Bright Blue */
+    border-radius: 50%;
+    margin-right: 15px;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+/* Read State */
+.read-status-grey {
+    background: #ffffff;
+    border-left: 4px solid #bdc3c7;
+}
+
+.alert-dot-grey {
+    width: 10px;
+    height: 10px;
+    background-color: #bdc3c7; /* Soft Grey */
+    border-radius: 50%;
+    margin-right: 15px;
+}

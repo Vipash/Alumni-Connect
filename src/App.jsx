@@ -300,8 +300,21 @@ function App() {
             setFilterType={setHubCategory} 
           />
         );
+
       case 'inbox':
-        return <Inbox user={loggedInUser} setUser={setLoggedInUser} />;
+        return (
+          <Inbox 
+            user={loggedInUser} 
+            setUser={setLoggedInUser} 
+            searchQuery={hubSearch}
+            onNavigateToNotice={(noticeId) => {
+              setHubSearch(noticeId); // This filters the ConnectHub for this specific ID
+              setActiveTab('connect'); // Switch to the notice board tab
+              setSidebarContent(null);  // Clear sidebar context
+            }} 
+          />
+        );
+        
       case 'announcements':
         return <AnnouncementsSection searchQuery={announcementSearch} />;
       default:
