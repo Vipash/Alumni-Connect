@@ -211,7 +211,7 @@ function MapSearchSection({ setSidebarContent }) {
   }, [companySearch, cityQuery, suggestions, isPicking, setSidebarContent]);
 
   return (
-    <div className="map-page-wrapper" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="map-page-wrapper">
       <button className="bookmark-toggle-btn" onClick={() => setShowBookmarks(!showBookmarks)}>
         🔖 {user.bookmarks?.length || 0} Saved
       </button>
