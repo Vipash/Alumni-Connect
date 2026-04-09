@@ -9,7 +9,6 @@ function Inbox({ user, setUser, searchQuery }) {
   const [pendingInterests, setPendingInterests] = useState(user?.interests || []);
   const [isSaving, setIsSaving] = useState(false);
 
-  // UPDATED: Added 'Volunteer' to the available categories
   const availableCategories = ['Internship', 'Full-time', 'Referral', 'Project', 'Scholarship', 'Volunteer'];
 
   const query = searchQuery?.toLowerCase() || "";

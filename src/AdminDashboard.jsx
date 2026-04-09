@@ -182,7 +182,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
             <p className="u-name">{admin?.username || 'Admin'}</p>
             <p className="u-role">{admin?.role}</p>
           </div>
-          <button className="nav-exit-btn" onClick={() => setView('home')}>Exit</button>
           <button className="nav-logout-btn" onClick={onLogout}>Logout</button>
         </div>
       </nav>
