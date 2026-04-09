@@ -55,26 +55,43 @@ function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filt
   };
 
   const handleSubmitNotice = async (e) => {
-    e.preventDefault(); 
-    const fd = new FormData(e.target);
-    const data = Object.fromEntries(fd.entries());
-    data.postedBy = user._id;
+  e.preventDefault(); 
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd.entries());
+  
+  // Ensure we use the correct ID property (handling both _id and id)
+  const userId = user?._id || user?.id;
+  if (!userId) {
+    alert("Session error: Please log in again.");
+    return;
+  }
+  data.postedBy = userId;
 
-    try {
-      const res = await fetch('/api/notices/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+  try {
+    const res = await fetch('/api/notices/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-      if (res.ok) {
-        const newNotice = await res.json();
-        setNotices([newNotice, ...notices]);
-        setShowForm(false);
-        setActiveSubTab('myposts'); 
-      }
-    } catch (err) { console.error("Post failed:", err); }
-  };
+    const result = await res.json();
+
+    if (res.ok) {
+      // Logic: Prepend the new notice to the list
+      // result usually contains the new notice object from the DB
+      setNotices(prev => [result, ...prev]);
+      setShowForm(false);
+      setActiveSubTab('bulletin'); 
+      alert("Notice posted successfully!");
+    } else {
+      // This will alert you if the backend rejected 'Scholarship'
+      alert("Error: " + (result.error || "Failed to post"));
+    }
+  } catch (err) { 
+    console.error("Post failed:", err);
+    alert("Network error occurred.");
+  }
+};
 
   const handleDelete = async (noticeId) => {
     if (!window.confirm("Delete this notice?")) return;
@@ -140,6 +157,7 @@ function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filt
         <option value="Referral">Referral</option>
         <option value="Project">Project</option>
         <option value="Scholarship">Scholarship</option>
+        <option value="Volunteer">Volunteer</option>
       </select>
     </div>
     <button 
@@ -341,7 +359,7 @@ return () => {
               <div className="input-group" style={{display: 'flex', gap: '10px'}}>
                 <div style={{flex:1}}><label>Type</label>
                   <select name="opportunityType">
-                    <option>Internship</option><option>Full-time</option><option>Referral</option><option>Project</option><option>Scholarship</option>
+                    <option>Internship</option><option>Full-time</option><option>Referral</option><option>Project</option><option>Scholarship</option><option>Volunteer</option>
                   </select>
                 </div>
                 <div style={{flex:1}}><label>Deadline</label><input type="date" name="deadline" required /></div>

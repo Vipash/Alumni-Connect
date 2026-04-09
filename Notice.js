@@ -5,9 +5,9 @@ const noticeSchema = new mongoose.Schema({
   company: { type: String, required: true },
   location: { type: String, required: true },
   opportunityType: { 
-    type: String, 
-    enum: ['Internship', 'Full-time', 'Project', 'Referral', 'Volunteer'], 
-    required: true 
+  type: String, 
+  enum: ['Internship', 'Full-time', 'Project', 'Referral', 'Volunteer', 'Scholarship'],
+  required: true 
   },
   deadline: { type: Date, required: true },
   contactMethod: { 
