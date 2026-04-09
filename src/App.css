@@ -152,8 +152,7 @@ button:hover { transform: translateY(-2px); filter: brightness(1.1);}
     margin-bottom: 10px; 
     padding: 12px 20px;
     border-radius: 8px;
-    font-weight: 600;input:focus { border-color: var(--mbm-blue); box-shadow: 0 0 0 3px rgba(38, 42, 107, 0.15);}}
-
+    font-weight: 600;input:focus { border-color: var(--mbm-blue); box-shadow: 0 0 0 3px rgb(0, 9, 174);}}
     .modal-box input, 
 .modal-box select, 
 .registration-form input { 

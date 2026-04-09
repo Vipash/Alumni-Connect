@@ -434,11 +434,12 @@
 .nav-center button {background: transparent; border: none; padding: 10px 18px; font-weight: 500; color: #636e72; cursor: pointer; transition: all 0.2s; border-radius: 6px;}
 .nav-center button:hover { background: #f1f4f9; color: #2c3e50; }
 .nav-center button.active {background: #eef2ff; color: #34495e; border-bottom: 3px solid #f39c12; /* MBM Gold */}
+.back-link-btn {background: transparent; color: #3498db; border: none; cursor: pointer; padding: 0; margin-bottom: 10px; font-weight: 600;}
 /* Admin Identity & Logout */
 .nav-right {display: flex; align-items: center; gap: 20px;}
 .admin-user-info { text-align: right; }
 .u-name { font-weight: bold; font-size: 0.9rem; margin: 0; }
-.u-role { font-size: 0.75rem; color: #00ef67; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+.u-role { font-size: 0.75rem; font-weight: bold; color: #c4c100; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
 .nav-logout-btn { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 .content-toolbar {display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);}
 .admin-search-input {width: 300px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem;}

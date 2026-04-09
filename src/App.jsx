@@ -428,14 +428,28 @@ function App() {
                   {portalStep === 'login-choice' && (
                     <AuthHome 
                       onLogin={(role) => setPortalStep(`login-${role}`)} 
-                      onRegister={(role) => { setFormData({ ...formData, role: role }); setPortalStep(`reg-${role}`); }} 
+                      onRegister={(role) => { 
+                        // Clear old data so a fresh form opens every time
+                        setFormData({
+                          name: '', email: '', role: role, branch: '', passoutYear: '',
+                          rollNumber: '', company: '', mobile: '', password: '', displayName: '',
+                        });
+                        setSelectedCoords(null); // Reset map as well
+                        setPortalStep(`reg-${role}`); 
+                      }} 
                       onAdminLogin={handleAdminLogin} 
                     />
                   )}
 
                   {portalStep.startsWith('login-') && portalStep !== 'login-choice' && (
                     <form onSubmit={handleLogin} className="login-container">
-                      <button type="button" onClick={() => setPortalStep('login-choice')}>← Back</button>
+                      <button 
+                        type="button" 
+                        className="back-link-btn" 
+                        onClick={() => setPortalStep('login-choice')}
+                      >
+                        ← Back to Selection
+                      </button>
                       <h2>{portalStep.includes('student') ? 'Student' : 'Alumni'} Sign In</h2>
                       <label>Email</label><input name="email" type="email" required />
                       <label>Password</label><input name="password" type="password" required />
@@ -445,17 +459,22 @@ function App() {
 
                   {portalStep.startsWith('reg-') && (
                     <form onSubmit={handleSubmit} className="registration-form">
-                      <button type="button" onClick={() => setPortalStep('login-choice')}>← Back</button>
+                       <button 
+                        type="button" 
+                        className="back-link-btn" 
+                        onClick={() => setPortalStep('login-choice')}>
+                        ← Back to Selection
+                      </button>
                       <h2>{portalStep === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
-                      <label>Full Name</label><input value={formData.name} required onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                      <label>Branch</label><input value={formData.branch} required onChange={(e) => setFormData({...formData, branch: e.target.value})} />
-                      <label>Passout Year</label><input type="number" value={formData.passoutYear} required onChange={(e) => setFormData({...formData, passoutYear: e.target.value})} />
+                      <label>Full Name</label><input placeholder="Vipss" value={formData.name} required onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                      <label>Branch</label><input placeholder="Computer Science" value={formData.branch} required onChange={(e) => setFormData({...formData, branch: e.target.value})} />
+                      <label>Passout Year</label><input  type="number" placeholder="2026" value={formData.passoutYear} required onChange={(e) => setFormData({...formData, passoutYear: e.target.value})} />
                       {portalStep === 'reg-student' && (
-                        <><label>Roll Number</label><input value={formData.rollNumber} required onChange={(e) => setFormData({...formData, rollNumber: e.target.value})} /></>
+                        <><label>Roll Number</label><input placeholder="23UCSE4050" value={formData.rollNumber} required onChange={(e) => setFormData({...formData, rollNumber: e.target.value})} /></>
                       )}
                       {portalStep === 'reg-alumni' && (
                         <>
-                          <label>Current Company</label><input value={formData.company} required onChange={(e) => setFormData({...formData, company: e.target.value})} />
+                          <label>Current Company</label><input placeholder="N.O.N.E." value={formData.company} required onChange={(e) => setFormData({...formData, company: e.target.value})} />
                           <label>Location</label>
                           <button type="button" className="location-btn" onClick={() => setIsMapOpen(true)}>
                             {selectedCoords ? 'Location Picked ✅' : 'Click to Pin Location on Map'}
@@ -464,8 +483,9 @@ function App() {
                       )}
                       <hr />
                       <h3>Contact Details</h3>
-                      <label>Email Address</label><input type="email" value={formData.email} required onChange={(e) => setFormData({...formData, email: e.target.value})} />
-                      <label>Mobile Number</label><input type="tel" pattern="[0-9]{10}" value={formData.mobile} required onChange={(e) => setFormData({...formData, mobile: e.target.value})} />
+                      <small style={{color: '#666', fontSize: '0.75rem'}}>* Only verified individuals can view these</small>
+                      <label>Email Address</label><input placeholder="vipashmeena@gmail.com" type="email" value={formData.email} required onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                      <label>Mobile Number</label><input placeholder="8824299517" type="tel" pattern="[0-9]{10}" value={formData.mobile} required onChange={(e) => setFormData({...formData, mobile: e.target.value})} />
                       <hr />
                       <h3>Account Information</h3>
                       <label>Username</label><input value={formData.displayName} required onChange={(e) => setFormData({...formData, displayName: e.target.value})} />
