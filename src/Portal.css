@@ -305,9 +305,9 @@
 .form-field label {display: block;  font-weight: bold;  font-size: 0.85rem;  margin-bottom: 5px;  color: var(--mbm-blue);}
 .action-row { display: flex; gap: 15px; margin-top: 25px; }
 .connect-btn-large { flex: 2; background: var(--mbm-gold); color: white; padding: 15px; font-size: 1rem; }
-.approve-btn { flex: 1; background: #0490e7; color:#004a99;}
-.delete-btn { flex: 1; background: #d10000; color: #ff6767;}
-.delete-btn-large { flex: 1; background: #ff7675; color: white; padding: 15px; }
+.approve-btn { flex: 1; background: #262a6b; color:#ffffff;}
+.delete-btn { flex: 1; background: #b80808; color: #ffffff;}
+.delete-btn-large { flex: 1; background: #ff0000; color: white; padding: 15px; }
 .mini-profile-box { max-width: 350px !important; }
 .avatar-placeholder {width: 70px; height: 70px; background: var(--mbm-blue); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px; font-weight: bold;}
 .profile-header-mini h3 { margin: 5px 0; }
@@ -438,7 +438,7 @@
 .nav-right {display: flex; align-items: center; gap: 20px;}
 .admin-user-info { text-align: right; }
 .u-name { font-weight: bold; font-size: 0.9rem; margin: 0; }
-.u-role { font-size: 0.75rem; color: #27ae60; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+.u-role { font-size: 0.75rem; color: #00ef67; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
 .nav-logout-btn { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 .content-toolbar {display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);}
 .admin-search-input {width: 300px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem;}
