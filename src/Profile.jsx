@@ -144,51 +144,78 @@ function Profile({ user, setUser, setSidebarContent }) {
           onUpdate={(updated) => { setUser(updated); setIsEditing(false); }}
         />
       ) : (
-        <div className="profile-card">
-          <div className="profile-header">
-            <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="Profile" />
-            <div className="header-text">
-              <h1>{user.displayName || user.name}</h1>
-              <p className="user-role-tag">{user.role?.toUpperCase()}</p>
+  <div className="profile-card">
+    <div className="profile-header">
+      <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="Profile" />
+      <div className="header-text">
+        <h1>{user.displayName || user.name}</h1>
+        <p className="user-role-tag">{user.role?.toUpperCase()}</p>
+      </div>
+    </div>
+
+    <div className="profile-body"> {/* Keep this one */}
+      <section className="profile-row-group">
+        <h4 className="row-title">Documents & Links</h4>
+        <div className="grid-info">
+          <div className="info-item">
+            <label>Resume</label>
+            {user.resumeUrl ? (
+              <div className="resume-actions" style={{ display: 'flex', gap: '10px' }}>
+                <a href={user.resumeUrl} target="_blank" rel="noopener noreferrer" className="link-text">
+                  View Resume
+                </a>
+                <a href={user.resumeUrl} download className="link-text">Download</a>
+              </div>
+            ) : (
+              <span className="text-muted">No resume uploaded</span>
+            )}
+          </div>
+          {user.linkedin && (
+            <div className="info-item">
+              <label>LinkedIn</label>
+              <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className="link-text">View Profile</a>
             </div>
-          </div>
-
-          <div className="profile-body">
-            <section className="profile-row-group">
-              <h4 className="row-title">Professional Bio</h4>
-              <p className="bio-text">{user.bio || "No bio added yet."}</p>
-            </section>
-
-            <section className="profile-row-group">
-              <h4 className="row-title">Basic Information</h4>
-              <div className="grid-info">
-                <div className="info-item"><label>Email</label><span>{user.email}</span></div>
-                <div className="info-item"><label>Mobile</label><span>{user.mobile || 'N/A'}</span></div>
-                <div className="info-item"><label>Branch</label><span>{user.branch}</span></div>
-                <div className="info-item"><label>Batch</label><span>{user.passoutYear}</span></div>
-                <div className="info-item"><label>Father's Name</label><span>{user.fatherName}</span></div>
-                <div className="info-item"><label>DOB</label><span>{user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'}</span></div>
-              </div>
-            </section>
-
-            <section className="profile-row-group">
-              <h4 className="row-title">Academic History</h4>
-              <div className="grid-info">
-                <div className="info-item"><label>10th Year</label><span>{user.tenthYear}</span></div>
-                <div className="info-item"><label>12th Year</label><span>{user.twelfthYear}</span></div>
-              </div>
-            </section>
-
-            <section className="profile-row-group">
-              <h4 className="row-title">Addresses</h4>
-              <div className="grid-info">
-                <div className="info-item"><label>Current</label><span>{user.currentAddress || 'N/A'}</span></div>
-                <div className="info-item"><label>Permanent</label><span>{user.permanentAddress || 'N/A'}</span></div>
-              </div>
-            </section>
-          </div>
+          )}
         </div>
-      )}
+      </section>
+
+      {/* REMOVED: the extra <div className="profile-body"> that was here */}
+      
+      <section className="profile-row-group">
+        <h4 className="row-title">Professional Bio</h4>
+        <p className="bio-text">{user.bio || "No bio added yet."}</p>
+      </section>
+
+      <section className="profile-row-group">
+        <h4 className="row-title">Basic Information</h4>
+        <div className="grid-info">
+          <div className="info-item"><label>Email</label><span>{user.email}</span></div>
+          <div className="info-item"><label>Mobile</label><span>{user.mobile || 'N/A'}</span></div>
+          <div className="info-item"><label>Branch</label><span>{user.branch}</span></div>
+          <div className="info-item"><label>Batch</label><span>{user.passoutYear}</span></div>
+          <div className="info-item"><label>Father's Name</label><span>{user.fatherName}</span></div>
+          <div className="info-item"><label>DOB</label><span>{user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'}</span></div>
+        </div>
+      </section>
+
+      <section className="profile-row-group">
+        <h4 className="row-title">Academic History</h4>
+        <div className="grid-info">
+          <div className="info-item"><label>10th Year</label><span>{user.tenthYear}</span></div>
+          <div className="info-item"><label>12th Year</label><span>{user.twelfthYear}</span></div>
+        </div>
+      </section>
+
+      <section className="profile-row-group">
+        <h4 className="row-title">Addresses</h4>
+        <div className="grid-info">
+          <div className="info-item"><label>Current</label><span>{user.currentAddress || 'N/A'}</span></div>
+          <div className="info-item"><label>Permanent</label><span>{user.permanentAddress || 'N/A'}</span></div>
+        </div>
+      </section>
+    </div> {/* Close the profile-body here */}
+  </div>
+)}
     </div>
   );
 }

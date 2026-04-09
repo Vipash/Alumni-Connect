@@ -96,6 +96,26 @@ const EditProfile = forwardRef(({ user, onCancel, onUpdate }, ref) => {
               <input name="displayName" value={formData.displayName} onChange={handleChange} />
             </div>
 
+          <div className="form-group">
+            <label>Resume (PDF)</label>
+            <input type="file" accept=".pdf" onChange={(e) => handleFileUpload(e, 'resumeUrl')} />
+            {formData.resumeUrl && (
+              <p className="file-hint" style={{ fontSize: '0.75rem', color: '#666', marginTop: '5px' }}>
+                ✅ Current resume: <a href={formData.resumeUrl} target="_blank" rel="noreferrer">View existing file</a>
+              </p>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>LinkedIn URL</label>
+            <input 
+              name="linkedin" 
+              placeholder="https://linkedin.com/in/..." 
+              value={formData.linkedin} 
+              onChange={handleChange} 
+            />
+          </div>
+
             <div className="form-group">
               <label>Mobile Number</label>
               <input name="mobile" type="tel" value={formData.mobile} onChange={handleChange} />
@@ -151,11 +171,6 @@ const EditProfile = forwardRef(({ user, onCancel, onUpdate }, ref) => {
             <div className="form-group">
                <label>Profile Photo</label>
                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'profilePhoto')} />
-            </div>
-
-            <div className="form-group">
-               <label>Resume (PDF)</label>
-               <input type="file" accept=".pdf" onChange={(e) => handleFileUpload(e, 'resumeUrl')} />
             </div>
           </div>
         </div>
