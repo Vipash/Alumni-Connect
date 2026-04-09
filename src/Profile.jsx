@@ -139,7 +139,7 @@ function Profile({ user, setUser, setSidebarContent }) {
       ) : isEditing ? (
         <EditProfile
           user={user}
-          formRef={formRef}
+          ref={formRef} // CORRECT: use the 'ref' prop
           onCancel={() => setIsEditing(false)}
           onUpdate={(updated) => { setUser(updated); setIsEditing(false); }}
         />

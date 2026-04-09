@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 
-function EditProfile({ user, onCancel, onUpdate }) {
+// 1. Define the component using forwardRef directly
+const EditProfile = forwardRef(({ user, onCancel, onUpdate }, ref) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [formData, setFormData] = useState({
     displayName: user.displayName || user.name || '',
@@ -52,16 +53,14 @@ function EditProfile({ user, onCancel, onUpdate }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault(); 
     try {
-      // Logic Fix: We send all data to the standard update route
       const response = await fetch(`/api/profile/update`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           ...formData, 
           userId: user._id,
-          // Convert comma strings back to arrays for the database
           hobbiesTechnical: formData.hobbiesTechnical.split(',').map(s => s.trim()),
           hobbiesPersonal: formData.hobbiesPersonal.split(',').map(s => s.trim())
         }) 
@@ -85,11 +84,12 @@ function EditProfile({ user, onCancel, onUpdate }) {
 
   return (
     <div className="profile-card">
-      <form onSubmit={handleSubmit} className="edit-profile-form">
+      {/* 2. ref is now correctly passed to the form */}
+      <form ref={ref} onSubmit={handleSubmit} className="edit-profile-form">
         <h3>Edit Detailed Profile</h3>
         {successMessage && <div className="success-banner">{successMessage}</div>}
         
-        <div className="onboarding-form"> {/* Reusing grid styles from App.css */}
+        <div className="onboarding-form">
           <div className="form-grid">
             <div className="form-group">
               <label>Display Name</label>
@@ -158,13 +158,10 @@ function EditProfile({ user, onCancel, onUpdate }) {
                <input type="file" accept=".pdf" onChange={(e) => handleFileUpload(e, 'resumeUrl')} />
             </div>
           </div>
-
-          <div className="form-actions" style={{ marginTop: '30px', display: 'flex', gap: '10px' }}>
-          </div>
         </div>
       </form>
     </div>
   );
-}
+});
 
 export default EditProfile;
