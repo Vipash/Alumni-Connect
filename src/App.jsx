@@ -149,13 +149,13 @@ function App() {
   };
 
   const handleInboxClick = () => {
-    setActiveTab('inbox');
-    setSidebarContent(null);
-    setUnreadCount(0);
-    if (loggedInUser) {
-      fetch(`/api/notifications/${loggedInUser._id}/mark-all-read`, { method: 'PATCH' });
-    }
-  };
+  setActiveTab('inbox');
+  setSidebarContent(null);
+  // Optional: If you want to clear the count ONLY when clicking "Mark All" 
+  // in the sidebar, keep this here. 
+  fetch(`/api/notifications/${loggedInUser._id}/mark-all-read`, { method: 'PATCH' })
+    .then(() => setUnreadCount(0));
+};
 
   // --- EFFECTS ---
  useEffect(() => {
@@ -173,15 +173,21 @@ function App() {
 }, [activeTab, isMapOpen]);
 
   useEffect(() => {
-    if (loggedInUser) {
+  if (loggedInUser?._id) {
+    const fetchUnread = () => {
       fetch(`/api/notifications/${loggedInUser._id}`)
         .then((res) => res.json())
         .then((data) => {
           const unread = data.filter((n) => !n.read).length;
           setUnreadCount(unread);
         });
-    }
-  }, [loggedInUser, activeTab]);
+    };
+    fetchUnread();
+    // Optional: poll every 60 seconds for new alerts
+    const interval = setInterval(fetchUnread, 60000);
+    return () => clearInterval(interval);
+  }
+}, [loggedInUser, activeTab]);
 
   // --- DYNAMIC RENDERING LOGIC ---
   const renderLeftPartition = () => {

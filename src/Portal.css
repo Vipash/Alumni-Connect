@@ -246,7 +246,7 @@
 .connect-hub-container {display: flex; flex-direction: column; height: 100%; width: 100% !important; gap: 20px; max-width: 100% !important; overflow: hidden; overflow-x: hidden !important; box-sizing: border-box;}
 .hub-header {display: flex; flex-shrink: 0; flex-direction: column; justify-content: space-between; align-items: flex-start !important; background: white; border-bottom: 1px solid #eee; padding: 15px 20px !important; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;}
 .hub-tabs {display: flex; gap: 10px;}
-.hub-tabs button {width: auto !important; margin: 0 !important; background: transparent; color: #666; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 20px;}
+.hub-tabs button {width: auto !important; margin: 0 !important; background: transparent; color: #666; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 20px; position: relative;}
 .hub-tabs button.active {color: var(--mbm-blue); border-bottom: 3px solid var(--mbm-gold); background: rgba(38, 42, 107, 0.05);}
 .hub-tabs button:hover {transform: none; /* Disable the standard button jump for tabs */ background: rgba(38, 42, 107, 0.02);}
 .hub-content-body {
@@ -315,6 +315,32 @@
 .tab-btn {position: relative; /* Essential for badge positioning */ padding: 10px 20px;}
 .tab-pane {height: 100%; width: 100%;}
 .tab-pane:not(:has(.leaflet-container)) {padding: 30px;}
+.tab-unread-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background-color: #ff3f52;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+.alert-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ff3f52;
+  border-radius: 50%;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+.alert-card-soft.read {
+  opacity: 0.7;
+  background: #f9f9f9;
+}
+.alert-card-soft.unread {
+  border-left: 4px solid #ff3f52;
+  background: #fff;
+}
 .notification-badge {position: absolute; top: -5px; right: -5px; background-color: #ff3f52; color: white; font-size: 0.7rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; /* Makes it pop against the button */ box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: bounce 0.5s ease-in-out;}
 @keyframes bounce {0%, 20%, 50%, 80%, 100% {transform: translateY(0); } 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);}}
 .digest-item {display: flex; align-items: center; gap: 15px; padding: 12px; border-bottom: 1px solid #eee;}
