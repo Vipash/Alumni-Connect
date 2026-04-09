@@ -6,14 +6,15 @@ function Inbox({ user, setUser, searchQuery }) {
   const [recentMatches, setRecentMatches] = useState([]);
   const [notices, setNotices] = useState([]); 
   
-  // States for the Preferences UI
   const [pendingInterests, setPendingInterests] = useState(user?.interests || []);
   const [isSaving, setIsSaving] = useState(false);
 
-  const availableCategories = ['Internship', 'Full-time', 'Referral', 'Project', 'Scholarship'];
+  // UPDATED: Added 'Volunteer' to the available categories
+  const availableCategories = ['Internship', 'Full-time', 'Referral', 'Project', 'Scholarship', 'Volunteer'];
 
   const query = searchQuery?.toLowerCase() || "";
   
+  // Filtering for Daily Digest
   const filteredDigest = notices
     .filter(n => new Date(n.createdAt) > new Date(Date.now() - 24*60*60*1000))
     .filter(n => 
@@ -21,12 +22,12 @@ function Inbox({ user, setUser, searchQuery }) {
       n.company?.toLowerCase().includes(query)
     );
 
+  // Filtering for My Alerts
   const filteredMatches = recentMatches.filter(m => 
     m.title?.toLowerCase().includes(query) || 
     m.company?.toLowerCase().includes(query)
   );
   
-  // Sync state if the user prop changes (e.g., after a refresh)
   useEffect(() => {
     if (user?.interests) {
       setPendingInterests(user.interests);
@@ -34,50 +35,32 @@ function Inbox({ user, setUser, searchQuery }) {
   }, [user]);
 
   const markAsRead = async (notificationId) => {
-  try {
-    const res = await fetch(`/api/notifications/read/${notificationId}`, {
-      method: 'PATCH'
-    });
-        if (res.ok) {
-          // Update local state to hide the dot immediately
-          setNotifications(prev => 
-            prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
-          );
-          // Trigger a refresh of the global unread count in App.jsx
-          if (setUser) setUser({ ...user }); 
-        }
-      } catch (err) {
-        console.error("Error marking read:", err);
+    try {
+      const res = await fetch(`/api/notifications/read/${notificationId}`, {
+        method: 'PATCH'
+      });
+      if (res.ok) {
+        setNotifications(prev => 
+          prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
+        );
+        if (setUser) setUser({ ...user }); 
       }
-    };
+    } catch (err) {
+      console.error("Error marking read:", err);
+    }
+  };
 
-    const handleMarkAllRead = async () => {
-  try {
-    const res = await fetch(`/api/notifications/${user._id}/mark-all-read`, { method: 'PATCH' });
-        if (res.ok) {
-          setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-          if (setUser) setUser({ ...user });
-        }
-      } catch (err) {
-        console.error("Error marking all read:", err);
-      }
-    };
-
-  // Combined Effect for fetching data
   useEffect(() => {
     if (user?._id) {
-      // 1. Fetch real notifications
       fetch(`/api/notifications/${user._id}`)
         .then(res => res.json())
         .then(setNotifications);
 
-      // 2. Fetch all notices for Digest and Backfill
       fetch('/api/notices')
         .then(res => res.json())
         .then(allNotices => {
           setNotices(allNotices);
           
-          // Backfill logic: find matches in the last 7 days
           if (user.interests) {
             const matches = allNotices.filter(notice => 
               user.interests.includes(notice.opportunityType) &&
@@ -112,7 +95,6 @@ function Inbox({ user, setUser, searchQuery }) {
         <div className="hub-tabs">
           <button className={activeTab === 'alerts' ? 'active' : ''} onClick={() => setActiveTab('alerts')}>
             My Alerts 
-            {/* Show dot on tab if any real notifications are unread */}
             {notifications.some(n => !n.read) && <span className="tab-unread-dot"></span>}
           </button>
           <button className={activeTab === 'digest' ? 'active' : ''} onClick={() => setActiveTab('digest')}>Daily Digest</button>
@@ -131,22 +113,22 @@ function Inbox({ user, setUser, searchQuery }) {
             </div>
 
             <div className="alerts-list">
-              {/* Actual Notifications */}
               {notifications.map(n => (
                 <div 
                   key={n._id} 
                   className={`alert-card-soft ${n.read ? 'read' : 'unread'}`}
-                  onClick={() => !n.read && markAsRead(n._id)} // Click to read
+                  onClick={() => !n.read && markAsRead(n._id)}
                   style={{ cursor: n.read ? 'default' : 'pointer' }}
                 >
-                  {!n.read && <div className="alert-dot"></div>} {/* Red dot for unread */}
+                  {!n.read && <div className="alert-dot"></div>}
                   <div className="alert-text">
                     <p>{n.message}</p>
                     <span className="timestamp">New Alert • {new Date(n.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               ))}
-              {/* Backfilled Matches */}
+              
+              {/* Backfilled Matches (This will now include Volunteer matches) */}
               {recentMatches.length > 0 && (
                 <>
                   <div className="backfill-divider">Recent matches from the past week</div>
