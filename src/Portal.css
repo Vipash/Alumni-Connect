@@ -34,7 +34,13 @@
 .edit-profile-actions {display: none !important;}
 .sidebar-progress .progress-label {color: #666; font-size: 0.7rem;}
 /* 1. The Container must have a fixed height relative to the viewport */
-.portal-main-partition {display: flex; flex: 1;  height: calc(100vh - 66px); width: 100%; max-width: 100%; margin: 0; background: #f8f9fa;  overflow: hidden;}
+.portal-main-partition {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 66px);
+    width: 100%;
+    overflow: hidden;
+}
 /* 2. LEFT PARTITION (Fixed width, internal scrolling) */
 .partition-left { width: 350px; background: #ffffff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; padding: 2rem; overflow-y: auto;}
 .partition-header h2 {color: #003366; margin-bottom: 0.5rem;}
@@ -47,11 +53,17 @@
     height: 100%;
     background: #ffffff;
     position: relative;
-    overflow-x: hidden; 
-    overflow-y: auto !important;
-    min-width: 0; 
+    overflow-y: auto !important; /* Forces this specific panel to scroll */
+    overflow-x: hidden;
+    min-width: 0;
 }
-.tab-render-container {flex: 1; /* Force it to grow */ display: flex; flex-direction: column; height: 100%; width: 100%;}
+.tab-render-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+}
 /* 4. LEAFLET SPECIFIC FIXES */
 .partition-right .leaflet-container {flex: 1; height: 450px !important;  width: 100% !important;  z-index: 1;}
 .tab-render-container:not(:has(.leaflet-container)) {
@@ -67,7 +79,6 @@
 .loading { animation: pulse 1.5s infinite; }
 .map-fancy-container {
     height: 500px;
-    min-height: 500px;
     flex-shrink: 0;
     border: 3px solid #262a6b !important;
     border-radius: 12px;
@@ -412,19 +423,4 @@
     max-width: 100vw !important;
     overflow-x: hidden !important;
     overflow-y: clip;
-}
-
-.portal-main-partition {
-  height: calc(100vh - 66px) !important;
-}
-
-/* Force the tab container to stay within its bounds */
-.tab-render-container {
-  max-height: 100%;
-  overflow: hidden;
-}
-
-.map-fancy-container .leaflet-container {
-    height: 500px !important; /* Match the fancy-container height */
-    width: 100% !important;
 }
