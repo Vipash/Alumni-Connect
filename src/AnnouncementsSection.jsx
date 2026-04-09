@@ -58,16 +58,18 @@ function AnnouncementsSection({ searchQuery }) { // Receive searchQuery as prop
               key={item._id} 
               className={`announcement-card ${expandedId === item._id ? 'expanded' : ''}`}
             >
-              <div 
-                className="announcement-header" 
-                onClick={() => setExpandedId(expandedId === item._id ? null : item._id)}
-              >
-                <div className="header-main">
-                  <span className="ann-date">{new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
-                  <strong>{item.title}</strong>
-                </div>
-                <span className="ann-subject">{item.subject}</span>
-                <span className="expand-icon">{expandedId === item._id ? '−' : '+'}</span>
+             <div className="announcement-header" onClick={() => setExpandedId(expandedId === item._id ? null : item._id)}>
+                  <span className="ann-date">
+                      {new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit' })}
+                      <br />
+                      {new Date(item.date).toLocaleDateString('en-GB', { month: 'short' })}
+                  </span>
+                  
+                  <span className="ann-title">{item.title}</span>
+                  
+                  <span className="ann-subject">{item.subject}</span>
+                  
+                  <span className="expand-icon">{expandedId === item._id ? '−' : '+'}</span>
               </div>
 
               {expandedId === item._id && (
