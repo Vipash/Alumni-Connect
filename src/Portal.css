@@ -810,3 +810,65 @@
     background: #fce8e8;
     transform: translateY(-2px);
 }
+
+/* Container for search inside MapContainer */
+.map-search-wrapper {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    pointer-events: none; /* Let clicks pass through to map EXCEPT for children */
+}
+
+.map-search-form {
+    pointer-events: auto; /* Re-enable clicks for the form */
+    display: flex;
+    background: white;
+    padding: 6px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 320px;
+    gap: 5px;
+}
+
+.map-search-form input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.map-search-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* The Large Confirmation Button Fix */
+.map-confirm-btn {
+    width: 100%;
+    padding: 14px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.2s;
+}
+
+.map-confirm-btn:hover {
+    background: #219150;
+}

@@ -4,9 +4,8 @@ import { useState } from 'react';
 export default function LocationPicker({ setCoords, onConfirm }) {
   const [marker, setMarker] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const map = useMap(); // Access the map instance
+  const map = useMap();
 
-  // Handler for searching locations via OpenStreetMap Nominatim
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery) return;
@@ -20,12 +19,11 @@ export default function LocationPicker({ setCoords, onConfirm }) {
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
         const newPos = { lat: parseFloat(lat), lng: parseFloat(lon) };
-        
         setMarker(newPos);
         setCoords([newPos.lat, newPos.lng]);
-        map.flyTo(newPos, 14); // Moves the map smoothly to the search result
+        map.flyTo(newPos, 14);
       } else {
-        alert("Location not found. Try adding a city or state.");
+        alert("Location not found.");
       }
     } catch (err) {
       console.error("Search error:", err);
@@ -41,30 +39,21 @@ export default function LocationPicker({ setCoords, onConfirm }) {
 
   return (
     <>
-      {/* Search Input UI - Positioned at top-center of map */}
-      <div className="map-search-overlay">
-        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '5px' }}>
+      {/* Sleeker Search Overlay */}
+      <div className="map-search-wrapper">
+        <form onSubmit={handleSearch} className="map-search-form">
           <input
             type="text"
-            placeholder="Search city or area..."
+            placeholder="Search city, area..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.stopPropagation()} // Prevents map dragging while typing
+            onKeyDown={(e) => e.stopPropagation()} 
           />
-          <button type="submit">Search</button>
+          <button type="submit" className="map-search-btn">Search</button>
         </form>
       </div>
 
-      {marker && (
-        <>
-          <Marker position={marker} />
-          <div className="picker-info-box">
-            <p>Selected: {marker.lat.toFixed(4)}, {marker.lng.toFixed(4)}</p>
-            {/* Keeping the confirm button here as well for easy access */}
-            <button onClick={onConfirm}>Confirm This Spot</button>
-          </div>
-        </>
-      )}
+      {marker && <Marker position={marker} />}
     </>
   );
 }

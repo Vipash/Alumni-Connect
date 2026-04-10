@@ -20,10 +20,11 @@ function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filt
 
   // Filtering Logic
   const filteredNotices = notices.filter(n => {
+    const isDirectIdMatch = n._id === searchQuery; 
     const matchesSearch = n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           n.company.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = filterType === 'All' || n.opportunityType === filterType;
-    return matchesSearch && matchesType;
+    return (isDirectIdMatch || matchesSearch) && matchesType;
   });
   
   const getDeadlineStatus = (deadline) => {
@@ -129,46 +130,6 @@ function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filt
   };
 
   const myPosts = notices.filter(n => (n.postedBy?._id || n.postedBy) === user._id);
-
-  const HubSidebar = ({ searchQuery, setSearchQuery, filterType, setFilterType }) => (
-  <div className="search-sidebar-container" style={{ padding: '20px' }}>
-    <h3 style={{ color: 'var(--mbm-blue)', marginBottom: '20px' }}>Connect Hub</h3>
-    <div style={{ marginBottom: '25px' }}>
-      <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Search</label>
-      <input 
-        className="partition-input" 
-        type="text" 
-        placeholder="Role or Company..." 
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)} 
-      />
-    </div>
-    <div style={{ marginBottom: '25px' }}>
-      <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Opportunity Type</label>
-      <select 
-        className="partition-input"
-        value={filterType}
-        onChange={(e) => setFilterType(e.target.value)}
-        style={{ width: '100%', cursor: 'pointer' }}
-      >
-        <option value="All">All Types</option>
-        <option value="Internship">Internship</option>
-        <option value="Full-time">Full-time</option>
-        <option value="Referral">Referral</option>
-        <option value="Project">Project</option>
-        <option value="Scholarship">Scholarship</option>
-        <option value="Volunteer">Volunteer</option>
-      </select>
-    </div>
-    <button 
-      className="nav-btn" 
-      style={{ width: '100%', marginTop: '10px' }} 
-      onClick={() => { setSearchQuery(''); setFilterType('All'); }}
-    >
-      Clear Filters
-    </button>
-  </div>
-);
 
   useEffect(() => {
   if (!setSidebarContent) return;
@@ -381,3 +342,44 @@ return () => {
 }
 
 export default ConnectHub;
+
+const HubSidebar = ({ searchQuery, setSearchQuery, filterType, setFilterType }) => (
+  <div className="search-sidebar-container" style={{ padding: '20px' }}>
+    <h3 style={{ color: 'var(--mbm-blue)', marginBottom: '20px' }}>Connect Hub</h3>
+    <div style={{ marginBottom: '25px' }}>
+      <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Search</label>
+      <input 
+        className="partition-input" 
+        type="text" 
+        placeholder="Role or Company..." 
+        value={searchQuery}
+        autoComplete="off" // Prevents browser dropdowns from blocking the UI
+        onChange={(e) => setSearchQuery(e.target.value)} 
+      />
+    </div>
+    <div style={{ marginBottom: '25px' }}>
+      <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Opportunity Type</label>
+      <select 
+        className="partition-input"
+        value={filterType}
+        onChange={(e) => setFilterType(e.target.value)}
+        style={{ width: '100%', cursor: 'pointer' }}
+      >
+        <option value="All">All Types</option>
+        <option value="Internship">Internship</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Referral">Referral</option>
+        <option value="Project">Project</option>
+        <option value="Scholarship">Scholarship</option>
+        <option value="Volunteer">Volunteer</option>
+      </select>
+    </div>
+    <button 
+      className="nav-btn" 
+      style={{ width: '100%', marginTop: '10px' }} 
+      onClick={() => { setSearchQuery(''); setFilterType('All'); }}
+    >
+      Clear Filters
+    </button>
+  </div>
+);

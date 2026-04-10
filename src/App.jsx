@@ -573,28 +573,25 @@ function App() {
             {isMapOpen && (
               <div className="location-picker-overlay">
                 <div className="modal-box" style={{ 
-                    maxWidth: '800px', 
-                    width: '95%', 
-                    height: '550px', 
-                    display: 'flex', 
-                    flexDirection: 'column' 
+                  maxWidth: '800px', 
+                  width: '95%', 
+                  height: '580px', // Set a tall enough fixed height
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  padding: '20px'
                 }}>
                   <button className="close-x" onClick={() => setIsMapOpen(false)}>×</button>
-                  <h3 style={{ marginBottom: '10px' }}>Pin Your Location</h3>
+                  <h3 style={{ marginBottom: '15px' }}>Pin Your Current Work Location</h3>
                   
-                  <div style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
+                  {/* Map takes up all available space between title and button */}
+                  <div style={{ flex: 1, position: 'relative', borderRadius: '12px', overflow: 'hidden', border: '1px solid #eee' }}>
                     <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       <LocationPicker setCoords={setSelectedCoords} onConfirm={() => setIsMapOpen(false)} />
                     </MapContainer>
                   </div>
 
-                  {/* This button is outside the map but inside the flex modal */}
-                  <button 
-                    className="primary-btn" 
-                    style={{ marginTop: '15px', width: '100%' }} 
-                    onClick={() => setIsMapOpen(false)}
-                  >
+                  <button className="map-confirm-btn" onClick={() => setIsMapOpen(false)}>
                     Confirm Selected Location
                   </button>
                 </div>
