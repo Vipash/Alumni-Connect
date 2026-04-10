@@ -314,7 +314,7 @@ function App() {
             }} 
           />
         );
-        
+
       case 'announcements':
         return <AnnouncementsSection searchQuery={announcementSearch} />;
       default:
@@ -471,48 +471,92 @@ function App() {
                   )}
 
                   {portalStep.startsWith('reg-') && (
-                    <form onSubmit={handleSubmit} className="registration-form">
-                       <button 
-                        type="button" 
-                        className="back-link-btn" 
-                        onClick={() => setPortalStep('login-choice')}>
-                        ← Back to Selection
-                      </button>
-                      <h2>{portalStep === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
-                      <label>Full Name</label><input placeholder="Vipss" value={formData.name} required onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                      <label>Branch</label><input placeholder="Computer Science" value={formData.branch} required onChange={(e) => setFormData({...formData, branch: e.target.value})} />
-                      <label>Passout Year</label><input  type="number" placeholder="2026" value={formData.passoutYear} required onChange={(e) => setFormData({...formData, passoutYear: e.target.value})} />
-                      {portalStep === 'reg-student' && (
-                        <><label>Roll Number</label><input placeholder="23UCSE4050" value={formData.rollNumber} required onChange={(e) => setFormData({...formData, rollNumber: e.target.value})} /></>
-                      )}
-                      {portalStep === 'reg-alumni' && (
-                        <>
-                          <label>Current Company</label><input placeholder="N.O.N.E." value={formData.company} required onChange={(e) => setFormData({...formData, company: e.target.value})} />
-                          <label>Location</label>
-                          <button type="button" className="location-btn" onClick={() => setIsMapOpen(true)}>
-                            {selectedCoords ? 'Location Picked ✅' : 'Click to Pin Location on Map'}
-                          </button>
-                        </>
-                      )}
-                      <hr />
-                      <h3>Contact Details</h3>
-                      <small style={{color: '#666', fontSize: '0.75rem'}}>* Only verified individuals can view these</small>
-                      <label>Email Address</label><input placeholder="vipashmeena@gmail.com" type="email" value={formData.email} required onChange={(e) => setFormData({...formData, email: e.target.value})} />
-                      <label>Mobile Number</label><input placeholder="8824299517" type="tel" pattern="[0-9]{10}" value={formData.mobile} required onChange={(e) => setFormData({...formData, mobile: e.target.value})} />
-                      <hr />
-                      <h3>Account Information</h3>
-                      <label>Username</label><input value={formData.displayName} required onChange={(e) => setFormData({...formData, displayName: e.target.value})} />
-                      <label>Password</label><input type="password" value={formData.password} required onChange={(e) => setFormData({...formData, password: e.target.value})} />
-                      <button type="submit" className="submit-btn">Complete Registration</button>
-                    </form>
-                  )}
+            <form onSubmit={handleSubmit} className="registration-form">
+              <button type="button" className="back-link-btn" onClick={() => setPortalStep('login-choice')}>← Back</button>
+              <div className="form-header">
+                <h2>{portalStep === 'reg-alumni' ? 'Alumni' : 'Student'} Registration</h2>
+                <p className="form-subtitle">Please fill in your details to request portal access.</p>
+              </div>
+              
+              <div className="form-group">
+                <label>Full Name</label>
+                <input placeholder="e.g. John Doe" value={formData.name} required onChange={(e) => setFormData({...formData, name: e.target.value})} />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Branch</label>
+                  <input placeholder="e.g. Computer Science" value={formData.branch} required onChange={(e) => setFormData({...formData, branch: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Passout Year</label>
+                  <input type="number" placeholder="YYYY" value={formData.passoutYear} required onChange={(e) => setFormData({...formData, passoutYear: e.target.value})} />
+                </div>
+              </div>
+
+              {portalStep === 'reg-student' && (
+                <div className="form-group">
+                  <label>Roll Number</label>
+                  <input placeholder="e.g. 21BECEC001" value={formData.rollNumber} required onChange={(e) => setFormData({...formData, rollNumber: e.target.value})} />
+                </div>
+              )}
+
+              {portalStep === 'reg-alumni' && (
+                <>
+                  <div className="form-group">
+                    <label>Current Company</label>
+                    <input placeholder="e.g. Google, TCS" value={formData.company} required onChange={(e) => setFormData({...formData, company: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Work Location</label>
+                    <span className="field-desc">Pin your current city to help students find alumni in their area.</span>
+                    <button type="button" className="location-btn" onClick={() => setIsMapOpen(true)}>
+                      {selectedCoords ? 'Location Picked ✅' : 'Click to Pin Location on Map'}
+                    </button>
+                  </div>
+                </>
+              )}
+
+              <div className="section-divider">
+                <h3>Contact Details</h3>
+                <p className="section-desc">Only verified MBM individuals can view your contact info.</p>
+              </div>
+
+              <div className="form-group">
+                <label>Email Address</label>
+                <input type="email" placeholder="email@example.com" value={formData.email} required onChange={(e) => setFormData({...formData, email: e.target.value})} />
+              </div>
+
+              <div className="form-group">
+                <label>Mobile Number</label>
+                <input type="tel" pattern="[0-9]{10}" placeholder="10-digit mobile number" value={formData.mobile} required onChange={(e) => setFormData({...formData, mobile: e.target.value})} />
+              </div>
+
+              <div className="section-divider">
+                <h3>Account Information</h3>
+                <p className="section-desc">These details will be used for your future logins.</p>
+              </div>
+
+              <div className="form-group">
+                <label>Username</label>
+                <input placeholder="Choose a display name" value={formData.displayName} required onChange={(e) => setFormData({...formData, displayName: e.target.value})} />
+              </div>
+
+              <div className="form-group">
+                <label>Password</label>
+                <input type="password" placeholder="••••••••" value={formData.password} required onChange={(e) => setFormData({...formData, password: e.target.value})} />
+              </div>
+
+              <button type="submit" className="submit-btn">Submit for Verification</button>
+            </form>
+          )}
                 </div>
               </div>
             )}
 
             {/* LOCATION PICKER MODAL */}
             {isMapOpen && (
-              <div className="modal-overlay" style={{ zIndex: 5000, background: 'rgba(0,0,0,0.7)' }}>
+              <div className="location-picker-overlay">
                 <div className="modal-box" style={{ maxWidth: '800px', width: '90%', height: '500px' }}>
                   <button className="close-x" onClick={() => setIsMapOpen(false)}>×</button>
                   <h3>Pin Your Location</h3>
