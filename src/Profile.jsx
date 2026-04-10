@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import EditProfile from './EditProfile';
 
+const ensureAbsoluteUrl = (url) => {
+  if (!url) return "#";
+  // If it doesn't start with http, prepend https://
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+};
+
 const getProfileStatus = (user) => {
   const fieldMapping = {
     displayName: 'Display Name', bio: 'Professional Bio', mobile: 'Mobile Number',
@@ -72,31 +78,58 @@ function Profile({ user, setUser, setSidebarContent }) {
   }, [isEditing, isOnboarding, user, setSidebarContent]);
 
   const handleOnboardingSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('/api/profile/complete', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user._id,
-          ...onboardData,
-          hobbiesTechnical: onboardData.hobbiesTechnical.split(',').map(s => s.trim()),
-          hobbiesPersonal: onboardData.hobbiesPersonal.split(',').map(s => s.trim()),
-        })
-      });
+  e.preventDefault();
+  
+  // Logical Constraints
+  const currentYear = new Date().getFullYear();
+  const tYear = parseInt(onboardData.tenthYear);
+  const wYear = parseInt(onboardData.twelfthYear);
+  const birthYear = new Date(onboardData.dob).getFullYear();
 
-      if (res.ok) {
-        const updatedUser = await res.json();
-        setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setIsOnboarding(false);
-        setIsEditing(false);
-        alert("Profile updated!");
-      }
-    } catch (err) {
-      alert("Error saving profile.");
+  // 1. Check for missing fields (Browser 'required' handles most, but we double check)
+  if (!onboardData.fatherName || !onboardData.dob || !onboardData.currentAddress) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  // 2. Year Logic
+  if (tYear < 1950 || tYear > currentYear) {
+    alert("Invalid 10th Pass-out Year.");
+    return;
+  }
+  if (wYear <= tYear) {
+    alert("12th Pass-out Year must be after 10th Pass-out Year.");
+    return;
+  }
+  if (tYear - birthYear < 10) {
+    alert("Please check your Date of Birth and 10th Pass-out Year logic.");
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/profile/complete', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: user._id,
+        ...onboardData,
+        hobbiesTechnical: onboardData.hobbiesTechnical.split(',').map(s => s.trim()),
+        hobbiesPersonal: onboardData.hobbiesPersonal.split(',').map(s => s.trim()),
+      })
+    });
+
+    if (res.ok) {
+      const updatedUser = await res.json();
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setIsOnboarding(false);
+      setIsEditing(false);
+      alert("Profile updated!");
     }
-  };
+  } catch (err) {
+    alert("Error saving profile.");
+  }
+};
 
   if (!user) return <div className="profile-container">Loading...</div>;
 
@@ -173,7 +206,14 @@ function Profile({ user, setUser, setSidebarContent }) {
           {user.linkedin && (
             <div className="info-item">
               <label>LinkedIn</label>
-              <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className="link-text">View Profile</a>
+              <a 
+                href={ensureAbsoluteUrl(user.linkedin)} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="link-text"
+              >
+                View Profile
+              </a>
             </div>
           )}
         </div>

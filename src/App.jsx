@@ -117,27 +117,52 @@ function App() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const payload = {
-      ...formData,
-      passoutYear: parseInt(formData.passoutYear, 10),
-      mobile: formData.mobile || '0000000000',
-      location: selectedCoords
-        ? { type: 'Point', coordinates: [selectedCoords[1], selectedCoords[0]] }
-        : null,
-    };
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (response.ok) {
-      alert('Registration submitted!');
-      setView('home');
-    } else {
-      alert('Error: ' + (await response.text()));
-    }
+  e.preventDefault();
+
+  // 1. Basic Logical Constraints
+  const currentYear = new Date().getFullYear();
+  const passoutYear = parseInt(formData.passoutYear, 10);
+
+  if (!formData.name || !formData.email || !formData.password || !formData.branch) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  if (isNaN(passoutYear) || passoutYear < 1951 || passoutYear > currentYear + 6) {
+    alert("Please enter a valid Passout Year (e.g., 1951 - 2030).");
+    return;
+  }
+
+  if (formData.mobile && !/^\d{10}$/.test(formData.mobile)) {
+    alert("Mobile number must be exactly 10 digits.");
+    return;
+  }
+
+  // 2. Prepare Payload
+  const payload = {
+    ...formData,
+    passoutYear,
+    mobile: formData.mobile || '0000000000',
+    location: selectedCoords
+      ? { type: 'Point', coordinates: [selectedCoords[1], selectedCoords[0]] }
+      : null,
   };
+
+  // 3. Submit
+  const response = await fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (response.ok) {
+    alert('Registration submitted! Please wait for admin approval.');
+    setView('home');
+  } else {
+    const errorText = await response.text();
+    alert('Error: ' + errorText);
+  }
+};
 
   // --- UTILS ---
   const downloadMagazine = () => {
@@ -194,40 +219,9 @@ function App() {
   const renderLeftPartition = () => {
     // 1. If a component (like Profile or Map) has pushed specific sidebar UI via setSidebarContent
     if (sidebarContent) return sidebarContent;
-
-    // 2. Fallback logic for tabs with standard sidebar fields
     switch (activeTab) {
       case 'connect':
-        return (
-          <div className="search-box-group">
-            <div className="partition-header">
-              <h2>Connect Hub</h2>
-              <p className="subtitle">Filters & Tools</p>
-            </div>
-            <label>Job Search</label>
-            <input 
-              type="text" 
-              placeholder="Keywords..." 
-              className="partition-input" 
-              value={hubSearch}
-              onChange={(e) => setHubSearch(e.target.value)}
-            />
-            <label>Category</label>
-            <select 
-              className="partition-input"
-              value={hubCategory}
-              onChange={(e) => setHubCategory(e.target.value)}
-            >
-              <option value="All">All Categories</option>
-              <option value="Full-Time">Full-Time</option>
-              <option value="Internship">Internship</option>
-              <option value="Project">Project</option>
-              <option value="Scholarship">Scholarship</option>
-              <option value="Referral">Referral</option>
-            </select>
-            <button className="apply-filter-btn">Filter Hub</button>
-          </div>
-        );
+        return null;
 
       case 'inbox':
         return (
@@ -309,10 +303,10 @@ function App() {
             setUser={setLoggedInUser} 
             searchQuery={hubSearch}
             onNavigateToNotice={(noticeId) => {
-              setHubSearch(noticeId); // This filters the ConnectHub for this specific ID
-              setActiveTab('connect'); // Switch to the notice board tab
-              setSidebarContent(null);  // Clear sidebar context
-            }} 
+              setHubSearch(noticeId); 
+              setActiveTab('connect'); 
+              setSidebarContent(null);
+            }}
           />
         );
 
@@ -348,7 +342,9 @@ function App() {
             <nav className="sub-nav-tabs">
               <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => {setActiveTab('profile'); setSidebarContent(null);}}>My Profile</button>
               <button className={activeTab === 'map' ? 'active' : ''} onClick={() => {setActiveTab('map'); setSidebarContent(null);}}>Alumni Search</button>
-              <button className={activeTab === 'connect' ? 'active' : ''} onClick={() => {setActiveTab('connect'); setSidebarContent(null);}}>Connect Hub</button>
+              <button className={activeTab === 'connect' ? 'active' : ''} 
+                onClick={() => {setActiveTab('connect'); setHubSearch(''); setSidebarContent(null);}}> Connect Hub
+              </button>
               <button className={activeTab === 'inbox' ? 'active' : ''} onClick={handleInboxClick}>
                 Inbox {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
               </button>
@@ -504,8 +500,16 @@ function App() {
                   <input placeholder="e.g. Computer Science" value={formData.branch} required onChange={(e) => setFormData({...formData, branch: e.target.value})} />
                 </div>
                 <div className="form-group">
-                  <label>Passout Year</label>
-                  <input type="number" placeholder="YYYY" value={formData.passoutYear} required onChange={(e) => setFormData({...formData, passoutYear: e.target.value})} />
+                  <label>Passout Year <span style={{color: 'red'}}>*</span></label>
+                  <input 
+                    type="number" 
+                    min="1950" 
+                    max="2100"
+                    placeholder="YYYY" 
+                    value={formData.passoutYear} 
+                    required 
+                    onChange={(e) => setFormData({...formData, passoutYear: e.target.value})} 
+                  />
                 </div>
               </div>
 
