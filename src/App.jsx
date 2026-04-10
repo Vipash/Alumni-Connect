@@ -55,6 +55,7 @@ function App() {
   });
 
   // --- FEATURE STATES ---
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -453,6 +454,20 @@ function App() {
                       onAdminLogin={handleAdminLogin} 
                     />
                   )}
+                  <>
+                  <p style={{ textAlign: 'center', fontSize: '0.8rem', marginTop: '20px', color: '#666' }}>
+                      Having trouble? <span 
+                        onClick={() => setIsSupportOpen(true)} 
+                        style={{ color: '#3498db', cursor: 'pointer', textDecoration: 'underline' }}
+                      >
+                        Contact Support
+                      </span>
+                  </p>
+                </>
+
+                <div className="support-sidebar-link" onClick={() => setIsSupportOpen(true)}>
+                  <span>🛠 Support & Feedback</span>
+                </div>
 
                   {portalStep.startsWith('login-') && portalStep !== 'login-choice' && (
                     <form onSubmit={handleLogin} className="login-container">
