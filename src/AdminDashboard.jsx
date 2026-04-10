@@ -129,6 +129,40 @@ function AdminDashboard({ admin, setView, onLogout }) {
     </div>
   );
 
+  // Inside AdminDashboard.jsx
+const [tickets, setTickets] = useState([]);
+
+useEffect(() => {
+  fetch('/api/admin/support')
+    .then(res => res.json())
+    .then(data => setTickets(data));
+}, []);
+
+// In your JSX (Table view)
+<section className="admin-section">
+  <h3>User Queries & Feedback</h3>
+  <table className="admin-table">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>User</th>
+        <th>Message</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {tickets.map(t => (
+        <tr key={t._id}>
+          <td><span className={`badge-${t.type.toLowerCase()}`}>{t.type}</span></td>
+          <td>{t.userName} <br/><small>{t.sender}</small></td>
+          <td>{t.message}</td>
+          <td>{new Date(t.timestamp).toLocaleDateString()}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</section>
+
   const ManageAdmins = () => {
     const [formData, setFormData] = useState({ username: '', password: '', role: 'Moderator' });
     const handleCreate = async (e) => {

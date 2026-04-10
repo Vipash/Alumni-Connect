@@ -345,6 +345,29 @@ app.get('/api/admin/stats', isAdmin, async (req, res) => {
   }
 });
 
+const Support = require('./models/Support'); // Path to the schema above
+
+// 1. POST route to save the feedback
+app.post('/api/support', async (req, res) => {
+  try {
+    const newSupport = new Support(req.body);
+    await newSupport.save();
+    res.status(201).send({ message: "Success" });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// 2. GET route for the Admin to see all feedback
+app.get('/api/admin/support', async (req, res) => {
+  try {
+    const tickets = await Support.find().sort({ timestamp: -1 });
+    res.json(tickets);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 // Security Logs
 app.post('/api/log-interaction', async (req, res) => {
   try {

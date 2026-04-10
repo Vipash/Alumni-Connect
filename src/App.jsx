@@ -36,6 +36,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('profile');
   const [sidebarContent, setSidebarContent] = useState(null);
 
+  const [mapSearchQuery, setMapSearchQuery] = useState('');
   // --- AUTH STATE ---
   const [loggedInUser, setLoggedInUser] = useState(() => {
     const saved = localStorage.getItem('user');
@@ -66,6 +67,29 @@ function App() {
     name: '', email: '', role: '', branch: '', passoutYear: '',
     rollNumber: '', company: '', mobile: '', password: '', displayName: '',
   });
+
+  const handlePublicSupport = () => {
+  const subject = encodeURIComponent("MBM Portal Support Request");
+  const body = encodeURIComponent("Hello, I am having trouble with...");
+  window.location.href = `mailto:vipashmeena@gmail.com?subject=${subject}&body=${body}`;
+};
+
+  const handleMapSearch = async () => {
+  if (!mapSearchQuery) return; // Use the new state
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(mapSearchQuery)}`);
+    const data = await res.json();
+    if (data.length > 0) {
+      const { lat, lon } = data[0];
+      setSelectedCoords([parseFloat(lat), parseFloat(lon)]);
+      // The LocationPicker component will handle the flyTo via the externalCoords prop
+    } else {
+      alert("Location not found.");
+    }
+  } catch (err) {
+    console.error("Search error:", err);
+  }
+};
 
   // --- AUTH HANDLERS ---
   const handleAdminLogin = async (e) => {
@@ -452,10 +476,10 @@ function App() {
                   )}
                   <>
                   <p style={{ textAlign: 'center', fontSize: '0.8rem', marginTop: '20px', color: '#666' }}>
-                      Having trouble? <span 
-                        onClick={() => setIsSupportOpen(true)} 
-                        style={{ color: '#3498db', cursor: 'pointer', textDecoration: 'underline' }}
-                      >
+                      Having trouble? 
+                      <span 
+                        onClick={handlePublicSupport} 
+                        style={{ color: '#3498db', cursor: 'pointer', textDecoration: 'underline' }}>
                         Contact Support
                       </span>
                   </p>
@@ -576,26 +600,42 @@ function App() {
             {/* LOCATION PICKER MODAL */}
             {isMapOpen && (
               <div className="location-picker-overlay">
-                <div className="modal-box" style={{ 
-                  maxWidth: '800px', 
-                  width: '95%', 
-                  height: '580px', // Set a tall enough fixed height
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  padding: '20px'
-                }}>
+                <div className="modal-box" style={{ maxWidth: '800px', width: '95%', height: '650px', display: 'flex', flexDirection: 'column', padding: '20px' }}>
                   <button className="close-x" onClick={() => setIsMapOpen(false)}>×</button>
                   <h3 style={{ marginBottom: '15px' }}>Pin Your Current Work Location</h3>
                   
-                  {/* Map takes up all available space between title and button */}
+                  {/* 1. THE MAP CONTAINER (Now just the map) */}
                   <div style={{ flex: 1, position: 'relative', borderRadius: '12px', overflow: 'hidden', border: '1px solid #eee' }}>
                     <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                      <LocationPicker setCoords={setSelectedCoords} onConfirm={() => setIsMapOpen(false)} />
+                      <LocationPicker 
+                        setCoords={setSelectedCoords} 
+                        externalCoords={selectedCoords} 
+                      />
                     </MapContainer>
                   </div>
 
-                  <button className="map-confirm-btn" onClick={() => setIsMapOpen(false)}>
+                  {/* 2. THE SEARCH BAR (Moved below the map) */}
+                  <div className="map-search-footer" style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
+                    <input 
+                      type="text" 
+                      className="partition-input" 
+                      style={{ flex: 1, margin: 0 }} 
+                      placeholder="Search for your city..."
+                      value={mapSearchQuery} // Use the new state
+                      onChange={(e) => setMapSearchQuery(e.target.value)}
+                    />
+                    <button 
+                      type="button" 
+                      className="primary-btn" 
+                      style={{ width: 'auto', padding: '0 20px' }}
+                      onClick={handleMapSearch} // See logic below
+                    >
+                      Search
+                    </button>
+                  </div>
+
+                  <button className="map-confirm-btn" style={{ marginTop: '10px' }} onClick={() => setIsMapOpen(false)}>
                     Confirm Selected Location
                   </button>
                 </div>
