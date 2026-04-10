@@ -557,16 +557,31 @@ function App() {
             {/* LOCATION PICKER MODAL */}
             {isMapOpen && (
               <div className="location-picker-overlay">
-                <div className="modal-box" style={{ maxWidth: '800px', width: '90%', height: '500px' }}>
+                <div className="modal-box" style={{ 
+                    maxWidth: '800px', 
+                    width: '95%', 
+                    height: '550px', 
+                    display: 'flex', 
+                    flexDirection: 'column' 
+                }}>
                   <button className="close-x" onClick={() => setIsMapOpen(false)}>×</button>
-                  <h3>Pin Your Location</h3>
-                  <div style={{ height: '100%', marginTop: '10px' }}>
-                    <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '350px', borderRadius: '12px' }}>
+                  <h3 style={{ marginBottom: '10px' }}>Pin Your Location</h3>
+                  
+                  <div style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
+                    <MapContainer center={[26.2389, 73.0243]} zoom={13} style={{ height: '100%', width: '100%' }}>
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       <LocationPicker setCoords={setSelectedCoords} onConfirm={() => setIsMapOpen(false)} />
                     </MapContainer>
-                    <button className="primary-btn" style={{ marginTop: '15px' }} onClick={() => setIsMapOpen(false)}>Confirm Location</button>
                   </div>
+
+                  {/* This button is outside the map but inside the flex modal */}
+                  <button 
+                    className="primary-btn" 
+                    style={{ marginTop: '15px', width: '100%' }} 
+                    onClick={() => setIsMapOpen(false)}
+                  >
+                    Confirm Selected Location
+                  </button>
                 </div>
               </div>
             )}
