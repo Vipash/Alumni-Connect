@@ -345,7 +345,7 @@ app.get('/api/admin/stats', isAdmin, async (req, res) => {
   }
 });
 
-const Support = require('./models/Support'); // Path to the schema above
+const Support = require('./Support');
 
 // 1. POST route to save the feedback
 app.post('/api/support', async (req, res) => {
