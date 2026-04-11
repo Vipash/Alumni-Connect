@@ -15,6 +15,7 @@ import ConnectHub from './ConnectHub';
 import AuthHome from './AuthHome';
 import InstructionManual from './InstructionManual';
 import AboutUs from './AboutUs';
+import Support from './Support';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -503,6 +504,13 @@ function App() {
                       <label>Password</label><input name="password" type="password" required />
                       <button type="submit" className="primary-btn">Sign In</button>
                     </form>
+                  )}
+
+                  {isSupportOpen && (
+                    <SupportModal 
+                      user={loggedInUser} 
+                      onClose={() => setIsSupportOpen(false)} 
+                    />
                   )}
 
                   {portalStep.startsWith('reg-') && (
