@@ -356,6 +356,10 @@ function App() {
             setFilterType={setHubCategory}
           />
         );
+
+        case 'support':
+          return <SupportModal user={loggedInUser} isTabMode={true} />;
+
       case 'inbox':
         return (
           <Inbox
@@ -451,7 +455,12 @@ function App() {
               >
                 Notice Board
               </button>
-              <button onClick={() => setIsSupportOpen(true)}>🛠 Support</button>
+              <button 
+                className={activeTab === 'support' ? 'active' : ''} 
+                onClick={() => {setActiveTab('support'); setSidebarContent(null);}}
+              >
+                🛠 Support
+              </button>
             </nav>
           )}
 

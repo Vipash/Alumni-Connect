@@ -6,7 +6,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [statusFilter, setStatusFilter] = useState('pending'); // pending | verified | post | history
   const [listData, setListData] = useState([]);
-  const [tickets, setTickets] = useState([]); // Only one declaration
+  const [tickets, setTickets] = useState([]);
   const [feedbackFilter, setFeedbackFilter] = useState('registered'); // 'registered' | 'public'
   const [loading, setLoading] = useState(false);
   const [audience, setAudience] = useState('all');
@@ -63,15 +63,15 @@ function AdminDashboard({ admin, setView, onLogout }) {
   };
 
   const fetchTickets = async () => {
-    try {
-      const res = await fetch('/api/admin/support');
-      const data = await res.json();
-      setTickets(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Tickets fetch error:', err);
-      setTickets([]);
-    }
-  };
+  try {
+    const res = await fetch('/api/admin/support-tickets'); 
+    const data = await res.json();
+    setTickets(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error('Tickets fetch error:', err);
+    setTickets([]);
+  }
+};
 
   // 3. Derived Data
   const filteredData = listData.filter((item) => {
@@ -91,14 +91,26 @@ function AdminDashboard({ admin, setView, onLogout }) {
   );
 
   // 4. UseEffects
+
+  // Stats: once on mount
   useEffect(() => {
     fetchStats();
   }, []);
 
+  // Feedback tickets: only when switching into the feedback tab
   useEffect(() => {
     if (activeTab === 'feedback') {
       fetchTickets();
-    } else {
+    }
+  }, [activeTab]);
+
+  // Lists for other tabs: when tab or statusFilter changes
+  useEffect(() => {
+    if (
+      activeTab !== 'overview' &&
+      activeTab !== 'manage-admins' &&
+      activeTab !== 'feedback'
+    ) {
       fetchCurrentList();
     }
   }, [activeTab, statusFilter]);
@@ -187,7 +199,8 @@ function AdminDashboard({ admin, setView, onLogout }) {
             Today&apos;s Traffic: <strong>Online</strong>
           </p>
           <p>
-            Server Status: <span style={{ color: 'green' }}>Healthy</span>
+            Server Status:{' '}
+            <span style={{ color: 'green' }}>Healthy</span>
           </p>
         </div>
       </div>
@@ -236,9 +249,22 @@ function AdminDashboard({ admin, setView, onLogout }) {
                   </span>
                 </td>
                 <td>
-                  <strong>{t.userName}</strong>
+                  <strong>{t.name || 'N/A'}</strong>
+                  {!t.isRegistered && (
+                    <span
+                      style={{
+                        fontSize: '0.7rem',
+                        color: 'orange',
+                        marginLeft: '5px',
+                      }}
+                    >
+                      (GUEST)
+                    </span>
+                  )}
                   <br />
-                  <small style={{ color: '#666' }}>{t.senderEmail}</small>
+                  <small style={{ color: '#666' }}>
+                    {t.email || 'N/A'}
+                  </small>
                 </td>
                 <td style={{ maxWidth: '300px', fontSize: '0.9rem' }}>
                   {t.message}
@@ -252,7 +278,10 @@ function AdminDashboard({ admin, setView, onLogout }) {
             ))}
             {filteredTickets.length === 0 && (
               <tr>
-                <td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>
+                <td
+                  colSpan="4"
+                  style={{ textAlign: 'center', padding: '20px' }}
+                >
                   No feedback found in this category.
                 </td>
               </tr>
@@ -321,7 +350,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     );
   };
 
-  // 7. FINAL RETURN STATEMENT (The only one for the main component)
+  // 7. FINAL RETURN STATEMENT
   return (
     <div className="admin-dashboard-page">
       <nav className="admin-navbar">
@@ -406,7 +435,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
           activeTab
         ) && (
           <div className="content-toolbar">
-            {/* Search applies to listData (users/logs/announcements history) */}
             <input
               type="text"
               placeholder="Search records..."
@@ -530,7 +558,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
                             <td>{item.ipAddress}</td>
                             <td>
                               {item.timestamp
-                                ? new Date(item.timestamp).toLocaleString()
+                                ? new Date(
+                                    item.timestamp
+                                  ).toLocaleString()
                                 : ''}
                             </td>
                           </>
@@ -538,7 +568,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
                           <>
                             <td>
                               {item.date
-                                ? new Date(item.date).toLocaleDateString()
+                                ? new Date(
+                                    item.date
+                                  ).toLocaleDateString()
                                 : ''}
                             </td>
                             <td>{item.title}</td>
@@ -546,7 +578,10 @@ function AdminDashboard({ admin, setView, onLogout }) {
                               <button
                                 className="delete-btn"
                                 onClick={() =>
-                                  handleAction(item._id, 'delete-announcement')
+                                  handleAction(
+                                    item._id,
+                                    'delete-announcement'
+                                  )
                                 }
                               >
                                 Delete
