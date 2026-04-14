@@ -374,6 +374,7 @@ function App() {
                 Inbox {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
               </button>
               <button className={activeTab === 'announcements' ? 'active' : ''} onClick={() => {setActiveTab('announcements'); setSidebarContent(null);}}>Notice Board</button>
+              <button onClick={() => setIsSupportOpen(true)}>🛠 Support</button>
             </nav>
           )}
 

@@ -347,24 +347,31 @@ app.get('/api/admin/stats', isAdmin, async (req, res) => {
 
 const Support = require('./Support');
 
-// 1. POST route to save the feedback
+// POST: Public & Registered users both hit this
 app.post('/api/support', async (req, res) => {
   try {
-    const newSupport = new Support(req.body);
-    await newSupport.save();
-    res.status(201).send({ message: "Success" });
+    const { email, name, type, message, isRegistered } = req.body;
+    const ticket = new Support({
+      senderEmail: email,
+      userName: name,
+      type: type,
+      message: message,
+      isRegistered: isRegistered
+    });
+    await ticket.save();
+    res.status(201).json({ message: "Received" });
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).send("Error saving feedback");
   }
 });
 
-// 2. GET route for the Admin to see all feedback
-app.get('/api/admin/support', async (req, res) => {
+// GET: For Admin Dashboard
+app.get('/api/admin/support-tickets', async (req, res) => {
   try {
-    const tickets = await Support.find().sort({ timestamp: -1 });
+    const tickets = await Support.find().sort({ createdAt: -1 });
     res.json(tickets);
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).send("Error fetching tickets");
   }
 });
 
