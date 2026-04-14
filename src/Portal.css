@@ -793,24 +793,6 @@
     text-align: center;
 }
 
-.support-sidebar-link {
-    margin-top: auto; /* Pushes to bottom of sidebar */
-    padding: 12px;
-    background: #fdf2f2;
-    border-radius: 8px;
-    color: #e74c3c;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    transition: 0.2s;
-}
-
-.support-sidebar-link:hover {
-    background: #fce8e8;
-    transform: translateY(-2px);
-}
-
 /* Container for search inside MapContainer */
 .map-search-wrapper {
     position: absolute;
@@ -872,3 +854,4 @@
 .map-confirm-btn:hover {
     background: #219150;
 }
+
