@@ -455,7 +455,7 @@ function App() {
             </nav>
           )}
 
-          <div className="portal-main-partition">
+           <div className="portal-main-partition">
             <aside className="partition-left">{renderLeftPartition()}</aside>
 
             <main className="partition-right">
@@ -473,15 +473,8 @@ function App() {
               </div>
             </main>
           </div>
-
-          {isSupportOpen && (
-            <SupportModal
-              user={loggedInUser}
-              onClose={() => setIsSupportOpen(false)}
-            />
-          )}
         </div>
-      ) : view === 'admin-dashboard' ? ( // FIX: same key as in handleAdminLogin
+      ) : view === 'admin-dashboard' ? (
         <AdminDashboard
           admin={adminUser}
           setView={setView}
@@ -899,13 +892,6 @@ function App() {
                       </button>
                     </form>
                   )}
-
-                  {isSupportOpen && (
-                    <SupportModal
-                      user={loggedInUser}
-                      onClose={() => setIsSupportOpen(false)}
-                    />
-                  )}
                 </div>
               </div>
             )}
@@ -994,6 +980,12 @@ function App() {
             )}
           </main>
         </div>
+      )}
+      {isSupportOpen && (
+        <SupportModal
+          user={loggedInUser}
+          onClose={() => setIsSupportOpen(false)}
+        />
       )}
     </div>
   );
