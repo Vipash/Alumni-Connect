@@ -12,6 +12,8 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [audience, setAudience] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [stats, setStats] = useState(null);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [allAdmins, setAllAdmins] = useState([]);
 
   const adminData = JSON.parse(localStorage.getItem('admin'));
   const adminId = adminData?._id;
@@ -63,15 +65,37 @@ function AdminDashboard({ admin, setView, onLogout }) {
   };
 
   const fetchTickets = async () => {
-  try {
-    const res = await fetch('/api/admin/support-tickets'); 
-    const data = await res.json();
-    setTickets(Array.isArray(data) ? data : []);
-  } catch (err) {
-    console.error('Tickets fetch error:', err);
-    setTickets([]);
-  }
-};
+    try {
+      // Make sure this matches your server route, e.g. app.get('/api/admin/support', ...)
+      const res = await fetch('/api/admin/support');
+      const data = await res.json();
+      setTickets(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Tickets fetch error:', err);
+      setTickets([]);
+    }
+  };
+
+  const fetchAllAdmins = async () => {
+    try {
+      const res = await fetch('/api/admin/list', {
+        headers: { 'admin-id': adminId },
+      });
+      if (res.ok) setAllAdmins(await res.json());
+    } catch (err) {
+      console.error('Admin list fetch error:', err);
+      setAllAdmins([]);
+    }
+  };
+
+  const deleteAdmin = async (id) => {
+    if (!window.confirm("Remove this admin's access?")) return;
+    const res = await fetch(`/api/admin/delete/${id}`, {
+      method: 'DELETE',
+      headers: { 'admin-id': adminId },
+    });
+    if (res.ok) fetchAllAdmins();
+  };
 
   // 3. Derived Data
   const filteredData = listData.filter((item) => {
@@ -114,6 +138,11 @@ function AdminDashboard({ admin, setView, onLogout }) {
       fetchCurrentList();
     }
   }, [activeTab, statusFilter]);
+
+  // Fetch admins when the tab is active
+  useEffect(() => {
+    if (activeTab === 'manage-admins') fetchAllAdmins();
+  }, [activeTab]);
 
   // 5. Action Handlers
   const handleAction = async (id, action) => {
@@ -232,24 +261,26 @@ function AdminDashboard({ admin, setView, onLogout }) {
             <tr>
               <th>Type</th>
               <th>Sender</th>
-              <th>Message</th>
-              <th>Date</th>
+              <th>Time</th>
             </tr>
           </thead>
           <tbody>
             {filteredTickets.map((t) => (
-              <tr key={t._id}>
+              <tr
+                key={t._id}
+                onClick={() => setSelectedTicket(t)}
+                style={{ cursor: 'pointer' }}
+                className="hover-row"
+              >
                 <td>
                   <span
-                    className={`badge-pill status-${
-                      t.type?.toLowerCase() || 'other'
-                    }`}
+                    className={`badge-pill status-${t.type?.toLowerCase() || 'other'}`}
                   >
                     {t.type}
                   </span>
                 </td>
                 <td>
-                  <strong>{t.name || 'N/A'}</strong>
+                  <strong>{t.name || 'Anonymous Guest'}</strong>
                   {!t.isRegistered && (
                     <span
                       style={{
@@ -262,33 +293,53 @@ function AdminDashboard({ admin, setView, onLogout }) {
                     </span>
                   )}
                   <br />
-                  <small style={{ color: '#666' }}>
-                    {t.email || 'N/A'}
-                  </small>
-                </td>
-                <td style={{ maxWidth: '300px', fontSize: '0.9rem' }}>
-                  {t.message}
+                  <small>{t.email || 'N/A'}</small>
                 </td>
                 <td>
                   {t.createdAt
-                    ? new Date(t.createdAt).toLocaleDateString()
-                    : ''}
+                    ? new Date(t.createdAt).toLocaleString()
+                    : 'N/A'}
                 </td>
               </tr>
             ))}
-            {filteredTickets.length === 0 && (
-              <tr>
-                <td
-                  colSpan="4"
-                  style={{ textAlign: 'center', padding: '20px' }}
-                >
-                  No feedback found in this category.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>
+
+      {/* Ticket Detail Modal */}
+      {selectedTicket && (
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedTicket(null)}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Feedback Detail</h3>
+            <hr />
+            <p>
+              <strong>From:</strong>{' '}
+              {selectedTicket.name || 'Anonymous Guest'} (
+              {selectedTicket.email || 'N/A'})
+            </p>
+            <p>
+              <strong>Type:</strong> {selectedTicket.type}
+            </p>
+            <p>
+              <strong>Sent At:</strong>{' '}
+              {selectedTicket.createdAt
+                ? new Date(selectedTicket.createdAt).toLocaleString()
+                : 'N/A'}
+            </p>
+            <div className="message-box">
+              <strong>Message:</strong>
+              <p>{selectedTicket.message}</p>
+            </div>
+            <button onClick={() => setSelectedTicket(null)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -310,42 +361,85 @@ function AdminDashboard({ admin, setView, onLogout }) {
         alert('Admin Created!');
         e.target.reset();
         setFormData({ username: '', password: '', role: 'Moderator' });
+        fetchAllAdmins();
       }
     };
 
     return (
-      <div className="admin-card-simple">
-        <h3>Add New Administrator</h3>
-        <form onSubmit={handleCreate} className="admin-form-clean">
-          <input
-            required
-            placeholder="Username"
-            onChange={(e) =>
-              setFormData({ ...formData, username: e.target.value })
-            }
-          />
-          <input
-            required
-            type="password"
-            placeholder="Password"
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-          />
-          <select
-            value={formData.role}
-            onChange={(e) =>
-              setFormData({ ...formData, role: e.target.value })
-            }
-          >
-            <option value="Moderator">Moderator</option>
-            <option value="Admin">Admin</option>
-            <option value="GodMode">GodMode</option>
-          </select>
-          <button type="submit" className="approve-btn">
-            Create Account
-          </button>
-        </form>
+      <div className="manage-admins-wrapper">
+        <div className="admin-card-simple">
+          <h3>Add New Administrator</h3>
+          <form onSubmit={handleCreate} className="admin-form-clean">
+            <input
+              required
+              placeholder="Username"
+              value={formData.username}
+              onChange={(e) =>
+                setFormData({ ...formData, username: e.target.value })
+              }
+            />
+            <input
+              required
+              type="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+            />
+            <select
+              value={formData.role}
+              onChange={(e) =>
+                setFormData({ ...formData, role: e.target.value })
+              }
+            >
+              <option value="Moderator">Moderator</option>
+              <option value="Admin">Admin</option>
+              <option value="GodMode">GodMode</option>
+            </select>
+            <button type="submit" className="approve-btn">
+              Create Account
+            </button>
+          </form>
+        </div>
+
+        <div className="data-table-container" style={{ marginTop: '20px' }}>
+          <h3>Current System Administrators</h3>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allAdmins.map((a) => (
+                <tr key={a._id}>
+                  <td>{a.username}</td>
+                  <td>{a.role}</td>
+                  <td>
+                    {a.role !== 'GodMode' && (
+                      <button
+                        className="delete-btn"
+                        onClick={() => deleteAdmin(a._id)}
+                      >
+                        Revoke Access
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {allAdmins.length === 0 && (
+                <tr>
+                  <td colSpan="3" style={{ textAlign: 'center', padding: 16 }}>
+                    No admins found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   };

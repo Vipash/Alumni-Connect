@@ -511,6 +511,26 @@ app.get('/api/admin/logs', isAdmin, async (req, res) => {
   }
 });
 
+  // Get list of all admins (GodMode Only)
+  app.get('/api/admin/list', isAdmin, async (req, res) => {
+    try {
+      const admins = await Admin.find({}, '-password'); // Never send passwords
+      res.json(admins);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  });
+
+  // Delete an admin
+  app.delete('/api/admin/delete/:id', isAdmin, async (req, res) => {
+    try {
+      await Admin.findByIdAndDelete(req.params.id);
+      res.send('Admin removed');
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  });
+
 // ---------- PRODUCTION SERVING ----------
 
 if (process.env.NODE_ENV === 'production') {
