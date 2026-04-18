@@ -14,6 +14,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [stats, setStats] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [allAdmins, setAllAdmins] = useState([]);
+  const [adminSubTab, setAdminSubTab] = useState('list');
 
   const adminData = JSON.parse(localStorage.getItem('admin'));
   const adminId = adminData?._id;
@@ -66,8 +67,8 @@ function AdminDashboard({ admin, setView, onLogout }) {
 
   const fetchTickets = async () => {
     try {
-      // Make sure this matches your server route, e.g. app.get('/api/admin/support', ...)
-      const res = await fetch('/api/admin/support');
+      const res = await fetch('/api/admin/support-tickets');
+      if (!res.ok) throw new Error('Network response was not ok');
       const data = await res.json();
       setTickets(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -273,33 +274,21 @@ function AdminDashboard({ admin, setView, onLogout }) {
                 className="hover-row"
               >
                 <td>
-                  <span
-                    className={`badge-pill status-${t.type?.toLowerCase() || 'other'}`}
-                  >
-                    {t.type}
-                  </span>
-                </td>
-                <td>
-                  <strong>{t.name || 'Anonymous Guest'}</strong>
-                  {!t.isRegistered && (
-                    <span
-                      style={{
-                        fontSize: '0.7rem',
-                        color: 'orange',
-                        marginLeft: '5px',
-                      }}
-                    >
-                      (GUEST)
-                    </span>
-                  )}
-                  <br />
-                  <small>{t.email || 'N/A'}</small>
-                </td>
-                <td>
-                  {t.createdAt
-                    ? new Date(t.createdAt).toLocaleString()
-                    : 'N/A'}
-                </td>
+                <span
+                  className={`badge-pill status-${t.type?.toLowerCase() || 'other'}`}
+                >
+                  {t.type}
+                </span>
+              </td>
+              <td>
+                <strong>{t.userName || "Guest User"}</strong><br/>
+                <small>{t.senderEmail}</small>
+              </td>
+              <td>
+                {t.createdAt
+                  ? new Date(t.createdAt).toLocaleString()
+                  : 'N/A'}
+              </td>
               </tr>
             ))}
           </tbody>
@@ -319,9 +308,8 @@ function AdminDashboard({ admin, setView, onLogout }) {
             <h3>Feedback Detail</h3>
             <hr />
             <p>
-              <strong>From:</strong>{' '}
-              {selectedTicket.name || 'Anonymous Guest'} (
-              {selectedTicket.email || 'N/A'})
+              <strong>From:</strong> {selectedTicket.userName || "Guest"} (
+              {selectedTicket.senderEmail || 'N/A'})
             </p>
             <p>
               <strong>Type:</strong> {selectedTicket.type}
@@ -366,79 +354,106 @@ function AdminDashboard({ admin, setView, onLogout }) {
     };
 
     return (
-      <div className="manage-admins-wrapper">
-        <div className="admin-card-simple">
-          <h3>Add New Administrator</h3>
-          <form onSubmit={handleCreate} className="admin-form-clean">
-            <input
-              required
-              placeholder="Username"
-              value={formData.username}
-              onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
-              }
-            />
-            <input
-              required
-              type="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-            />
-            <select
-              value={formData.role}
-              onChange={(e) =>
-                setFormData({ ...formData, role: e.target.value })
-              }
+      <div className="admin-access-container">
+        {/* Sub-Tabs Navigation */}
+        <div className="content-toolbar">
+          <div className="filter-group">
+            <button
+              className={adminSubTab === 'list' ? 'sel' : ''}
+              onClick={() => setAdminSubTab('list')}
             >
-              <option value="Moderator">Moderator</option>
-              <option value="Admin">Admin</option>
-              <option value="GodMode">GodMode</option>
-            </select>
-            <button type="submit" className="approve-btn">
-              Create Account
+              Current Admins
             </button>
-          </form>
+            <button
+              className={adminSubTab === 'create' ? 'sel' : ''}
+              onClick={() => setAdminSubTab('create')}
+            >
+              Add New Admin
+            </button>
+          </div>
         </div>
 
-        <div className="data-table-container" style={{ marginTop: '20px' }}>
-          <h3>Current System Administrators</h3>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {allAdmins.map((a) => (
-                <tr key={a._id}>
-                  <td>{a.username}</td>
-                  <td>{a.role}</td>
-                  <td>
-                    {a.role !== 'GodMode' && (
-                      <button
-                        className="delete-btn"
-                        onClick={() => deleteAdmin(a._id)}
+        <div className="tab-content-area" style={{ marginTop: '20px' }}>
+          {adminSubTab === 'list' ? (
+            <div className="data-table-container">
+              <h3>System Administrators</h3>
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allAdmins.map((a) => (
+                    <tr key={a._id}>
+                      <td>{a.username}</td>
+                      <td>{a.role}</td>
+                      <td>
+                        {a.role !== 'GodMode' ? (
+                          <button
+                            className="delete-btn"
+                            onClick={() => deleteAdmin(a._id)}
+                          >
+                            Revoke Access
+                          </button>
+                        ) : (
+                          <small>Master Account</small>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {allAdmins.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="3"
+                        style={{ textAlign: 'center', padding: 16 }}
                       >
-                        Revoke Access
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {allAdmins.length === 0 && (
-                <tr>
-                  <td colSpan="3" style={{ textAlign: 'center', padding: 16 }}>
-                    No admins found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                        No admins found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="admin-card-simple">
+              <h3>Add New Administrator</h3>
+              <form onSubmit={handleCreate} className="admin-form-clean">
+                <input
+                  required
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
+                />
+                <input
+                  required
+                  type="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                />
+                <select
+                  value={formData.role}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
+                >
+                  <option value="Moderator">Moderator</option>
+                  <option value="Admin">Admin</option>
+                  <option value="GodMode">GodMode</option>
+                </select>
+                <button type="submit" className="approve-btn">
+                  Create Account
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </div>
     );
