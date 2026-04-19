@@ -21,6 +21,27 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [tickers, setTickers] = useState([]);
   const [editingTicker, setEditingTicker] = useState(null);
 
+  // NEW: tab permissions configuration
+  const AVAILABLE_TABS = [
+    { id: 'overview', label: 'Overview / Stats' },
+    { id: 'announcements', label: 'Announcements & Tickers' },
+    { id: 'alumni', label: 'Alumni Verification' },
+    { id: 'students', label: 'Student Verification' },
+    { id: 'feedback', label: 'Issues & Feedback' },
+    { id: 'logs', label: 'Security Logs' },
+  ];
+
+  // Default selection for new admins
+  const [selectedPerms, setSelectedPerms] = useState(['overview']);
+
+  const togglePermission = (tabId) => {
+    setSelectedPerms((prev) =>
+      prev.includes(tabId)
+        ? prev.filter((p) => p !== tabId)
+        : [...prev, tabId]
+    );
+  };
+
   const adminData = JSON.parse(localStorage.getItem('admin'));
   const adminId = adminData?._id;
 
@@ -412,12 +433,17 @@ function AdminDashboard({ admin, setView, onLogout }) {
       const response = await fetch('/api/admin/create-new', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, creatorRole: admin.role }),
+        body: JSON.stringify({
+          ...formData,
+          creatorRole: admin.role,
+          permissions: selectedPerms,
+        }),
       });
       if (response.ok) {
         alert('Admin Created!');
         e.target.reset();
         setFormData({ username: '', password: '', role: 'Moderator' });
+        setSelectedPerms(['overview']);
         fetchAllAdmins();
       }
     };
@@ -517,6 +543,26 @@ function AdminDashboard({ admin, setView, onLogout }) {
                   <option value="Admin">Admin</option>
                   <option value="GodMode">GodMode</option>
                 </select>
+
+                <div className="permissions-container">
+                  <h4>Grant Tab Access</h4>
+                  <div className="permissions-grid">
+                    {AVAILABLE_TABS.map((tab) => (
+                      <label 
+                        key={tab.id} 
+                        className={`checkbox-label ${selectedPerms.includes(tab.id) ? 'checked' : ''}`}
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={selectedPerms.includes(tab.id)}
+                          onChange={() => togglePermission(tab.id)}
+                        />
+                        {tab.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <button type="submit" className="approve-btn">
                   Create Account
                 </button>
@@ -541,46 +587,61 @@ function AdminDashboard({ admin, setView, onLogout }) {
         </div>
 
         <div className="nav-center">
-          <button
-            className={activeTab === 'overview' ? 'active' : ''}
-            onClick={() => setActiveTab('overview')}
-          >
-            Overview
-          </button>
-          <button
-            className={activeTab === 'alumni' ? 'active' : ''}
-            onClick={() => {
-              setActiveTab('alumni');
-              setStatusFilter('pending');
-            }}
-          >
-            Alumni
-          </button>
-          <button
-            className={activeTab === 'students' ? 'active' : ''}
-            onClick={() => {
-              setActiveTab('students');
-              setStatusFilter('pending');
-            }}
-          >
-            Students
-          </button>
-          <button
-            className={activeTab === 'announcements' ? 'active' : ''}
-            onClick={() => {
-              setActiveTab('announcements');
-              setStatusFilter('post');
-              setAnnouncementSubTab('post');
-            }}
-          >
-            Announcements
-          </button>
-          <button
-            className={activeTab === 'logs' ? 'active' : ''}
-            onClick={() => setActiveTab('logs')}
-          >
-            Security Logs
-          </button>
+          {admin?.permissions?.includes('overview') && (
+            <button
+              className={activeTab === 'overview' ? 'active' : ''}
+              onClick={() => setActiveTab('overview')}
+            >
+              Overview
+            </button>
+          )}
+
+          {admin?.permissions?.includes('alumni') && (
+            <button
+              className={activeTab === 'alumni' ? 'active' : ''}
+              onClick={() => {
+                setActiveTab('alumni');
+                setStatusFilter('pending');
+              }}
+            >
+              Alumni
+            </button>
+          )}
+
+          {admin?.permissions?.includes('students') && (
+            <button
+              className={activeTab === 'students' ? 'active' : ''}
+              onClick={() => {
+                setActiveTab('students');
+                setStatusFilter('pending');
+              }}
+            >
+              Students
+            </button>
+          )}
+
+          {admin?.permissions?.includes('announcements') && (
+            <button
+              className={activeTab === 'announcements' ? 'active' : ''}
+              onClick={() => {
+                setActiveTab('announcements');
+                setStatusFilter('post');
+                setAnnouncementSubTab('post');
+              }}
+            >
+              Announcements
+            </button>
+          )}
+
+          {admin?.permissions?.includes('logs') && (
+            <button
+              className={activeTab === 'logs' ? 'active' : ''}
+              onClick={() => setActiveTab('logs')}
+            >
+              Security Logs
+            </button>
+          )}
+
           {admin?.role === 'GodMode' && (
             <button
               className={activeTab === 'manage-admins' ? 'active' : ''}
@@ -589,12 +650,15 @@ function AdminDashboard({ admin, setView, onLogout }) {
               Admin Access
             </button>
           )}
-          <button
-            className={activeTab === 'feedback' ? 'active' : ''}
-            onClick={() => setActiveTab('feedback')}
-          >
-            Issues &amp; Feedback
-          </button>
+
+          {admin?.permissions?.includes('feedback') && (
+            <button
+              className={activeTab === 'feedback' ? 'active' : ''}
+              onClick={() => setActiveTab('feedback')}
+            >
+              Issues &amp; Feedback
+            </button>
+          )}
         </div>
 
         <div className="nav-right">
@@ -662,7 +726,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
                   History
                 </button>
                 <button
-                  className={announcementSubTab === 'tickers' ? 'sel' : ''}
+                  className={
+                    announcementSubTab === 'tickers' ? 'sel' : ''
+                  }
                   onClick={() => setAnnouncementSubTab('tickers')}
                 >
                   Manage Tickers
@@ -714,7 +780,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
               <div className="ticker-management-section">
                 <div className="admin-card-simple">
                   <h3>
-                    {editingTicker ? 'Edit Ticker' : 'Add New Ticker Item'}
+                    {editingTicker
+                      ? 'Edit Ticker'
+                      : 'Add New Ticker Item'}
                   </h3>
                   <form
                     onSubmit={handleTickerSubmit}

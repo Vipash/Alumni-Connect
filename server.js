@@ -65,7 +65,17 @@ app.get('/api/announcements', async (req, res) => {
 const isAdmin = async (req, res, next) => {
   const adminId = req.headers['admin-id'];
   if (!adminId) return res.status(403).send('Admin access required');
-  next();
+
+  try {
+    const admin = await Admin.findById(adminId);
+    if (!admin) return res.status(403).send('Invalid Admin Session');
+    
+    // Attach admin info to the request for use in later routes
+    req.admin = admin; 
+    next();
+  } catch (err) {
+    res.status(500).send('Security check failed');
+  }
 };
 
 // Admin login
@@ -91,22 +101,26 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-// Create new admin (GodMode only)
+// Update Create Admin Route
 app.post('/api/admin/create-new', async (req, res) => {
   try {
-    const { username, password, role, creatorRole } = req.body;
+    const { username, password, role, permissions, creatorRole } = req.body;
 
     if (creatorRole !== 'GodMode') {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newAdmin = new Admin({ username, password: hashedPassword, role });
+    const newAdmin = new Admin({ 
+      username, 
+      password: hashedPassword, 
+      role, 
+      permissions // Save the array of checked tabs
+    });
+    
     await newAdmin.save();
-
     res.status(201).json({ message: 'New admin created successfully' });
   } catch (err) {
-    console.error('Admin create error:', err);
     res.status(500).json({ error: err.message });
   }
 });

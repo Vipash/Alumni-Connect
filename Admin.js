@@ -1,19 +1,14 @@
 const mongoose = require('mongoose');
 
 // This defines exactly what an Admin looks like in your database
-const AdminSchema = new mongoose.Schema({
-  username: { 
-    type: String, 
-    required: true, 
-    unique: true // Prevents two admins from having the same name
-  },
-  password: { 
-    type: String, 
-    required: true 
-  },
-  role: { 
-    type: String, 
-    default: 'Moderator' // Options: 'GodMode', 'Moderator', 'Editor'
+const adminSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, default: 'Admin' }, // 'GodMode' or 'Admin'
+  // NEW: Store list of accessible tabs
+  permissions: { 
+    type: [String], 
+    default: ['dashboard'] // Default minimal access
   }
 });
 
