@@ -64,7 +64,9 @@ function App() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [hubSearch, setHubSearch] = useState('');
   const [hubCategory, setHubCategory] = useState('All');
-  const [announcementSearch, setAnnouncementSearch] = useState('');
+  const [announcementSubTab, setAnnouncementSubTab] = useState('post'); // post | history | tickers
+  const [tickers, setTickers] = useState([]);
+  const [editingTicker, setEditingTicker] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -78,6 +80,23 @@ function App() {
     displayName: '',
   });
 
+  const fetchTickers = async () => {
+  const res = await fetch('https://alumni-connect-fegi.onrender.com/api/admin/tickers', {
+    headers: { 'admin-id': adminId },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      // Sort by priority descending for the admin view
+      setTickers(data.sort((a, b) => b.priority - a.priority));
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'announcements' && announcementSubTab === 'tickers') {
+      fetchTickers();
+    }
+  }, [activeTab, announcementSubTab]);
+  
   // --- MAP SEARCH HANDLER ---
   const handleMapSearch = async () => {
     if (!mapSearchQuery) return;

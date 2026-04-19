@@ -78,7 +78,7 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
-// Admin login
+// UPDATED: send permissions too
 app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -91,9 +91,10 @@ app.post('/api/admin/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid Admin Credentials' });
 
     res.json({
+      _id: admin._id,
       username: admin.username,
       role: admin.role,
-      _id: admin._id,
+      permissions: admin.permissions || [], // ✅ important
     });
   } catch (err) {
     console.error('Admin Login Error:', err);

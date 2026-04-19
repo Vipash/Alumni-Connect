@@ -548,12 +548,14 @@ function AdminDashboard({ admin, setView, onLogout }) {
                   <h4>Grant Tab Access</h4>
                   <div className="permissions-grid">
                     {AVAILABLE_TABS.map((tab) => (
-                      <label 
-                        key={tab.id} 
-                        className={`checkbox-label ${selectedPerms.includes(tab.id) ? 'checked' : ''}`}
+                      <label
+                        key={tab.id}
+                        className={`checkbox-label ${
+                          selectedPerms.includes(tab.id) ? 'checked' : ''
+                        }`}
                       >
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           checked={selectedPerms.includes(tab.id)}
                           onChange={() => togglePermission(tab.id)}
                         />
@@ -574,6 +576,15 @@ function AdminDashboard({ admin, setView, onLogout }) {
     );
   };
 
+  // Helper: who can see which tab
+  const canSeeTab = (permissionKey) => {
+    if (admin?.role === 'GodMode') return true;
+    const perms = admin?.permissions;
+    // If no permissions field yet (old accounts), show everything
+    if (!Array.isArray(perms)) return true;
+    return perms.includes(permissionKey);
+  };
+
   // 7. FINAL RETURN STATEMENT
   return (
     <div className="admin-dashboard-page">
@@ -587,7 +598,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
         </div>
 
         <div className="nav-center">
-          {admin?.permissions?.includes('overview') && (
+          {canSeeTab('overview') && (
             <button
               className={activeTab === 'overview' ? 'active' : ''}
               onClick={() => setActiveTab('overview')}
@@ -596,7 +607,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
             </button>
           )}
 
-          {admin?.permissions?.includes('alumni') && (
+          {canSeeTab('alumni') && (
             <button
               className={activeTab === 'alumni' ? 'active' : ''}
               onClick={() => {
@@ -608,7 +619,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
             </button>
           )}
 
-          {admin?.permissions?.includes('students') && (
+          {canSeeTab('students') && (
             <button
               className={activeTab === 'students' ? 'active' : ''}
               onClick={() => {
@@ -620,7 +631,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
             </button>
           )}
 
-          {admin?.permissions?.includes('announcements') && (
+          {canSeeTab('announcements') && (
             <button
               className={activeTab === 'announcements' ? 'active' : ''}
               onClick={() => {
@@ -633,7 +644,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
             </button>
           )}
 
-          {admin?.permissions?.includes('logs') && (
+          {canSeeTab('logs') && (
             <button
               className={activeTab === 'logs' ? 'active' : ''}
               onClick={() => setActiveTab('logs')}
@@ -642,6 +653,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
             </button>
           )}
 
+          {/* ONLY GodMode sees Admin Access */}
           {admin?.role === 'GodMode' && (
             <button
               className={activeTab === 'manage-admins' ? 'active' : ''}
@@ -651,7 +663,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
             </button>
           )}
 
-          {admin?.permissions?.includes('feedback') && (
+          {canSeeTab('feedback') && (
             <button
               className={activeTab === 'feedback' ? 'active' : ''}
               onClick={() => setActiveTab('feedback')}
