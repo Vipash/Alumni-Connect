@@ -467,6 +467,46 @@ app.get('/api/admin/support-tickets', async (req, res) => {
   }
 });
 
+const Ticker = require('./Ticker');
+
+// GET all tickers (Public - for the landing page)
+app.get('/api/tickers', async (req, res) => {
+  try {
+    const tickers = await Ticker.find({ isActive: true }).sort({ priority: -1 });
+    res.json(tickers);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// ADMIN: Get all tickers (including inactive ones)
+app.get('/api/admin/tickers', isAdmin, async (req, res) => {
+  const tickers = await Ticker.find().sort({ createdAt: -1 });
+  res.json(tickers);
+});
+
+// ADMIN: Create/Update Ticker
+app.post('/api/admin/tickers', isAdmin, async (req, res) => {
+  const { id, text, isActive, priority } = req.body;
+  try {
+    if (id) {
+      await Ticker.findByIdAndUpdate(id, { text, isActive, priority });
+    } else {
+      const newTicker = new Ticker({ text, isActive, priority });
+      await newTicker.save();
+    }
+    res.status(200).send("Success");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// ADMIN: Delete Ticker
+app.delete('/api/admin/tickers/:id', isAdmin, async (req, res) => {
+  await Ticker.findByIdAndDelete(req.params.id);
+  res.send("Deleted");
+});
+
 // ---------- SECURITY LOGS ----------
 
 app.post('/api/log-interaction', async (req, res) => {

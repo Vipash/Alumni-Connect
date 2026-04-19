@@ -16,6 +16,11 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [allAdmins, setAllAdmins] = useState([]);
   const [adminSubTab, setAdminSubTab] = useState('list');
 
+  // NEW: announcements sub-tabs and ticker state
+  const [announcementSubTab, setAnnouncementSubTab] = useState('post'); // post | history | tickers
+  const [tickers, setTickers] = useState([]);
+  const [editingTicker, setEditingTicker] = useState(null);
+
   const adminData = JSON.parse(localStorage.getItem('admin'));
   const adminId = adminData?._id;
 
@@ -36,7 +41,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
 
   const getApiUrl = () => {
     if (activeTab === 'logs') return '/api/admin/logs';
-    if (activeTab === 'announcements') return '/api/announcements';
+    // Only fetch announcements list when in history mode
+    if (activeTab === 'announcements' && statusFilter === 'history')
+      return '/api/announcements';
     const role = activeTab === 'alumni' ? 'alumni' : 'student';
     return `/api/admin/${statusFilter}/${role}`;
   };
@@ -98,6 +105,57 @@ function AdminDashboard({ admin, setView, onLogout }) {
     if (res.ok) fetchAllAdmins();
   };
 
+  // NEW: ticker helpers
+  const fetchTickers = async () => {
+    try {
+      const res = await fetch(
+        'https://alumni-connect-fegi.onrender.com/api/admin/tickers',
+        {
+          headers: { 'admin-id': adminId },
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        // Sort by priority (higher first)
+        setTickers(data.sort((a, b) => b.priority - a.priority));
+      }
+    } catch (err) {
+      console.error('Ticker fetch error:', err);
+      setTickers([]);
+    }
+  };
+
+  const handleTickerSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingTicker) return;
+
+    const method = editingTicker?._id ? 'PUT' : 'POST';
+    const url = editingTicker?._id
+      ? `/api/admin/tickers/${editingTicker._id}`
+      : '/api/admin/tickers';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'admin-id': adminId },
+      body: JSON.stringify(editingTicker),
+    });
+
+    if (res.ok) {
+      alert('Ticker updated!');
+      setEditingTicker(null);
+      fetchTickers();
+    }
+  };
+
+  const handleTickerDelete = async (id) => {
+    if (!window.confirm('Delete this ticker?')) return;
+    const res = await fetch(`/api/admin/tickers/${id}`, {
+      method: 'DELETE',
+      headers: { 'admin-id': adminId },
+    });
+    if (res.ok) fetchTickers();
+  };
+
   // 3. Derived Data
   const filteredData = listData.filter((item) => {
     if (!searchTerm) return true;
@@ -144,6 +202,13 @@ function AdminDashboard({ admin, setView, onLogout }) {
   useEffect(() => {
     if (activeTab === 'manage-admins') fetchAllAdmins();
   }, [activeTab]);
+
+  // NEW: fetch tickers when announcements → tickers tab active
+  useEffect(() => {
+    if (activeTab === 'announcements' && announcementSubTab === 'tickers') {
+      fetchTickers();
+    }
+  }, [activeTab, announcementSubTab]);
 
   // 5. Action Handlers
   const handleAction = async (id, action) => {
@@ -193,6 +258,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
       alert('Posted!');
       e.target.reset();
       setStatusFilter('history');
+      setAnnouncementSubTab('history');
       fetchCurrentList();
     }
   };
@@ -274,21 +340,24 @@ function AdminDashboard({ admin, setView, onLogout }) {
                 className="hover-row"
               >
                 <td>
-                <span
-                  className={`badge-pill status-${t.type?.toLowerCase() || 'other'}`}
-                >
-                  {t.type}
-                </span>
-              </td>
-              <td>
-                <strong>{t.userName || "Guest User"}</strong><br/>
-                <small>{t.senderEmail}</small>
-              </td>
-              <td>
-                {t.createdAt
-                  ? new Date(t.createdAt).toLocaleString()
-                  : 'N/A'}
-              </td>
+                  <span
+                    className={`badge-pill status-${
+                      t.type?.toLowerCase() || 'other'
+                    }`}
+                  >
+                    {t.type}
+                  </span>
+                </td>
+                <td>
+                  <strong>{t.userName || 'Guest User'}</strong>
+                  <br />
+                  <small>{t.senderEmail}</small>
+                </td>
+                <td>
+                  {t.createdAt
+                    ? new Date(t.createdAt).toLocaleString()
+                    : 'N/A'}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -308,7 +377,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
             <h3>Feedback Detail</h3>
             <hr />
             <p>
-              <strong>From:</strong> {selectedTicket.userName || "Guest"} (
+              <strong>From:</strong> {selectedTicket.userName || 'Guest'} (
               {selectedTicket.senderEmail || 'N/A'})
             </p>
             <p>
@@ -501,6 +570,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
             onClick={() => {
               setActiveTab('announcements');
               setStatusFilter('post');
+              setAnnouncementSubTab('post');
             }}
           >
             Announcements
@@ -569,19 +639,33 @@ function AdminDashboard({ admin, setView, onLogout }) {
               </div>
             )}
 
+            {/* UPDATED: announcements toolbar uses sub-tabs */}
             {activeTab === 'announcements' && (
               <div className="filter-group">
                 <button
-                  className={statusFilter === 'post' ? 'sel' : ''}
-                  onClick={() => setStatusFilter('post')}
+                  className={announcementSubTab === 'post' ? 'sel' : ''}
+                  onClick={() => {
+                    setAnnouncementSubTab('post');
+                    setStatusFilter('post');
+                  }}
                 >
                   Post New
                 </button>
                 <button
-                  className={statusFilter === 'history' ? 'sel' : ''}
-                  onClick={() => setStatusFilter('history')}
+                  className={announcementSubTab === 'history' ? 'sel' : ''}
+                  onClick={() => {
+                    setAnnouncementSubTab('history');
+                    setStatusFilter('history');
+                    fetchCurrentList();
+                  }}
                 >
                   History
+                </button>
+                <button
+                  className={announcementSubTab === 'tickers' ? 'sel' : ''}
+                  onClick={() => setAnnouncementSubTab('tickers')}
+                >
+                  Manage Tickers
                 </button>
               </div>
             )}
@@ -594,38 +678,192 @@ function AdminDashboard({ admin, setView, onLogout }) {
           {activeTab === 'feedback' && <FeedbackView />}
 
           {/* Announcement post form */}
-          {activeTab === 'announcements' && statusFilter === 'post' && (
-            <div className="admin-card-simple">
-              <form
-                onSubmit={handlePostAnnouncement}
-                className="admin-form-clean"
-              >
-                <input name="title" placeholder="Title" required />
-                <input name="subject" placeholder="Subject" required />
-                <textarea
-                  name="content"
-                  placeholder="Announcement Content..."
-                  rows="4"
-                  required
-                />
-                <select
-                  value={audience}
-                  onChange={(e) => setAudience(e.target.value)}
+          {activeTab === 'announcements' &&
+            announcementSubTab === 'post' && (
+              <div className="admin-card-simple">
+                <form
+                  onSubmit={handlePostAnnouncement}
+                  className="admin-form-clean"
                 >
-                  <option value="all">Everyone</option>
-                  <option value="alumni">Alumni Only</option>
-                  <option value="students">Students Only</option>
-                </select>
-                <button type="submit" className="approve-btn">
-                  Publish
-                </button>
-              </form>
-            </div>
-          )}
+                  <input name="title" placeholder="Title" required />
+                  <input name="subject" placeholder="Subject" required />
+                  <textarea
+                    name="content"
+                    placeholder="Announcement Content..."
+                    rows="4"
+                    required
+                  />
+                  <select
+                    value={audience}
+                    onChange={(e) => setAudience(e.target.value)}
+                  >
+                    <option value="all">Everyone</option>
+                    <option value="alumni">Alumni Only</option>
+                    <option value="students">Students Only</option>
+                  </select>
+                  <button type="submit" className="approve-btn">
+                    Publish
+                  </button>
+                </form>
+              </div>
+            )}
+
+          {/* NEW: Ticker management UI */}
+          {activeTab === 'announcements' &&
+            announcementSubTab === 'tickers' && (
+              <div className="ticker-management-section">
+                <div className="admin-card-simple">
+                  <h3>
+                    {editingTicker ? 'Edit Ticker' : 'Add New Ticker Item'}
+                  </h3>
+                  <form
+                    onSubmit={handleTickerSubmit}
+                    className="admin-form-clean"
+                  >
+                    <input
+                      required
+                      placeholder="Ticker Text (e.g., 'Final Year Exams starting from May 5th...')"
+                      value={editingTicker?.text || ''}
+                      onChange={(e) =>
+                        setEditingTicker({
+                          ...(editingTicker || {}),
+                          text: e.target.value,
+                          isActive: editingTicker?.isActive ?? true,
+                          priority: editingTicker?.priority ?? 0,
+                        })
+                      }
+                    />
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '15px',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <input
+                        type="number"
+                        placeholder="Priority (e.g. 10)"
+                        style={{ width: '120px' }}
+                        value={
+                          editingTicker?.priority === 0
+                            ? ''
+                            : editingTicker?.priority ?? ''
+                        }
+                        onChange={(e) =>
+                          setEditingTicker({
+                            ...(editingTicker || {}),
+                            priority: parseInt(
+                              e.target.value || '0',
+                              10
+                            ),
+                            text: editingTicker?.text || '',
+                            isActive: editingTicker?.isActive ?? true,
+                          })
+                        }
+                      />
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={editingTicker?.isActive ?? true}
+                          onChange={(e) =>
+                            setEditingTicker({
+                              ...(editingTicker || {}),
+                              isActive: e.target.checked,
+                              text: editingTicker?.text || '',
+                              priority: editingTicker?.priority ?? 0,
+                            })
+                          }
+                        />{' '}
+                        Show on Home Page
+                      </label>
+                      <button type="submit" className="approve-btn">
+                        {editingTicker ? 'Update Ticker' : 'Add Ticker'}
+                      </button>
+                      {editingTicker && (
+                        <button
+                          type="button"
+                          onClick={() => setEditingTicker(null)}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                </div>
+
+                <div
+                  className="data-table-container"
+                  style={{ marginTop: '20px' }}
+                >
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Order</th>
+                        <th>Ticker Message</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tickers.map((t) => (
+                        <tr key={t._id}>
+                          <td>
+                            <strong>#{t.priority}</strong>
+                          </td>
+                          <td>{t.text}</td>
+                          <td>
+                            <span
+                              className={`badge-pill ${
+                                t.isActive
+                                  ? 'status-verified'
+                                  : 'status-pending'
+                              }`}
+                            >
+                              {t.isActive ? 'Active' : 'Hidden'}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className="edit-btn-sm"
+                              onClick={() => setEditingTicker(t)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="delete-btn"
+                              onClick={() =>
+                                handleTickerDelete(t._id)
+                              }
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      {tickers.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan="4"
+                            style={{
+                              textAlign: 'center',
+                              padding: 16,
+                            }}
+                          >
+                            No tickers found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
           {/* Main Table for Users / Logs / Announcement History */}
           {((['alumni', 'students', 'logs'].includes(activeTab)) ||
-            (activeTab === 'announcements' && statusFilter === 'history')) && (
+            (activeTab === 'announcements' &&
+              announcementSubTab === 'history')) && (
             <div className="data-table-container">
               {loading ? (
                 <p>Loading...</p>
@@ -651,7 +889,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
                         <th>Contact</th>
                         <th>Details</th>
                         <th>
-                          {activeTab === 'alumni' ? 'Company' : 'Roll No'}
+                          {activeTab === 'alumni'
+                            ? 'Company'
+                            : 'Roll No'}
                         </th>
                         <th>Actions</th>
                       </tr>
