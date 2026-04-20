@@ -15,7 +15,7 @@ import ConnectHub from './ConnectHub';
 import AuthHome from './AuthHome';
 import InstructionManual from './InstructionManual';
 import AboutUs from './AboutUs';
-import SupportModal from './Support'; // FIX: correct component name
+import SupportModal from './Support';
 
 // Fix for Leaflet Icons
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -29,6 +29,58 @@ let DefaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
+
+// Public ticker section on landing page
+const TickerSection = () => {
+  const [liveTickers, setLiveTickers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getTickers = async () => {
+      try {
+        const response = await fetch('/api/tickers');
+        const data = await response.json();
+        setLiveTickers(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Failed to load tickers:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getTickers();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="news-ticker">
+        <div className="ticker-wrap">
+          <div className="ticker-item ticker-placeholder">
+            Loading updates...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="news-ticker">
+      <div className="ticker-wrap">
+        {liveTickers.length > 0 ? (
+          liveTickers.map((t) => (
+            <div key={t._id} className="ticker-item">
+              {t.text}
+            </div>
+          ))
+        ) : (
+          <div className="ticker-item">
+            Welcome to MBM Alumni Connect!
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 function App() {
   // --- CORE STATE ---
@@ -65,8 +117,11 @@ function App() {
   const [hubSearch, setHubSearch] = useState('');
   const [hubCategory, setHubCategory] = useState('All');
   const [announcementSubTab, setAnnouncementSubTab] = useState('post'); // post | history | tickers
+
+  // Optional: these are not used in App itself; safe to remove if unused
   const [tickers, setTickers] = useState([]);
   const [editingTicker, setEditingTicker] = useState(null);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -80,23 +135,6 @@ function App() {
     displayName: '',
   });
 
-  const fetchTickers = async () => {
-  const res = await fetch('https://alumni-connect-fegi.onrender.com/api/admin/tickers', {
-    headers: { 'admin-id': adminId },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      // Sort by priority descending for the admin view
-      setTickers(data.sort((a, b) => b.priority - a.priority));
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === 'announcements' && announcementSubTab === 'tickers') {
-      fetchTickers();
-    }
-  }, [activeTab, announcementSubTab]);
-  
   // --- MAP SEARCH HANDLER ---
   const handleMapSearch = async () => {
     if (!mapSearchQuery) return;
@@ -132,7 +170,7 @@ function App() {
       const data = await res.json();
       localStorage.setItem('admin', JSON.stringify(data));
       setAdminUser(data);
-      setView('admin-dashboard'); // FIX: unified key
+      setView('admin-dashboard');
     } else {
       alert('Invalid Admin Credentials');
     }
@@ -375,10 +413,8 @@ function App() {
             setFilterType={setHubCategory}
           />
         );
-
-        case 'support':
-          return <SupportModal user={loggedInUser} isTabMode={true} />;
-
+      case 'support':
+        return <SupportModal user={loggedInUser} isTabMode={true} />;
       case 'inbox':
         return (
           <Inbox
@@ -474,16 +510,19 @@ function App() {
               >
                 Notice Board
               </button>
-              <button 
-                className={activeTab === 'support' ? 'active' : ''} 
-                onClick={() => {setActiveTab('support'); setSidebarContent(null);}}
+              <button
+                className={activeTab === 'support' ? 'active' : ''}
+                onClick={() => {
+                  setActiveTab('support');
+                  setSidebarContent(null);
+                }}
               >
                 🛠 Support
               </button>
             </nav>
           )}
 
-           <div className="portal-main-partition">
+          <div className="portal-main-partition">
             <aside className="partition-left">{renderLeftPartition()}</aside>
 
             <main className="partition-right">
@@ -547,19 +586,9 @@ function App() {
                 </button>
               </div>
             </nav>
-            <div className="news-ticker">
-              <div className="ticker-wrap">
-                <div className="ticker-item">
-                  📢 Next Alumni Meet: December 2026
-                </div>
-                <div className="ticker-item">
-                  🎓 New Research Wing Inaugurated
-                </div>
-                <div className="ticker-item">
-                  📰 Latest E-Magazine "MBM Connect" Out Now!
-                </div>
-              </div>
-            </div>
+
+            {/* Dynamic ticker */}
+            <TickerSection />
           </div>
 
           <main className="content-body">
@@ -684,7 +713,10 @@ function App() {
 
                   {portalStep.startsWith('login-') &&
                     portalStep !== 'login-choice' && (
-                      <form onSubmit={handleLogin} className="login-container">
+                      <form
+                        onSubmit={handleLogin}
+                        className="login-container"
+                      >
                         <button
                           type="button"
                           className="back-link-btn"
@@ -728,7 +760,8 @@ function App() {
                           Registration
                         </h2>
                         <p className="form-subtitle">
-                          Please fill in your details to request portal access.
+                          Please fill in your details to request portal
+                          access.
                         </p>
                       </div>
 
