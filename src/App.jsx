@@ -262,6 +262,23 @@ function App() {
     }
   };
 
+  // Sample data - replace with your actual image names
+  const galleryItems = [
+    { img: "/assets/campus-main.jpg", text: "Welcome to the Historic MBM University Campus." },
+    { img: "/assets/alumni-meet.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
+    { img: "/assets/library.jpg", text: "Our newly renovated digital library and research wing." }
+  ];
+
+  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
+
+  // Auto-play logic
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentGalleryIndex((prev) => (prev === galleryItems.length - 1 ? 0 : prev + 1));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   // --- UTILS ---
   const downloadMagazine = () => {
     const link = document.createElement('a');
@@ -611,16 +628,32 @@ function App() {
                   </div>
                 </header>
                 <section className="portal-info-section">
-                  <div className="activity-card">
-                    <h3>Recent University Activities</h3>
-                    <p>Explore the latest updates from the campus...</p>
-                    <button
-                      className="secondary-btn"
-                      style={{ width: 'auto' }}
-                    >
-                      View Gallery
-                    </button>
+                  {/* Replace your old Gallery button with this */}
+                <div className="feature-strip-wrapper">
+                  <div className="feature-strip">
+                    <div className="strip-image-box">
+                      <img 
+                        src={galleryItems[currentGalleryIndex].img} 
+                        alt="Campus Gallery" 
+                        className="fade-in" 
+                        key={currentGalleryIndex} // Key forces animation reset on change
+                      />
+                    </div>
+                    <div className="strip-text-box">
+                      <p>{galleryItems[currentGalleryIndex].text}</p>
+                      
+                      {/* Navigation Controls inside the strip */}
+                      <div className="strip-nav">
+                        <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === 0 ? galleryItems.length - 1 : currentGalleryIndex - 1)}>
+                          ❮
+                        </button>
+                        <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === galleryItems.length - 1 ? 0 : currentGalleryIndex + 1)}>
+                          ❯
+                        </button>
+                      </div>
+                    </div>
                   </div>
+</div>
                   <div className="magazine-outlet">
                     <h3>Alumni E-Magazine</h3>
                     <div className="mag-preview">

@@ -15,6 +15,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [allAdmins, setAllAdmins] = useState([]);
   const [adminSubTab, setAdminSubTab] = useState('list');
+  const [announcementSearch, setAnnouncementSearch] = useState('');
 
   // NEW: announcements primary mode + subviews
   const [announcementMode, setAnnouncementMode] = useState('announcements'); // 'announcements' | 'tickers'
@@ -80,7 +81,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
   };
 
   const fetchCurrentList = async () => {
-    // Do not fetch list for overview, manage-admins, feedback, or ticker mode
+    // Do not fetch list for overview, manage-admins, feedback
     if (
       activeTab === 'overview' ||
       activeTab === 'manage-admins' ||
@@ -224,6 +225,16 @@ function AdminDashboard({ admin, setView, onLogout }) {
       item.displayName?.toLowerCase().includes(search) ||
       item.alumniName?.toLowerCase().includes(search) ||
       item.title?.toLowerCase().includes(search)
+    );
+  });
+
+  const filteredAnnouncements = listData.filter((item) => {
+    const search = (announcementSearch || '').toLowerCase();
+    if (!search) return true;
+
+    return (
+      item.title?.toLowerCase().includes(search) ||
+      item.subject?.toLowerCase().includes(search)
     );
   });
 
@@ -803,6 +814,18 @@ function AdminDashboard({ admin, setView, onLogout }) {
                   ? 'View & Edit Tickers'
                   : 'Post History'}
               </button>
+
+              {announcementMode === 'announcements' && subView === 'history' && (
+                <div className="filter-group">
+                  <input
+                    type="text"
+                    placeholder="Search announcements..."
+                    value={announcementSearch}
+                    onChange={(e) => setAnnouncementSearch(e.target.value)}
+                    className="search-input"
+                  />
+                </div>
+              )}
             </div>
 
             {/* CONTENT AREA */}
@@ -850,7 +873,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredData.map((item) => (
+                        {filteredAnnouncements.map((item) => (
                           <tr key={item._id}>
                             <td>
                               {item.date
@@ -875,7 +898,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                             </td>
                           </tr>
                         ))}
-                        {!loading && filteredData.length === 0 && (
+                        {!loading && filteredAnnouncements.length === 0 && (
                           <tr>
                             <td
                               colSpan={3}
