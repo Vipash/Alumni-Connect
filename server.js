@@ -94,7 +94,7 @@ app.post('/api/admin/login', async (req, res) => {
       _id: admin._id,
       username: admin.username,
       role: admin.role,
-      permissions: admin.permissions || [], // ✅ important
+      permissions: admin.permissions || [],
     });
   } catch (err) {
     console.error('Admin Login Error:', err);
@@ -490,6 +490,23 @@ app.get('/api/tickers', async (req, res) => {
     const tickers = await Ticker.find({ isActive: true }).sort({ priority: -1 });
     res.json(tickers);
   } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Add this to your server.js
+app.put('/api/admin/tickers/:id', isAdmin, async (req, res) => {
+  try {
+    const { text, isActive, priority } = req.body;
+    const updatedTicker = await Ticker.findByIdAndUpdate(
+      req.params.id,
+      { text, isActive, priority },
+      { new: true }
+    );
+    if (!updatedTicker) return res.status(404).send("Ticker not found");
+    res.json(updatedTicker);
+  } catch (err) {
+    console.error("Update error:", err);
     res.status(500).send(err.message);
   }
 });
