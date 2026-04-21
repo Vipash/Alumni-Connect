@@ -264,9 +264,9 @@ function App() {
 
   // Sample data - replace with your actual image names
   const galleryItems = [
-    { img: "/assets/campus-main.jpg", text: "Welcome to the Historic MBM University Campus." },
-    { img: "/assets/alumni-meet.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
-    { img: "/assets/library.jpg", text: "Our newly renovated digital library and research wing." }
+    { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
+    { img: "/assets/event1.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
+    { img: "/assets/lab1.jpg", text: "Our newly renovated digital library and research wing." }
   ];
 
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);

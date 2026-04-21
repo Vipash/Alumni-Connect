@@ -163,3 +163,127 @@
   .strip-image-box { width: 100%; height: 150px; }
   .strip-nav { position: static; transform: none; margin-top: 15px; justify-content: center; }
 }
+
+/* The Main Wide Container */
+.wide-feature-strip {
+  position: relative;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  
+  background: linear-gradient(90deg, #1a2a6c, #b21f1f, #fdbb2d); /* Example Vibrant Gradient */
+  background: #003366; /* Or a solid Professional Navy */
+  
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.strip-inner-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1100px;
+  height: 100%;
+  padding: 0 60px;
+  gap: 40px;
+}
+
+/* Square Image Box on the Left */
+.strip-image-container {
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.strip-img-fade {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: stripFadeIn 0.5s ease-in-out;
+}
+
+/* Text Container */
+.strip-text-container {
+  flex-grow: 1;
+}
+
+.strip-title {
+  margin: 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fdbb2d; /* Gold-ish highlight */
+  margin-bottom: 8px;
+}
+
+.strip-description {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 300;
+  line-height: 1.3;
+  color: #ffffff;
+}
+
+/* Navigation Arrows */
+.strip-arrow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  z-index: 10;
+}
+
+.strip-arrow:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.strip-arrow.left { left: 0; }
+.strip-arrow.right { right: 0; }
+
+/* Animated Progress Bar */
+.strip-progress-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+}
+
+.strip-progress-fill {
+  height: 100%;
+  background: #fdbb2d;
+  transition: width 0.5s ease;
+}
+
+@keyframes stripFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .wide-feature-strip { height: auto; padding: 40px 0; }
+  .strip-inner-content { flex-direction: column; text-align: center; padding: 0 40px; }
+  .strip-image-container { width: 120px; height: 120px; }
+  .strip-description { font-size: 1.1rem; }
+}
