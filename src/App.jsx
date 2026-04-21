@@ -628,21 +628,24 @@ function App() {
                   </div>
                 </header>
                 <section className="portal-info-section">
-                  {/* Replace your old Gallery button with this */}
-                <div className="feature-strip-wrapper">
-                  <div className="feature-strip">
+                  <div className="feature-strip-container"> {/* Updated wrapper class */}
+                  <div className="feature-strip-main"> {/* New inner content class */}
+                    
+                    {/* 1. THE BOX: Image contained on the far left */}
                     <div className="strip-image-box">
                       <img 
                         src={galleryItems[currentGalleryIndex].img} 
                         alt="Campus Gallery" 
                         className="fade-in" 
-                        key={currentGalleryIndex} // Key forces animation reset on change
+                        key={currentGalleryIndex}
                       />
                     </div>
+
+                    {/* 2. THE TEXT: Displays besides the image box */}
                     <div className="strip-text-box">
                       <p>{galleryItems[currentGalleryIndex].text}</p>
                       
-                      {/* Navigation Controls inside the strip */}
+                      {/* Navigation Controls */}
                       <div className="strip-nav">
                         <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === 0 ? galleryItems.length - 1 : currentGalleryIndex - 1)}>
                           ❮
@@ -653,7 +656,12 @@ function App() {
                       </div>
                     </div>
                   </div>
-</div>
+                  
+                  {/* Optional: Visual progress bar at the bottom */}
+                  <div className="strip-progress-bar" 
+                      style={{ width: `${((currentGalleryIndex + 1) / galleryItems.length) * 100}%` }}>
+                  </div>
+                </div>
                   <div className="magazine-outlet">
                     <h3>Alumni E-Magazine</h3>
                     <div className="mag-preview">
