@@ -628,34 +628,37 @@ function App() {
                   </div>
                 </header>
                 <section className="portal-info-section">
-                  <div className="feature-strip-container"> {/* Updated wrapper class */}
-                  <div className="feature-strip-main"> {/* New inner content class */}
-                    
-                    {/* 1. THE BOX: Image contained on the far left */}
-                    <div className="strip-image-box">
-                      <img 
-                        src={galleryItems[currentGalleryIndex].img} 
-                        alt="Campus Gallery" 
-                        className="fade-in" 
-                        key={currentGalleryIndex}
-                      />
-                    </div>
-
-                    {/* 2. THE TEXT: Displays besides the image box */}
-                    <div className="strip-text-box">
-                      <p>{galleryItems[currentGalleryIndex].text}</p>
+                  <div className="campus-hero-strip">
+                    <div className="campus-hero-main">
                       
-                      {/* Navigation Controls */}
-                      <div className="strip-nav">
-                        <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === 0 ? galleryItems.length - 1 : currentGalleryIndex - 1)}>
-                          ❮
-                        </button>
-                        <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === galleryItems.length - 1 ? 0 : currentGalleryIndex + 1)}>
-                          ❯
-                        </button>
+                      {/* 1. THE BOX: Image strictly contained on the left */}
+                      <div className="campus-hero-image-frame">
+                        <img 
+                          src={galleryItems[currentGalleryIndex].img} 
+                          alt="Campus Highlight" 
+                          className="hero-img-transition" 
+                          key={currentGalleryIndex} 
+                        />
+                      </div>
+
+                      {/* 2. THE TEXT: Side-by-side with the image */}
+                      <div className="campus-hero-text-area">
+                        <p>{galleryItems[currentGalleryIndex].text}</p>
+                        
+                        {/* Navigation Controls */}
+                        <div className="campus-hero-nav">
+                          <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === 0 ? galleryItems.length - 1 : currentGalleryIndex - 1)}>
+                            ❮
+                          </button>
+                          <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === galleryItems.length - 1 ? 0 : currentGalleryIndex + 1)}>
+                            ❯
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                    <div className="campus-hero-progress-bar" 
+                       style={{ width: `${((currentGalleryIndex + 1) / galleryItems.length) * 100}%` }}>
+                    </div>
                   
                   {/* Optional: Visual progress bar at the bottom */}
                   <div className="strip-progress-bar" 

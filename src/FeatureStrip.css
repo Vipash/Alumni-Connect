@@ -1,71 +1,113 @@
-/* 1. Force the container to be exactly 110px and no more */
-.feature-strip-container {
+/* 1. The Outer Container - Fixed height and wide layout */
+.campus-hero-strip {
   width: 100% !important;
-  max-width: 1200px; /* Optional: keeps it from getting too wide on huge screens */
+  max-width: 1200px !important;
   margin: 40px auto !important;
   height: 110px !important; 
-  background: #003366 !important;
+  background: #003366 !important; /* Deep University Navy */
   display: flex !important;
   flex-direction: column !important;
   border-radius: 8px;
-  overflow: hidden !important; /* CRITICAL: Clips anything that tries to leak out */
+  overflow: hidden !important; /* Forces everything inside to stay inside */
   box-shadow: 0 8px 25px rgba(0,0,0,0.2);
   position: relative;
 }
 
-/* 2. Force the row layout */
-.feature-strip-main {
+/* 2. Horizontal Flex Wrapper */
+.campus-hero-main {
   display: flex !important;
-  flex-direction: row !important; 
+  flex-direction: row !important; /* Forces Side-by-Side */
   align-items: center !important;
   justify-content: flex-start !important;
-  height: 100% !important;
+  height: 110px !important;
   width: 100% !important;
 }
 
-/* 3. Force the Image Box to stay 150px wide and 110px tall */
-.strip-image-box {
+/* 3. THE BOX: The leftmost fixed container */
+.campus-hero-image-frame {
   width: 150px !important;
   min-width: 150px !important;
+  max-width: 150px !important;
   height: 110px !important;
-  flex-shrink: 0 !important;
+  flex-shrink: 0 !important; /* Prevents text from pushing the image out */
   overflow: hidden !important;
-  background: #002244;
+  background: #001a33;
+  position: relative;
 }
 
-/* 4. Force the Image to fill ONLY that box */
-.strip-image-box img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important; 
+/* 4. THE IMAGE: Locked to the 150x110 frame */
+.hero-img-transition {
+  width: 150px !important;  
+  height: 110px !important; 
+  object-fit: cover !important; /* Ensures the image fills the box perfectly without stretching */
   display: block !important;
   margin: 0 !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: heroFadeEffect 0.6s ease-in-out;
 }
 
-/* 5. The Text Container */
-.strip-text-box {
+/* 5. THE TEXT AREA: Fills the remaining width */
+.campus-hero-text-area {
   flex: 1 !important;
   padding: 0 30px !important;
   display: flex !important;
-  flex-direction: row !important; /* Ensures text and buttons are on the same line */
+  flex-direction: row !important;
   align-items: center !important;
   justify-content: space-between !important;
   color: #ffffff !important;
   height: 100% !important;
+  overflow: hidden; /* Safety against very long text */
 }
 
-.strip-text-box p {
+.campus-hero-text-area p {
   margin: 0 !important;
   font-size: 1.15rem !important;
   font-weight: 500 !important;
-  white-space: nowrap; /* Prevents text from wrapping to a new line */
+  white-space: nowrap; /* Forces text to stay on one line */
   overflow: hidden;
-  text-overflow: ellipsis; /* Adds ... if text is too long for the strip */
+  text-overflow: ellipsis; /* Adds "..." if the text is too long for the strip */
 }
 
-/* 6. Navigation */
-.strip-nav {
+/* 6. NAVIGATION BUTTONS */
+.campus-hero-nav {
   display: flex !important;
   gap: 12px !important;
   flex-shrink: 0 !important;
+}
+
+.campus-hero-nav button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.campus-hero-nav button:hover {
+  background: #fdbb2d; /* Gold pop color */
+  color: #003366;
+  border-color: #fdbb2d;
+}
+
+/* 7. PROGRESS BAR */
+.campus-hero-progress-bar {
+  height: 4px;
+  background: #fdbb2d;
+  transition: width 0.5s ease;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+@keyframes heroFadeEffect {
+  from { opacity: 0.5; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
 }
