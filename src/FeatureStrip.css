@@ -1,45 +1,46 @@
-/* 1. The Outer Container - Fixed height and wide layout */
+/* 1. Main Container: Fixed at 110px height */
 .campus-hero-strip {
   width: 100% !important;
   max-width: 1200px !important;
   margin: 40px auto !important;
   height: 110px !important; 
-  background: #003366 !important; /* Deep University Navy */
+  background: #003366 !important; /* MBM Deep Blue */
   display: flex !important;
   flex-direction: column !important;
   border-radius: 8px;
-  overflow: hidden !important; /* Forces everything inside to stay inside */
+  overflow: hidden !important; 
   box-shadow: 0 8px 25px rgba(0,0,0,0.2);
   position: relative;
+  z-index: 10; /* Ensures it sits above general background elements */
 }
 
-/* 2. Horizontal Flex Wrapper */
+/* 2. Content Wrapper: Forces horizontal row layout */
 .campus-hero-main {
   display: flex !important;
-  flex-direction: row !important; /* Forces Side-by-Side */
+  flex-direction: row !important; 
   align-items: center !important;
   justify-content: flex-start !important;
   height: 110px !important;
   width: 100% !important;
 }
 
-/* 3. THE BOX: The leftmost fixed container */
+/* 3. Image Frame: Fixed width box on the left */
 .campus-hero-image-frame {
   width: 150px !important;
   min-width: 150px !important;
   max-width: 150px !important;
   height: 110px !important;
-  flex-shrink: 0 !important; /* Prevents text from pushing the image out */
+  flex-shrink: 0 !important; /* Prevents text from squishing the image */
   overflow: hidden !important;
   background: #001a33;
   position: relative;
 }
 
-/* 4. THE IMAGE: Locked to the 150x110 frame */
+/* 4. Actual Image: Contained strictly within the 150x110 frame */
 .hero-img-transition {
-  width: 150px !important;  
+  width: 150px !important;
   height: 110px !important; 
-  object-fit: cover !important; /* Ensures the image fills the box perfectly without stretching */
+  object-fit: cover !important; 
   display: block !important;
   margin: 0 !important;
   position: absolute;
@@ -48,7 +49,7 @@
   animation: heroFadeEffect 0.6s ease-in-out;
 }
 
-/* 5. THE TEXT AREA: Fills the remaining width */
+/* 5. Text Area: Side-by-side with image, takes remaining space */
 .campus-hero-text-area {
   flex: 1 !important;
   padding: 0 30px !important;
@@ -58,19 +59,20 @@
   justify-content: space-between !important;
   color: #ffffff !important;
   height: 100% !important;
-  overflow: hidden; /* Safety against very long text */
+  overflow: hidden;
 }
 
 .campus-hero-text-area p {
   margin: 0 !important;
   font-size: 1.15rem !important;
   font-weight: 500 !important;
-  white-space: nowrap; /* Forces text to stay on one line */
+  white-space: nowrap; /* Keeps text on one line */
   overflow: hidden;
-  text-overflow: ellipsis; /* Adds "..." if the text is too long for the strip */
+  text-overflow: ellipsis; /* Adds "..." for long text */
+  color: #ffffff !important;
 }
 
-/* 6. NAVIGATION BUTTONS */
+/* 6. Navigation Controls */
 .campus-hero-nav {
   display: flex !important;
   gap: 12px !important;
@@ -78,33 +80,32 @@
 }
 
 .campus-hero-nav button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
 }
 
 .campus-hero-nav button:hover {
-  background: #fdbb2d; /* Gold pop color */
-  color: #003366;
-  border-color: #fdbb2d;
+  background: #fdbb2d !important; /* Gold highlight */
+  color: #003366 !important;
 }
 
-/* 7. PROGRESS BAR */
+/* 7. Bottom Progress Indicator */
 .campus-hero-progress-bar {
-  height: 4px;
-  background: #fdbb2d;
-  transition: width 0.5s ease;
-  position: absolute;
-  bottom: 0;
-  left: 0;
+  height: 4px !important;
+  background: #fdbb2d !important;
+  transition: width 0.5s ease !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
 }
 
 @keyframes heroFadeEffect {
