@@ -27,27 +27,38 @@ const FeatureStrip = () => {
   };
 
   return (
-    <div className="feature-strip-container">
-      <button className="nav-arrow left" onClick={handlePrev}>‹</button>
+  /* The main colored horizontal strip */
+  <div className="campus-hero-strip">
+    <div className="campus-hero-main">
       
-      <div className="strip-content">
-        <div className="image-box">
-          <img src={galleryData[currentIndex].img} alt="Gallery" />
-        </div>
-        <div className="text-box">
-          <p>{galleryData[currentIndex].text}</p>
-        </div>
+      {/* 1. THE BOX: Image strictly contained on the left */}
+      <div className="campus-hero-image-frame">
+        <img 
+          src={galleryData[currentIndex].img} 
+          alt="Campus Highlight" 
+          className="hero-img-transition" 
+          key={currentIndex} 
+        />
       </div>
 
-      <button className="nav-arrow right" onClick={handleNext}>›</button>
-      
-      <div className="dots-indicator">
-        {galleryData.map((_, i) => (
-          <span key={i} className={i === currentIndex ? "dot active" : "dot"} />
-        ))}
+      {/* 2. THE TEXT AREA: Side-by-side with the image */}
+      <div className="campus-hero-text-area">
+        <p>{galleryData[currentIndex].text}</p>
+        
+        {/* Navigation Controls on the far right */}
+        <div className="campus-hero-nav">
+          <button onClick={handlePrev}>❮</button>
+          <button onClick={handleNext}>❯</button>
+        </div>
       </div>
     </div>
-  );
+    
+    {/* Visual Progress Bar at the bottom of the strip */}
+    <div className="campus-hero-progress-bar" 
+         style={{ width: `${((currentIndex + 1) / galleryData.length) * 100}%` }}>
+    </div>
+  </div>
+);
 };
 
 export default FeatureStrip;
