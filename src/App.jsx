@@ -629,50 +629,50 @@ function App() {
                   </div>
                 </header>
                 <section className="portal-info-section">
-                  <div className="campus-hero-strip">
-                    <div className="campus-hero-main">
-                      
-                      {/* 1. THE BOX: Image strictly contained on the left */}
-                      <div className="campus-hero-image-frame">
-                        <img 
-                          src={galleryItems[currentGalleryIndex].img} 
-                          alt="Campus Highlight" 
-                          className="hero-img-transition" 
-                          key={currentGalleryIndex}
-                          // ADD THIS STYLE OBJECT BELOW:
-                          style={{ 
-                            width: '250px', 
-                            height: '180px', 
-                            objectFit: 'cover',
-                            display: 'block' 
-                          }} 
-                        />
+                  <section className="campus-hero-full-width">
+                    <div className="campus-hero-stack-container">
+                      <div className="stack-visual-area">
+                        {/* Background/Dull Images and Main Image */}
+                        {galleryItems.map((item, index) => {
+                          let position = "stack-hidden";
+                          if (index === currentGalleryIndex) position = "stack-active";
+                          else if (index === (currentGalleryIndex - 1 + galleryItems.length) % galleryItems.length) position = "stack-prev";
+                          else if (index === (currentGalleryIndex + 1) % galleryItems.length) position = "stack-next";
+
+                          return (
+                            <div key={index} className={`stack-card ${position}`}>
+                              <img src={item.img} alt="Campus" />
+                            </div>
+                          );
+                        })}
                       </div>
 
-                      {/* 2. THE TEXT: Side-by-side with the image */}
-                      <div className="campus-hero-text-area">
-                        <p>{galleryItems[currentGalleryIndex].text}</p>
-                        
-                        {/* Navigation Controls */}
-                        <div className="campus-hero-nav">
-                          <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === 0 ? galleryItems.length - 1 : currentGalleryIndex - 1)}>
-                            ❮
-                          </button>
-                          <button onClick={() => setCurrentGalleryIndex(currentGalleryIndex === galleryItems.length - 1 ? 0 : currentGalleryIndex + 1)}>
-                            ❯
-                          </button>
+                      {/* Text and Nav Overlay */}
+                      <div className="stack-content-overlay">
+                        <div className="stack-text-box">
+                          <p className="fade-in" key={currentGalleryIndex}>
+                            {galleryItems[currentGalleryIndex].text}
+                          </p>
+                        </div>
+
+                        <div className="stack-controls">
+                          <button onClick={handlePrev} className="stack-nav-btn">❮</button>
+                          <button onClick={handleNext} className="stack-nav-btn">❯</button>
                         </div>
                       </div>
+
+                      {/* Dot-based Progress Bar */}
+                      <div className="stack-dots">
+                        {galleryItems.map((_, index) => (
+                          <span 
+                            key={index} 
+                            className={`stack-dot ${index === currentGalleryIndex ? 'active' : ''}`}
+                            onClick={() => setCurrentGalleryIndex(index)}
+                          />
+                        ))}
+                      </div>
                     </div>
-                    <div className="campus-hero-progress-bar" 
-                       style={{ width: `${((currentGalleryIndex + 1) / galleryItems.length) * 100}%` }}>
-                    </div>
-                  
-                  {/* Optional: Visual progress bar at the bottom */}
-                  <div className="strip-progress-bar" 
-                      style={{ width: `${((currentGalleryIndex + 1) / galleryItems.length) * 100}%` }}>
-                  </div>
-                </div>
+                  </section>
                   <div className="magazine-outlet">
                     <h3>Alumni E-Magazine</h3>
                     <div className="mag-preview">

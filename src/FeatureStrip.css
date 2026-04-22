@@ -100,3 +100,151 @@
   from { opacity: 0; transform: scale(1.1); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Make the section span the full screen width */
+.campus-hero-full-width {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background: #002244; /* Darker navy for depth */
+  padding: 60px 0;
+  overflow: hidden;
+}
+
+.campus-hero-stack-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  height: 300px;
+  display: flex;
+  align-items: center;
+}
+
+/* 3D Stack Logic */
+.stack-visual-area {
+  position: relative;
+  width: 400px; /* Base width for the images */
+  height: 250px;
+  perspective: 1000px;
+  margin-left: 50px;
+}
+
+.stack-card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.stack-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+/* Floating Hover Animation */
+.stack-active:hover img {
+  transform: scale(1.05);
+}
+
+/* Positions */
+.stack-active {
+  z-index: 10;
+  transform: translateX(0) scale(1);
+  opacity: 1;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.stack-prev {
+  z-index: 5;
+  transform: translateX(-40%) scale(0.8) rotateY(15deg);
+  opacity: 0.3;
+  filter: grayscale(80%);
+}
+
+.stack-next {
+  z-index: 5;
+  transform: translateX(40%) scale(0.8) rotateY(-15deg);
+  opacity: 0.3;
+  filter: grayscale(80%);
+}
+
+.stack-hidden {
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+/* Text Overlay */
+.stack-content-overlay {
+  flex: 1;
+  padding: 0 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+}
+
+.stack-text-box p {
+  font-size: 1.6rem;
+  font-weight: 300;
+  line-height: 1.4;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Nav Buttons */
+.stack-controls {
+  display: flex;
+  gap: 20px;
+}
+
+.stack-nav-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: 0.3s;
+}
+
+.stack-nav-btn:hover {
+  background: #fdbb2d;
+  color: #002244;
+  transform: translateY(-3px);
+}
+
+/* Dot Progress Bar */
+.stack-dots {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.stack-dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.stack-dot.active {
+  background: #fdbb2d;
+  width: 25px;
+  border-radius: 10px;
+}
