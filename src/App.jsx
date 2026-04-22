@@ -264,51 +264,41 @@ function App() {
     }
   };
 
-const [galleryItems, setGalleryItems] = useState([]);
+const [galleryItems, setGalleryItems] = useState([
+  { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
+  { img: "/assets/event1.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
+  { img: "/assets/lab1.jpg", text: "Our newly renovated digital library and research wing." }
+]);
 const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
+const [magazineData, setMagazineData] = useState(null); // To store DB magazine URLs
 
-// 2) Fetch homepage media (gallery + magazine) once on mount
 useEffect(() => {
   const fetchMedia = async () => {
     try {
-      const response = await fetch('/api/media/home-data'); // backend should return { gallery: [...], magazine: {...} }
+      const response = await fetch('/api/media/home-data');
       const data = await response.json();
 
       if (Array.isArray(data.gallery) && data.gallery.length > 0) {
-        // Expecting each item like { imageUrl, title, desc } from Mongo/Cloudinary
         const mapped = data.gallery.map((item) => ({
           img: item.imageUrl,
           text: item.desc || item.title || '',
         }));
         setGalleryItems(mapped);
-      } else {
-        // fallback to your old static data if nothing in DB
-        setGalleryItems([
-          { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
-          { img: "/assets/event1.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
-          { img: "/assets/lab1.jpg", text: "Our newly renovated digital library and research wing." }
-        ]);
       }
-
-      // If your API also returns magazine data, you can set it here:
-      // setMagazineData(data.magazine);
+      
+      if (data.magazine) {
+        setMagazineData(data.magazine);
+      }
     } catch (err) {
-      console.error("Failed to fetch media", err);
-      // On error, still show static fallback so hero doesn’t break
-      setGalleryItems([
-        { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
-        { img: "/assets/event1.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
-        { img: "/assets/lab1.jpg", text: "Our newly renovated digital library and research wing." }
-      ]);
+      console.error("Failed to fetch media, using fallbacks.", err);
     }
   };
-
   fetchMedia();
 }, []);
 
-// 3) Keep your existing autoplay, but make it depend on galleryItems.length
+// REMOVE the second autoplay useEffect. Keep only this one:
 useEffect(() => {
-  if (galleryItems.length === 0) return;
+  if (galleryItems.length <= 1) return; // Don't rotate if only 1 image
   const interval = setInterval(() => {
     setCurrentGalleryIndex((prev) =>
       prev === galleryItems.length - 1 ? 0 : prev + 1
@@ -317,22 +307,16 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [galleryItems.length]);
 
-  // Auto-play logic
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentGalleryIndex((prev) => (prev === galleryItems.length - 1 ? 0 : prev + 1));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   // 1. Add this state at the top with your other states
 const [isMagOpen, setIsMagOpen] = useState(false);
 
 // 2. Updated Download Function
 const downloadMagazine = () => {
+  // Use the Cloudinary URL from the database if it exists, otherwise fallback to local
+  const pdfUrl = magazineData?.pdfUrl || '/magazine.pdf';
+  
   const link = document.createElement('a');
-  // ENSURE THE FILE IN /public IS NAMED magazine.pdf
-  link.href = '/magazine.pdf'; 
+  link.href = pdfUrl; 
   link.download = 'MBM_Alumni_Connect_Magazine.pdf';
   document.body.appendChild(link);
   link.click();
@@ -687,6 +671,7 @@ const downloadMagazine = () => {
                 </header>
                 <section className="portal-info-section">
                   <section className="campus-hero-full-width compact">
+                    {galleryItems.length > 0 ? (
                     <div className="campus-hero-stack-container">
                       
                       <div className="stack-visual-wrapper">
@@ -723,12 +708,17 @@ const downloadMagazine = () => {
                       <div className="stack-text-side">
                         <div className="text-content-wrapper">
                           <h3 className="section-subtitle">Highlights</h3>
-                          <p className="hero-text-display small-text" key={currentGalleryIndex}>
-                            {galleryItems[currentGalleryIndex].text}
+                          <p className="hero-text-display">
+                            {galleryItems[currentGalleryIndex]?.text || "Loading Highlights..."}
                           </p>
                         </div>
                       </div>
                     </div>
+                    ) : (
+                      <div className="loading-placeholder" style={{ color: 'white', textAlign: 'center', padding: '50px' }}>
+                        <p>Loading Campus Highlights...</p>
+                      </div>
+                    )}
 
                     {/* MODAL VIEW: Opens when View Gallery is clicked */}
                     {isGalleryOpen && (
