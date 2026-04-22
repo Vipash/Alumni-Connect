@@ -327,6 +327,14 @@ function App() {
     }
   }, [loggedInUser, activeTab]);
 
+  const handleNext = () => {
+    setCurrentGalleryIndex((prev) => (prev === galleryItems.length - 1 ? 0 : prev + 1));
+  };
+
+  const handlePrev = () => {
+    setCurrentGalleryIndex((prev) => (prev === 0 ? galleryItems.length - 1 : prev - 1));
+  };
+
   // --- DYNAMIC RENDERING LOGIC ---
   const renderLeftPartition = () => {
     if (sidebarContent) return sidebarContent;
@@ -631,9 +639,11 @@ function App() {
                 <section className="portal-info-section">
                   <section className="campus-hero-full-width">
                     <div className="campus-hero-stack-container">
+                      
+                      {/* 1. The 3D Image Stack */}
                       <div className="stack-visual-area">
-                        {/* Background/Dull Images and Main Image */}
                         {galleryItems.map((item, index) => {
+                          // Determine position based on index
                           let position = "stack-hidden";
                           if (index === currentGalleryIndex) position = "stack-active";
                           else if (index === (currentGalleryIndex - 1 + galleryItems.length) % galleryItems.length) position = "stack-prev";
@@ -647,10 +657,10 @@ function App() {
                         })}
                       </div>
 
-                      {/* Text and Nav Overlay */}
+                      {/* 2. Text Content Side */}
                       <div className="stack-content-overlay">
                         <div className="stack-text-box">
-                          <p className="fade-in" key={currentGalleryIndex}>
+                          <p className="hero-text-fade" key={currentGalleryIndex}>
                             {galleryItems[currentGalleryIndex].text}
                           </p>
                         </div>
@@ -661,7 +671,7 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Dot-based Progress Bar */}
+                      {/* 3. Dot Progress Bar */}
                       <div className="stack-dots">
                         {galleryItems.map((_, index) => (
                           <span 
