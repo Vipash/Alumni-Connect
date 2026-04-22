@@ -117,7 +117,8 @@ function App() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [hubSearch, setHubSearch] = useState('');
   const [hubCategory, setHubCategory] = useState('All');
-  const [announcementSubTab, setAnnouncementSubTab] = useState('post'); // post | history | tickers
+  const [announcementSubTab, setAnnouncementSubTab] = useState('post');
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   // Optional: these are not used in App itself; safe to remove if unused
   const [tickers, setTickers] = useState([]);
@@ -637,12 +638,11 @@ function App() {
                   </div>
                 </header>
                 <section className="portal-info-section">
-                  <section className="campus-hero-full-width">
+                  <section className="campus-hero-full-width compact">
                     <div className="campus-hero-stack-container">
                       
-                      {/* LEFT SIDE: 3D Image Stack & Control Cluster */}
                       <div className="stack-visual-wrapper">
-                        <div className="stack-visual-area">
+                        <div className="stack-visual-area compact-height">
                           {galleryItems.map((item, index) => {
                             let position = "stack-hidden";
                             if (index === currentGalleryIndex) position = "stack-active";
@@ -657,53 +657,83 @@ function App() {
                           })}
                         </div>
 
-                        {/* NEW: Navigation Cluster Under Images */}
                         <div className="stack-nav-cluster">
                           <button onClick={handlePrev} className="stack-icon-btn">❮</button>
-                          <button className="view-gallery-btn">View Gallery</button>
+                          <button className="view-gallery-btn" onClick={() => setIsGalleryOpen(true)}>
+                            View Gallery
+                          </button>
                           <button onClick={handleNext} className="stack-icon-btn">❯</button>
                         </div>
 
-                        {/* Dot Progress */}
                         <div className="stack-dots">
                           {galleryItems.map((_, index) => (
-                            <span 
-                              key={index} 
-                              className={`stack-dot ${index === currentGalleryIndex ? 'active' : ''}`}
-                              onClick={() => setCurrentGalleryIndex(index)}
-                            />
+                            <span key={index} className={`stack-dot ${index === currentGalleryIndex ? 'active' : ''}`} />
                           ))}
                         </div>
                       </div>
 
-                      {/* RIGHT SIDE: Classy Text Area */}
                       <div className="stack-text-side">
                         <div className="text-content-wrapper">
-                          <h3 className="section-subtitle">Campus Life</h3>
-                          <p className="hero-text-display" key={currentGalleryIndex}>
+                          <h3 className="section-subtitle">Highlights</h3>
+                          <p className="hero-text-display small-text" key={currentGalleryIndex}>
                             {galleryItems[currentGalleryIndex].text}
                           </p>
                         </div>
                       </div>
+                    </div>
+
+                    {/* MODAL VIEW: Opens when View Gallery is clicked */}
+                    {isGalleryOpen && (
+                      <div className="gallery-modal-overlay">
+                        <div className="gallery-modal-content">
+                          <button className="close-modal" onClick={() => setIsGalleryOpen(false)}>×</button>
+                          <h2>Campus Gallery</h2>
+                          <div className="gallery-grid">
+                            {galleryItems.map((item, i) => (
+                              <div key={i} className="gallery-card-item">
+                                <img src={item.img} alt="" />
+                                <p>{item.text}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </section>
+                  
+                  <section className="magazine-hero-section">
+                    <div className="magazine-container">
                       
+                      {/* Stacked PDF Preview Pages */}
+                      <div className="magazine-visual-stack">
+                        <div className="mag-page page-3"><img src="/magazine-p3.jpg" alt="page 3" /></div>
+                        <div className="mag-page page-2"><img src="/magazine-p2.jpg" alt="page 2" /></div>
+                        <div className="mag-page page-1">
+                          <img src="/magazine-cover.jpg" alt="Cover" />
+                          <div className="mag-badge">New Issue</div>
+                        </div>
+                      </div>
+
+                      {/* Description & Actions */}
+                      <div className="magazine-info">
+                        <h3 className="section-subtitle">E-Magazine</h3>
+                        <h2>The University Chronicles</h2>
+                        <p>Explore the latest breakthroughs in research, campus life, and student achievements in our monthly digital edition.</p>
+                        
+                        <div className="magazine-actions">
+                          {/* Opens PDF in new browser tab */}
+                          <a href="/path-to-your.pdf" target="_blank" rel="noopener noreferrer" className="mag-btn primary">
+                            View Online
+                          </a>
+                          {/* Initiates download */}
+                          <a href="/path-to-your.pdf" download="University_Magazine.pdf" className="mag-btn secondary">
+                            Download PDF
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </section>
-                  <div className="magazine-outlet">
-                    <h3>Alumni E-Magazine</h3>
-                    <div className="mag-preview">
-                      <p>
-                        The "Alumni Association e-Magazine" March 2026 Edition
-                        is now live.
-                      </p>
-                      <button
-                        className="primary-btn"
-                        onClick={downloadMagazine}
-                        style={{ width: 'auto' }}
-                      >
-                        Download PDF
-                      </button>
-                    </div>
-                  </div>
+
                   <footer className="landing-footer">
                     © 2026 MBM University Alumni Association |
                     <span

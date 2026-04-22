@@ -1,12 +1,11 @@
+/* Optimized Full-Width Wrapper */
 .campus-hero-full-width {
   width: 100vw !important;
   position: relative;
   left: 50%;
-  right: 50%;
-  margin-left: -50vw !important;
-  margin-right: -50vw !important;
+  transform: translateX(-50%); /* instead of left/right + margin +/-50vw */
   background: radial-gradient(circle at center, #003366, #001a33);
-  padding: 100px 0;
+  padding: 60px 0; /* slightly more compact */
   overflow: hidden;
 }
 
@@ -23,15 +22,34 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
   width: 500px;
+  transform-style: preserve-3d; /* enable 3D depth for children */
 }
 
 .stack-visual-area {
   position: relative;
   width: 450px;
-  height: 300px;
-  perspective: 1200px;
+  height: 280px; /* a bit more compact */
+  perspective: 1500px; /* deeper 3D */
+}
+
+/* Ensure images don't leak out / cause lag */
+.stack-card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); /* bouncy */
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  backface-visibility: hidden; /* fixes flicker on rotate */
+}
+
+.stack-card img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
 
 /* NAV CLUSTER */
@@ -76,8 +94,9 @@
 /* RIGHT SIDE TEXT */
 .stack-text-side {
   flex: 1;
-  padding-left: 100px; /* Distancing the text from the image stack */
-  max-width: 600px;
+  padding-left: 80px; /* slightly reduced for compactness */
+  max-width: 550px;
+  z-index: 20; /* keep above 3D cards */
 }
 
 .section-subtitle {
@@ -90,28 +109,36 @@
 
 .hero-text-display {
   color: white;
-  font-size: 2rem;
+  font-size: 1.8rem; /* slightly smaller */
   font-weight: 300;
-  line-height: 1.4;
+  line-height: 1.3;
   margin: 0;
-  font-family: 'Playfair Display', serif; /* Use a classy serif if available */
+  font-family: 'Playfair Display', serif;
   animation: elegantFade 0.8s ease-out;
+  min-height: 100px; /* prevent jump when text changes */
 }
 
-/* PERSPECTIVE POSITIONS */
-.stack-card {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 20px;
-  overflow: hidden;
-  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+/* PERSPECTIVE POSITIONS WITH DEEPER 3D */
+.stack-active {
+  z-index: 10;
+  transform: translateX(0) translateZ(50px) scale(1);
+  opacity: 1;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-.stack-active { z-index: 10; transform: translateX(0) scale(1); opacity: 1; border: 1px solid rgba(255,255,255,0.1); }
-.stack-prev { z-index: 5; transform: translateX(-45%) scale(0.85) rotateY(30deg); opacity: 0.15; filter: blur(2px); }
-.stack-next { z-index: 5; transform: translateX(45%) scale(0.85) rotateY(-30deg); opacity: 0.15; filter: blur(2px); }
+.stack-prev {
+  z-index: 5;
+  transform: translateX(-50%) translateZ(-100px) rotateY(35deg) scale(0.8);
+  opacity: 0.1; /* duller */
+  filter: blur(4px) grayscale(100%);
+}
+
+.stack-next {
+  z-index: 5;
+  transform: translateX(50%) translateZ(-100px) rotateY(-35deg) scale(0.8);
+  opacity: 0.1; /* duller */
+  filter: blur(4px) grayscale(100%);
+}
 
 /* DOTS */
 .stack-dots {
@@ -136,4 +163,137 @@
 @keyframes elegantFade {
   from { opacity: 0; transform: translateX(30px); }
   to { opacity: 1; transform: translateX(0); }
+}
+
+/* Compact Gallery Adjustments */
+.campus-hero-full-width.compact { padding: 40px 0; }
+.stack-visual-area.compact-height { height: 220px; width: 380px; }
+.hero-text-display.small-text { font-size: 1.5rem; }
+
+/* Magazine Section - full-width without scroll hack */
+.magazine-hero-section {
+  width: 100vw;
+  background: #f8f9fa;
+  padding: 80px 0;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.magazine-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 80px;
+}
+
+.magazine-visual-stack {
+  position: relative;
+  width: 300px;
+  height: 400px;
+}
+
+.mag-page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: 0.4s ease;
+}
+
+.mag-page img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.page-1 { z-index: 3; transform: rotate(-2deg); }
+.page-2 { z-index: 2; transform: translate(15px, 10px) rotate(3deg); opacity: 0.8; }
+.page-3 { z-index: 1; transform: translate(30px, 20px) rotate(7deg); opacity: 0.6; }
+
+.magazine-visual-stack:hover .page-1 { transform: rotate(0deg) scale(1.02); }
+
+.magazine-info h2 {
+  color: #003366;
+  font-size: 2.5rem;
+  margin: 10px 0;
+}
+
+.magazine-info p {
+  color: #555;
+  max-width: 450px;
+  line-height: 1.6;
+}
+
+.magazine-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.mag-btn {
+  padding: 12px 25px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.mag-btn.primary { background: #003366; color: white; }
+.mag-btn.secondary { border: 2px solid #003366; color: #003366; }
+.mag-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Gallery Modal Styles with backdrop blur */
+.gallery-modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px); /* subtle glass effect */
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-modal-content {
+  background: white;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 80vh;
+  padding: 40px;
+  border-radius: 12px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.gallery-card-item img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.close-modal {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 30px;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
