@@ -18,7 +18,7 @@ const Admin = require('./Admin');
 const User = require('./alumni');
 const Support = require('./Support');
 const mediaRoutes = require('./mediaRoutes');
-app.use('/api/media', mediaRoutes);
+
 
 const app = express();
 
@@ -27,6 +27,7 @@ app.use(express.json());
 app.use('/api/notices', noticeRoutes);
 app.use('/api/connections', connectionRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/media', mediaRoutes);
 
 const MONGO_URI =
   process.env.MONGO_URI ||
