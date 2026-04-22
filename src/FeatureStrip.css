@@ -1,4 +1,3 @@
-/* Full-width strip across the screen */
 .campus-hero-full-width {
   width: 100vw !important;
   position: relative;
@@ -6,139 +5,135 @@
   right: 50%;
   margin-left: -50vw !important;
   margin-right: -50vw !important;
-  background: #002244; /* Darker Navy for better contrast */
-  padding: 80px 0;
+  background: radial-gradient(circle at center, #003366, #001a33);
+  padding: 100px 0;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
 }
 
 .campus-hero-stack-container {
-  width: 100%;
-  max-width: 1200px;
+  max-width: 1300px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
-  position: relative;
-  height: 350px;
+  justify-content: space-between;
 }
 
-/* 3D Stack Area */
+/* LEFT WRAPPER */
+.stack-visual-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  width: 500px;
+}
+
 .stack-visual-area {
   position: relative;
   width: 450px;
-  height: 280px;
+  height: 300px;
   perspective: 1200px;
-  flex-shrink: 0;
 }
 
+/* NAV CLUSTER */
+.stack-nav-cluster {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.stack-icon-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.view-gallery-btn {
+  background: #fdbb2d;
+  color: #001a33;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(253, 187, 45, 0.3);
+  transition: 0.3s ease;
+}
+
+.view-gallery-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(253, 187, 45, 0.5);
+  background: #ffcc33;
+}
+
+/* RIGHT SIDE TEXT */
+.stack-text-side {
+  flex: 1;
+  padding-left: 100px; /* Distancing the text from the image stack */
+  max-width: 600px;
+}
+
+.section-subtitle {
+  color: #fdbb2d;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.hero-text-display {
+  color: white;
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1.4;
+  margin: 0;
+  font-family: 'Playfair Display', serif; /* Use a classy serif if available */
+  animation: elegantFade 0.8s ease-out;
+}
+
+/* PERSPECTIVE POSITIONS */
 .stack-card {
   position: absolute;
   width: 100%;
   height: 100%;
-  border-radius: 15px;
+  border-radius: 20px;
   overflow: hidden;
-  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
 }
 
-.stack-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
+.stack-active { z-index: 10; transform: translateX(0) scale(1); opacity: 1; border: 1px solid rgba(255,255,255,0.1); }
+.stack-prev { z-index: 5; transform: translateX(-45%) scale(0.85) rotateY(30deg); opacity: 0.15; filter: blur(2px); }
+.stack-next { z-index: 5; transform: translateX(45%) scale(0.85) rotateY(-30deg); opacity: 0.15; filter: blur(2px); }
 
-/* 3D Positioning */
-.stack-active {
-  z-index: 10;
-  transform: translateX(0) scale(1);
-  opacity: 1;
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-.stack-active:hover img {
-  transform: scale(1.08); /* Hover animation */
-}
-
-.stack-prev {
-  z-index: 5;
-  transform: translateX(-35%) scale(0.8) rotateY(25deg);
-  opacity: 0.25;
-  filter: grayscale(100%) blur(1px);
-}
-
-.stack-next {
-  z-index: 5;
-  transform: translateX(35%) scale(0.8) rotateY(-25deg);
-  opacity: 0.25;
-  filter: grayscale(100%) blur(1px);
-}
-
-.stack-hidden {
-  opacity: 0;
-  transform: scale(0.5);
-  pointer-events: none;
-}
-
-/* Text & Navigation */
-.stack-content-overlay {
-  padding-left: 80px;
-  color: white;
-  flex-grow: 1;
-}
-
-.hero-text-fade {
-  font-size: 1.8rem;
-  font-weight: 300;
-  line-height: 1.4;
-  margin-bottom: 40px;
-  animation: textSlideIn 0.5s ease-out;
-}
-
-.stack-nav-btn {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  cursor: pointer;
-  margin-right: 15px;
-  transition: 0.3s;
-}
-
-.stack-nav-btn:hover {
-  background: #fdbb2d;
-  color: #002244;
-  border-color: #fdbb2d;
-}
-
-/* Dot Progress */
+/* DOTS */
 .stack-dots {
-  position: absolute;
-  bottom: 0;
-  left: 225px; /* Centers under the 450px image stack */
-  transform: translateX(-50%);
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .stack-dot {
-  width: 8px;
-  height: 8px;
-  background: rgba(255,255,255,0.3);
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
   border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  transition: 0.4s;
 }
 
 .stack-dot.active {
   background: #fdbb2d;
-  width: 25px;
+  width: 20px;
   border-radius: 10px;
 }
 
-@keyframes textSlideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes elegantFade {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
 }

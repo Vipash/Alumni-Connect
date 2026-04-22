@@ -640,47 +640,52 @@ function App() {
                   <section className="campus-hero-full-width">
                     <div className="campus-hero-stack-container">
                       
-                      {/* 1. The 3D Image Stack */}
-                      <div className="stack-visual-area">
-                        {galleryItems.map((item, index) => {
-                          // Determine position based on index
-                          let position = "stack-hidden";
-                          if (index === currentGalleryIndex) position = "stack-active";
-                          else if (index === (currentGalleryIndex - 1 + galleryItems.length) % galleryItems.length) position = "stack-prev";
-                          else if (index === (currentGalleryIndex + 1) % galleryItems.length) position = "stack-next";
+                      {/* LEFT SIDE: 3D Image Stack & Control Cluster */}
+                      <div className="stack-visual-wrapper">
+                        <div className="stack-visual-area">
+                          {galleryItems.map((item, index) => {
+                            let position = "stack-hidden";
+                            if (index === currentGalleryIndex) position = "stack-active";
+                            else if (index === (currentGalleryIndex - 1 + galleryItems.length) % galleryItems.length) position = "stack-prev";
+                            else if (index === (currentGalleryIndex + 1) % galleryItems.length) position = "stack-next";
 
-                          return (
-                            <div key={index} className={`stack-card ${position}`}>
-                              <img src={item.img} alt="Campus" />
-                            </div>
-                          );
-                        })}
+                            return (
+                              <div key={index} className={`stack-card ${position}`}>
+                                <img src={item.img} alt="Campus" />
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* NEW: Navigation Cluster Under Images */}
+                        <div className="stack-nav-cluster">
+                          <button onClick={handlePrev} className="stack-icon-btn">❮</button>
+                          <button className="view-gallery-btn">View Gallery</button>
+                          <button onClick={handleNext} className="stack-icon-btn">❯</button>
+                        </div>
+
+                        {/* Dot Progress */}
+                        <div className="stack-dots">
+                          {galleryItems.map((_, index) => (
+                            <span 
+                              key={index} 
+                              className={`stack-dot ${index === currentGalleryIndex ? 'active' : ''}`}
+                              onClick={() => setCurrentGalleryIndex(index)}
+                            />
+                          ))}
+                        </div>
                       </div>
 
-                      {/* 2. Text Content Side */}
-                      <div className="stack-content-overlay">
-                        <div className="stack-text-box">
-                          <p className="hero-text-fade" key={currentGalleryIndex}>
+                      {/* RIGHT SIDE: Classy Text Area */}
+                      <div className="stack-text-side">
+                        <div className="text-content-wrapper">
+                          <h3 className="section-subtitle">Campus Life</h3>
+                          <p className="hero-text-display" key={currentGalleryIndex}>
                             {galleryItems[currentGalleryIndex].text}
                           </p>
                         </div>
-
-                        <div className="stack-controls">
-                          <button onClick={handlePrev} className="stack-nav-btn">❮</button>
-                          <button onClick={handleNext} className="stack-nav-btn">❯</button>
-                        </div>
                       </div>
-
-                      {/* 3. Dot Progress Bar */}
-                      <div className="stack-dots">
-                        {galleryItems.map((_, index) => (
-                          <span 
-                            key={index} 
-                            className={`stack-dot ${index === currentGalleryIndex ? 'active' : ''}`}
-                            onClick={() => setCurrentGalleryIndex(index)}
-                          />
-                        ))}
-                      </div>
+                      
                     </div>
                   </section>
                   <div className="magazine-outlet">
