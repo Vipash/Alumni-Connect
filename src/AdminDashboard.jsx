@@ -254,202 +254,93 @@ function AdminDashboard({ admin, setView, onLogout }) {
     }
   };
 
-  // Add to your Media Management States
-  const [existingMedia, setExistingMedia] = useState([]);
-  const [selectedFiles, setSelectedFiles] = useState([]); // For bulk upload
-  const MAX_IMAGES = 10;
+// --- MEDIA & MAGAZINE MANAGEMENT ---
+const [existingMedia, setExistingMedia] = useState([]);
+const [selectedFiles, setSelectedFiles] = useState([]);
+const [mediaTab, setMediaTab] = useState('gallery');
+const MAX_IMAGES = 12;
 
-  // Fetch existing media when the tab opens
-  useEffect(() => {
-    if (activeTab === 'media') {
-      fetchExistingMedia();
-    }
-  }, [activeTab]);
+// Fetch existing media whenever the media tab is active
+useEffect(() => {
+  if (activeTab === 'media') {
+    fetchExistingMedia();
+  }
+}, [activeTab]);
 
-  const fetchExistingMedia = async () => {
+const fetchExistingMedia = async () => {
+  try {
     const res = await fetch('/api/media/home-data');
     const data = await res.json();
     setExistingMedia(data.gallery || []);
-  };
-
-  const handleBulkUpload = async () => {
-    if (selectedFiles.length === 0) return alert("Select images first");
-    if (existingMedia.length + selectedFiles.length > MAX_IMAGES) {
-      return alert(`Max limit is ${MAX_IMAGES} images.`);
-    }
-
-    setLoading(true);
-    try {
-      const uploadPromises = Array.from(selectedFiles).map(async (file) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'profile');
-        formData.append('cloud_name', 'duoofmsri');
-
-        const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/image/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const cloudData = await cloudRes.json();
-
-        return fetch('/api/media/gallery-update', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: "New Highlight",
-            desc: "Add a description...",
-            imageUrl: cloudData.secure_url,
-          }),
-        });
-      });
-
-      await Promise.all(uploadPromises);
-      alert("All images uploaded!");
-      setSelectedFiles([]);
-      fetchExistingMedia(); // Refresh the list
-    } catch (err) {
-      alert("Bulk upload failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-const handleDeleteMedia = async (id) => {
-  if (!window.confirm("Remove this image?")) return;
-  // You'll need to add this DELETE route to your backend
-  await fetch(`/api/media/gallery/${id}`, { method: 'DELETE' });
-  fetchExistingMedia();
+  } catch (err) {
+    console.error("Failed to fetch gallery items", err);
+  }
 };
 
-  const handleGallerySubmit = async () => {
-  if (!newGalleryItem.image) return alert("Please select an image first!");
+// Consolidated Bulk Upload Logic
+const handleBulkUpload = async () => {
+  if (selectedFiles.length === 0) return alert("Select images first");
+  if (existingMedia.length + selectedFiles.length > MAX_IMAGES) {
+    return alert(`Limit reached. You can only have ${MAX_IMAGES} images on the landing page.`);
+  }
 
   setLoading(true);
   try {
-    const formData = new FormData();
-    // 1. The actual file
-    formData.append('file', newGalleryItem.image);
-    // 2. Your unsigned preset name
-    formData.append('upload_preset', 'profile'); 
-    // 3. Your cloud name
-    formData.append('cloud_name', 'duoofmsri');
+    const uploadPromises = Array.from(selectedFiles).map(async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'profile'); // Confirmed working preset
+      formData.append('cloud_name', 'duoofmsri');
 
-    // Note: Use 'auto' instead of 'image' to be safer with different file types
-    const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
-      method: 'POST',
-      body: formData,
+      const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const cloudData = await cloudRes.json();
+
+      return fetch('/api/media/gallery-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: "New Highlight",
+          desc: "Campus event detail",
+          imageUrl: cloudData.secure_url,
+        }),
+      });
     });
 
-    const cloudData = await cloudRes.json();
-
-    // If Cloudinary isn't happy, it will return an 'error' object
-    if (cloudData.error) {
-      console.error("Cloudinary Detailed Error:", cloudData.error.message);
-      alert(`Cloudinary Error: ${cloudData.error.message}`);
-      return; // Stop the process here
-    }
-
-    // Step 2: Send the secure_url to your MongoDB backend
-    const backendRes = await fetch('/api/media/gallery-update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: newGalleryItem.title,
-        desc: newGalleryItem.desc,
-        imageUrl: cloudData.secure_url, 
-      }),
-    });
-
-    if (backendRes.ok) {
-      alert("Gallery Item Uploaded Successfully!");
-      // Reset the form
-      setNewGalleryItem({ title: '', desc: '', image: null });
-    }
+    await Promise.all(uploadPromises);
+    alert(`${selectedFiles.length} images published successfully!`);
+    setSelectedFiles([]);
+    fetchExistingMedia(); 
   } catch (err) {
-    console.error("Upload process failed:", err);
-    alert("Network error. Check your connection or Cloudinary settings.");
+    alert("Bulk upload failed. Check your Cloudinary settings.");
   } finally {
     setLoading(false);
   }
 };
 
-  const handleMagazineSubmit = async () => {
-    if (!magazineUpload.pdf || !magazineUpload.cover) {
-      alert('Please select both PDF and Cover Image');
-      return;
-    }
+const handleDeleteMedia = async (id) => {
+  if (!window.confirm("Remove this image from the landing page?")) return;
+  try {
+    const res = await fetch(`/api/media/gallery/${id}`, { method: 'DELETE' });
+    if (res.ok) fetchExistingMedia();
+  } catch (err) {
+    alert("Could not delete item.");
+  }
+};
 
-    setLoading(true);
-    try {
-      // PDF
-      const pdfForm = new FormData();
-      pdfForm.append('file', magazineUpload.pdf);``
-      pdfForm.append('upload_preset', 'your_magazine_preset');
-      const pdfRes = await fetch(
-        'https://api.cloudinary.com/v1_1/duoofmsri/raw/upload',
-        { method: 'POST', body: pdfForm }
-      );
-      const pdfData = await pdfRes.json();
-
-      // Cover
-      const coverForm = new FormData();
-      coverForm.append('file', magazineUpload.cover);
-      coverForm.append('upload_preset', 'your_magazine_preset');
-      const coverRes = await fetch(
-        'https://api.cloudinary.com/v1_1/duoofmsri/image/upload',
-        { method: 'POST', body: coverForm }
-      );
-      const coverData = await coverRes.json();
-
-      let p1Url = null;
-      let p2Url = null;
-
-      if (magazineUpload.p1) {
-        const p1Form = new FormData();
-        p1Form.append('file', magazineUpload.p1);
-        p1Form.append('upload_preset', 'your_magazine_preset');
-        const p1Res = await fetch(
-          'https://api.cloudinary.com/v1_1/duoofmsri/image/upload',
-          { method: 'POST', body: p1Form }
-        );
-        const p1Data = await p1Res.json();
-        p1Url = p1Data.secure_url;
-      }
-
-      if (magazineUpload.p2) {
-        const p2Form = new FormData();
-        p2Form.append('file', magazineUpload.p2);
-        p2Form.append('upload_preset', 'your_magazine_preset');
-        const p2Res = await fetch(
-          'https://api.cloudinary.com/v1_1/duoofmsri/image/upload',
-          { method: 'POST', body: p2Form }
-        );
-        const p2Data = await p2Res.json();
-        p2Url = p2Data.secure_url;
-      }
-
-      const backendRes = await fetch('/api/media/magazine-update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pdfUrl: pdfData.secure_url,
-          coverUrl: coverData.secure_url,
-          p1Url,
-          p2Url,
-        }),
-      });
-
-      if (!backendRes.ok) throw new Error('Backend magazine update failed');
-
-      alert('Magazine Published!');
-      setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
-    } catch (err) {
-      console.error('Magazine upload error:', err);
-      alert('Failed to publish magazine');
-    } finally {
-      setLoading(false);
-    }
-  };
+const updateMediaData = async (id, updatedFields) => {
+  try {
+    await fetch(`/api/media/gallery/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedFields),
+    });
+  } catch (err) {
+    console.error("Update failed", err);
+  }
+};
 
   const handlePostAnnouncement = async (e) => {
     e.preventDefault();
@@ -1251,178 +1142,147 @@ const handleDeleteMedia = async (id) => {
 
         {/* Media Management Tab */}
         {activeTab === 'media' && (
-          <div className="media-mgmt-container">
-            <div
-              className="tab-header-actions"
-              style={{ marginBottom: '20px' }}
+  <div className="media-mgmt-container">
+    {/* Sub-navigation for Media Types */}
+    <div className="tab-header-actions" style={{ marginBottom: '20px' }}>
+      <div className="sub-tab-nav">
+        <button 
+          className={mediaTab === 'gallery' ? 'active' : ''} 
+          onClick={() => setMediaTab('gallery')}
+        >
+          Campus Gallery
+        </button>
+        <button 
+          className={mediaTab === 'magazine' ? 'active' : ''} 
+          onClick={() => setMediaTab('magazine')}
+        >
+          E-Magazine
+        </button>
+      </div>
+    </div>
+
+    {mediaTab === 'gallery' ? (
+      <div className="management-suite">
+        {/* Gallery Bulk Upload Card */}
+        <div className="post-announcement-card" style={{ maxWidth: '100%', marginBottom: '30px' }}>
+          <h3>Bulk Gallery Upload</h3>
+          <p className="limit-text" style={{ fontSize: '0.85rem', color: '#666' }}>
+            Manage the landing page carousel. Current: {existingMedia.length} / {MAX_IMAGES} images
+          </p>
+          <div className="bulk-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', marginTop: '15px' }}>
+            <input 
+              type="file" 
+              id="multi-file" 
+              multiple 
+              accept="image/*" 
+              hidden 
+              onChange={(e) => setSelectedFiles(e.target.files)}
+            />
+            <label htmlFor="multi-file" className="mbm-btn-outline" style={{ cursor: 'pointer' }}>
+              {selectedFiles.length > 0 ? `${selectedFiles.length} Selected` : 'Select Images'}
+            </label>
+            <button 
+              className="mbm-btn-primary" 
+              onClick={handleBulkUpload} 
+              disabled={loading || selectedFiles.length === 0}
             >
-              <div className="sub-tab-nav">
-                <button
-                  className={mediaTab === 'gallery' ? 'active' : ''}
-                  onClick={() => setMediaTab('gallery')}
+              {loading ? 'Uploading...' : 'Publish to Homepage'}
+            </button>
+          </div>
+        </div>
+
+        {/* Gallery Grid Management */}
+        <div className="media-management-grid">
+          {existingMedia.map((item) => (
+            <div key={item._id} className="media-item-card">
+              <div className="media-preview">
+                <img src={item.imageUrl} alt="Gallery" />
+                <button 
+                  className="media-delete-overlay" 
+                  onClick={() => handleDeleteMedia(item._id)}
+                  title="Remove Image"
                 >
-                  Campus Gallery
+                  ×
                 </button>
-                <button
-                  className={mediaTab === 'magazine' ? 'active' : ''}
-                  onClick={() => setMediaTab('magazine')}
-                >
-                  E-Magazine
-                </button>
+              </div>
+              <div className="media-details">
+                <input 
+                  type="text" 
+                  defaultValue={item.title} 
+                  onBlur={(e) => updateMediaData(item._id, { title: e.target.value })}
+                  placeholder="Event Title"
+                  className="grid-input"
+                />
+                <textarea 
+                  defaultValue={item.desc} 
+                  onBlur={(e) => updateMediaData(item._id, { desc: e.target.value })}
+                  placeholder="Short description..."
+                  className="grid-textarea"
+                />
               </div>
             </div>
-
-            {mediaTab === 'gallery' ? (
-              <div
-                className="post-announcement-card"
-                style={{ maxWidth: '600px' }}
-              >
-                <h3>Add Gallery Highlight</h3>
-                <div
-                  className="form-grid"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '15px',
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Event Title"
-                    className="search-input"
-                    value={newGalleryItem.title}
-                    onChange={(e) =>
-                      setNewGalleryItem({
-                        ...newGalleryItem,
-                        title: e.target.value,
-                      })
-                    }
-                  />
-                  <textarea
-                    placeholder="Brief description for the landing page..."
-                    className="search-input"
-                    style={{ height: '80px' }}
-                    value={newGalleryItem.desc}
-                    onChange={(e) =>
-                      setNewGalleryItem({
-                        ...newGalleryItem,
-                        desc: e.target.value,
-                      })
-                    }
-                  />
-                  <div className="file-upload-zone">
-                    <label>Select Image (Landscape preferred):</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        setNewGalleryItem({
-                          ...newGalleryItem,
-                          image: e.target.files[0],
-                        })
-                      }
-                    />
-                  </div>
-                  <button
-                    className="post-btn"
-                    disabled={loading}
-                    onClick={handleGallerySubmit}
-                  >
-                    {loading
-                      ? 'Uploading to Cloudinary...'
-                      : 'Update Homepage Gallery'}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div
-                className="post-announcement-card"
-                style={{ maxWidth: '600px' }}
-              >
-                <h3>Update Alumni Connect Magazine</h3>
-                <p
-                  style={{
-                    fontSize: '0.85rem',
-                    color: '#666',
-                    marginBottom: '15px',
-                  }}
-                >
-                  Upload the PDF and a cover screenshot. These will reflect
-                  immediately on the site.
-                </p>
-                <div
-                  className="form-grid"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '15px',
-                  }}
-                >
-                  <label>1. Main Magazine PDF</label>
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    onChange={(e) =>
-                      setMagazineUpload({
-                        ...magazineUpload,
-                        pdf: e.target.files[0],
-                      })
-                    }
-                  />
-
-                  <label>2. Cover Preview Image (Screenshot)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      setMagazineUpload({
-                        ...magazineUpload,
-                        cover: e.target.files[0],
-                      })
-                    }
-                  />
-
-                  <div className="flex-row">
-                    <div style={{ flex: 1 }}>
-                      <label>Page 1 Preview</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) =>
-                          setMagazineUpload({
-                            ...magazineUpload,
-                            p1: e.target.files[0],
-                          })
-                        }
-                      />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <label>Page 2 Preview</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) =>
-                          setMagazineUpload({
-                            ...magazineUpload,
-                            p2: e.target.files[0],
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    className="post-btn"
-                    onClick={handleMagazineSubmit}
-                    disabled={loading}
-                  >
-                    {loading ? 'Syncing Files...' : 'Publish New Magazine'}
-                  </button>
-                </div>
-              </div>
-            )}
+          ))}
+        </div>
+      </div>
+    ) : (
+      /* E-Magazine Management Section */
+      <div className="post-announcement-card" style={{ maxWidth: '600px' }}>
+        <h3>Update Alumni Connect Magazine</h3>
+        <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>
+          Upload the PDF and a cover screenshot. These will reflect immediately on the site.
+        </p>
+        <div className="form-grid" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          
+          <div className="file-input-group">
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>1. Main Magazine PDF</label>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(e) => setMagazineUpload({ ...magazineUpload, pdf: e.target.files[0] })}
+            />
           </div>
-        )}
+
+          <div className="file-input-group">
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>2. Cover Preview Image (Screenshot)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setMagazineUpload({ ...magazineUpload, cover: e.target.files[0] })}
+            />
+          </div>
+
+          <div className="flex-row" style={{ display: 'flex', gap: '15px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 1 Preview</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setMagazineUpload({ ...magazineUpload, p1: e.target.files[0] })}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 2 Preview</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setMagazineUpload({ ...magazineUpload, p2: e.target.files[0] })}
+              />
+            </div>
+          </div>
+
+          <button
+            className="mbm-btn-primary"
+            onClick={handleMagazineSubmit}
+            disabled={loading}
+            style={{ marginTop: '10px' }}
+          >
+            {loading ? 'Syncing Files...' : 'Publish New Magazine'}
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
 
         {/* Main table area */}
         <div className="tab-render-area">

@@ -955,3 +955,82 @@
     padding: 5px;
     border: 1px solid #eee;
 }
+
+/* MBM Theme Palette */
+:root {
+  --mbm-blue: #2c3e50;
+  --mbm-gold: #f39c12;
+}
+
+.mbm-btn-primary {
+  background: var(--mbm-blue);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.mbm-btn-outline {
+  border: 2px solid var(--mbm-blue);
+  color: var(--mbm-blue);
+  background: transparent;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.media-management-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.media-item-card {
+  background: #fdfdfd;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.media-preview {
+  position: relative;
+  height: 140px;
+}
+
+.media-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-delete-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(231, 76, 60, 0.9);
+  color: white;
+  border: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.media-details {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.media-details input, .media-details textarea {
+  border: 1px solid #efefef;
+  padding: 5px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+}
