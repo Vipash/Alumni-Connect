@@ -254,48 +254,43 @@ function AdminDashboard({ admin, setView, onLogout }) {
     }
   };
 
-  // CLOUDINARY HELPERS
-
   const handleGallerySubmit = async () => {
-    if (!newGalleryItem.image || !newGalleryItem.title) {
-      alert('Fill all fields');
-      return;
-    }
+  if (!newGalleryItem.image) return alert("Select an image");
 
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', newGalleryItem.image);
-      formData.append('upload_preset', 'your_gallery_preset'); // TODO
+  setLoading(true);
+  try {
+    const formData = new FormData();
+    formData.append('file', newGalleryItem.image);
+    // Replace 'YOUR_UNSIGNED_PRESET' with the actual name from your Cloudinary 'Upload' settings
+    formData.append('upload_preset', 'YOUR_UNSIGNED_PRESET'); 
 
-      const cloudRes = await fetch(
-        'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
-        { method: 'POST', body: formData }
-      );
-      const cloudData = await cloudRes.json();
-      if (!cloudData.secure_url) throw new Error('Cloudinary upload failed');
+    const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const cloudData = await cloudRes.json();
 
-      const backendRes = await fetch('/api/media/gallery-update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: newGalleryItem.title,
-          desc: newGalleryItem.desc,
-          imageUrl: cloudData.secure_url,
-        }),
-      });
+    if (!cloudData.secure_url) throw new Error("Cloudinary upload failed");
 
-      if (!backendRes.ok) throw new Error('Backend gallery update failed');
+    // This matches the mediaroutes.js POST /gallery-update [cite: 86]
+    await fetch('/api/media/gallery-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: newGalleryItem.title,
+        desc: newGalleryItem.desc,
+        imageUrl: cloudData.secure_url, 
+      }),
+    });
 
-      alert('Gallery Updated Successfully!');
-      setNewGalleryItem({ title: '', desc: '', image: null });
-    } catch (err) {
-      console.error('Upload Error:', err);
-      alert('Failed to upload gallery item');
-    } finally {
-      setLoading(false);
-    }
-  };
+    alert("Gallery item added!");
+  } catch (err) {
+    console.error(err);
+    alert("Upload failed. Check console for details.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleMagazineSubmit = async () => {
     if (!magazineUpload.pdf || !magazineUpload.cover) {
@@ -310,7 +305,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
       pdfForm.append('file', magazineUpload.pdf);
       pdfForm.append('upload_preset', 'your_magazine_preset');
       const pdfRes = await fetch(
-        'https://api.cloudinary.com/v1_1/your_cloud_name/raw/upload',
+        'https://api.cloudinary.com/v1_1/duoofmsri/raw/upload',
         { method: 'POST', body: pdfForm }
       );
       const pdfData = await pdfRes.json();
@@ -320,7 +315,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
       coverForm.append('file', magazineUpload.cover);
       coverForm.append('upload_preset', 'your_magazine_preset');
       const coverRes = await fetch(
-        'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
+        'https://api.cloudinary.com/v1_1/duoofmsri/image/upload',
         { method: 'POST', body: coverForm }
       );
       const coverData = await coverRes.json();
@@ -333,7 +328,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
         p1Form.append('file', magazineUpload.p1);
         p1Form.append('upload_preset', 'your_magazine_preset');
         const p1Res = await fetch(
-          'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
+          'https://api.cloudinary.com/v1_1/duoofmsri/image/upload',
           { method: 'POST', body: p1Form }
         );
         const p1Data = await p1Res.json();
@@ -345,7 +340,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
         p2Form.append('file', magazineUpload.p2);
         p2Form.append('upload_preset', 'your_magazine_preset');
         const p2Res = await fetch(
-          'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
+          'https://api.cloudinary.com/v1_1/duoofmsri/image/upload',
           { method: 'POST', body: p2Form }
         );
         const p2Data = await p2Res.json();

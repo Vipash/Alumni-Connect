@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
+// media.js
 const GallerySchema = new mongoose.Schema({
   title: String,
   desc: String,
-  img: String, // This will store the Cloudinary URL
+  imageUrl: String,
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -296,7 +296,6 @@ useEffect(() => {
   fetchMedia();
 }, []);
 
-// REMOVE the second autoplay useEffect. Keep only this one:
 useEffect(() => {
   if (galleryItems.length <= 1) return; // Don't rotate if only 1 image
   const interval = setInterval(() => {
@@ -747,9 +746,11 @@ const downloadMagazine = () => {
                         <div className="mag-page page-3"><img src="/mag-page2.jpg" alt="" /></div>
                         <div className="mag-page page-2"><img src="/mag-page1.jpg" alt="" /></div>
                         <div className="mag-page page-1">
-                          <img src="/mag-cover.jpg" alt="Magazine Cover" />
-                          <div className="mag-badge">New Issue</div>
-                        </div>
+                          <div className="mag-page page-1">
+                            {/* Replace static /mag-cover.jpg with dynamic data */}
+                            <img src={magazineData?.coverUrl || "/mag-cover.jpg"} alt="Magazine Cover" />
+                            <div className="mag-badge">New Issue</div>
+                          </div>
                       </div>
 
                       <div className="magazine-info">
@@ -774,7 +775,7 @@ const downloadMagazine = () => {
                         <div className="mag-modal-content" onClick={e => e.stopPropagation()}>
                           <button className="close-mag" onClick={() => setIsMagOpen(false)}>×</button>
                           <iframe 
-                            src="/magazine.pdf#toolbar=0" 
+                            src={`${magazineData?.pdfUrl || '/magazine.pdf'}#toolbar=0`} 
                             title="Magazine Viewer"
                             width="100%" 
                             height="100%"
