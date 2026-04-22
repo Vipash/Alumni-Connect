@@ -281,15 +281,19 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // --- UTILS ---
-  const downloadMagazine = () => {
-    const link = document.createElement('a');
-    link.href = '/sfdsj.pdf';
-    link.download = 'MBM_Alumni_Connect_Magazine.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  // 1. Add this state at the top with your other states
+const [isMagOpen, setIsMagOpen] = useState(false);
+
+// 2. Updated Download Function
+const downloadMagazine = () => {
+  const link = document.createElement('a');
+  // ENSURE THE FILE IN /public IS NAMED magazine.pdf
+  link.href = '/magazine.pdf'; 
+  link.download = 'MBM_Alumni_Connect_Magazine.pdf';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
   const handleInboxClick = () => {
     setActiveTab('inbox');
@@ -704,34 +708,46 @@ function App() {
                   <section className="magazine-hero-section">
                     <div className="magazine-container">
                       
-                      {/* Stacked PDF Preview Pages */}
                       <div className="magazine-visual-stack">
-                        <div className="mag-page page-3"><img src="/magazine-p3.jpg" alt="page 3" /></div>
-                        <div className="mag-page page-2"><img src="/magazine-p2.jpg" alt="page 2" /></div>
+                        {/* Manually exported JPGs for performance */}
+                        <div className="mag-page page-3"><img src="/mag-page2.jpg" alt="" /></div>
+                        <div className="mag-page page-2"><img src="/mag-page1.jpg" alt="" /></div>
                         <div className="mag-page page-1">
-                          <img src="/magazine-cover.jpg" alt="Cover" />
+                          <img src="/mag-cover.jpg" alt="Magazine Cover" />
                           <div className="mag-badge">New Issue</div>
                         </div>
                       </div>
 
-                      {/* Description & Actions */}
                       <div className="magazine-info">
                         <h3 className="section-subtitle">E-Magazine</h3>
-                        <h2>The University Chronicles</h2>
+                        <h2>The Alumni Connect</h2>
                         <p>Explore the latest breakthroughs in research, campus life, and student achievements in our monthly digital edition.</p>
                         
                         <div className="magazine-actions">
-                          {/* Opens PDF in new browser tab */}
-                          <a href="/path-to-your.pdf" target="_blank" rel="noopener noreferrer" className="mag-btn primary">
+                          <button className="mag-btn primary" onClick={() => setIsMagOpen(true)}>
                             View Online
-                          </a>
-                          {/* Initiates download */}
-                          <a href="/path-to-your.pdf" download="University_Magazine.pdf" className="mag-btn secondary">
+                          </button>
+                          <button className="mag-btn secondary" onClick={downloadMagazine}>
                             Download PDF
-                          </a>
+                          </button>
                         </div>
                       </div>
                     </div>
+
+                    {/* Classy PDF Viewer Modal */}
+                    {isMagOpen && (
+                      <div className="mag-modal-overlay" onClick={() => setIsMagOpen(false)}>
+                        <div className="mag-modal-content" onClick={e => e.stopPropagation()}>
+                          <button className="close-mag" onClick={() => setIsMagOpen(false)}>×</button>
+                          <iframe 
+                            src="/magazine.pdf#toolbar=0" 
+                            title="Magazine Viewer"
+                            width="100%" 
+                            height="100%"
+                          ></iframe>
+                        </div>
+                      </div>
+                    )}
                   </section>
 
                   <footer className="landing-footer">
