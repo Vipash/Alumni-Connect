@@ -254,6 +254,73 @@ function AdminDashboard({ admin, setView, onLogout }) {
     }
   };
 
+  // Add to your Media Management States
+  const [existingMedia, setExistingMedia] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]); // For bulk upload
+  const MAX_IMAGES = 10;
+
+  // Fetch existing media when the tab opens
+  useEffect(() => {
+    if (activeTab === 'media') {
+      fetchExistingMedia();
+    }
+  }, [activeTab]);
+
+  const fetchExistingMedia = async () => {
+    const res = await fetch('/api/media/home-data');
+    const data = await res.json();
+    setExistingMedia(data.gallery || []);
+  };
+
+  const handleBulkUpload = async () => {
+    if (selectedFiles.length === 0) return alert("Select images first");
+    if (existingMedia.length + selectedFiles.length > MAX_IMAGES) {
+      return alert(`Max limit is ${MAX_IMAGES} images.`);
+    }
+
+    setLoading(true);
+    try {
+      const uploadPromises = Array.from(selectedFiles).map(async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'profile');
+        formData.append('cloud_name', 'duoofmsri');
+
+        const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/image/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const cloudData = await cloudRes.json();
+
+        return fetch('/api/media/gallery-update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: "New Highlight",
+            desc: "Add a description...",
+            imageUrl: cloudData.secure_url,
+          }),
+        });
+      });
+
+      await Promise.all(uploadPromises);
+      alert("All images uploaded!");
+      setSelectedFiles([]);
+      fetchExistingMedia(); // Refresh the list
+    } catch (err) {
+      alert("Bulk upload failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+const handleDeleteMedia = async (id) => {
+  if (!window.confirm("Remove this image?")) return;
+  // You'll need to add this DELETE route to your backend
+  await fetch(`/api/media/gallery/${id}`, { method: 'DELETE' });
+  fetchExistingMedia();
+};
+
   const handleGallerySubmit = async () => {
   if (!newGalleryItem.image) return alert("Please select an image first!");
 

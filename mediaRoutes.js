@@ -35,4 +35,16 @@ router.get('/home-data', async (req, res) => {
   }
 });
 
+// DELETE an image
+router.delete('/gallery/:id', async (req, res) => {
+  await Gallery.findByIdAndDelete(req.params.id);
+  res.json({ message: "Deleted" });
+});
+
+// UPDATE text
+router.patch('/gallery/:id', async (req, res) => {
+  await Gallery.findByIdAndUpdate(req.params.id, req.body);
+  res.json({ message: "Updated" });
+});
+
 module.exports = router;
