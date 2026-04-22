@@ -255,25 +255,35 @@ function AdminDashboard({ admin, setView, onLogout }) {
   };
 
   const handleGallerySubmit = async () => {
-  if (!newGalleryItem.image) return alert("Select an image");
+  if (!newGalleryItem.image) return alert("Please select an image first!");
 
   setLoading(true);
   try {
     const formData = new FormData();
+    // 1. The actual file
     formData.append('file', newGalleryItem.image);
-    // Replace 'YOUR_UNSIGNED_PRESET' with the actual name from your Cloudinary 'Upload' settings
-    formData.append('upload_preset', 'YOUR_UNSIGNED_PRESET'); 
+    // 2. Your unsigned preset name
+    formData.append('upload_preset', 'profile'); 
+    // 3. Your cloud name
+    formData.append('cloud_name', 'duoofmsri');
 
-    const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/image/upload', {
+    // Note: Use 'auto' instead of 'image' to be safer with different file types
+    const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
       method: 'POST',
       body: formData,
     });
+
     const cloudData = await cloudRes.json();
 
-    if (!cloudData.secure_url) throw new Error("Cloudinary upload failed");
+    // If Cloudinary isn't happy, it will return an 'error' object
+    if (cloudData.error) {
+      console.error("Cloudinary Detailed Error:", cloudData.error.message);
+      alert(`Cloudinary Error: ${cloudData.error.message}`);
+      return; // Stop the process here
+    }
 
-    // This matches the mediaroutes.js POST /gallery-update [cite: 86]
-    await fetch('/api/media/gallery-update', {
+    // Step 2: Send the secure_url to your MongoDB backend
+    const backendRes = await fetch('/api/media/gallery-update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -283,10 +293,14 @@ function AdminDashboard({ admin, setView, onLogout }) {
       }),
     });
 
-    alert("Gallery item added!");
+    if (backendRes.ok) {
+      alert("Gallery Item Uploaded Successfully!");
+      // Reset the form
+      setNewGalleryItem({ title: '', desc: '', image: null });
+    }
   } catch (err) {
-    console.error(err);
-    alert("Upload failed. Check console for details.");
+    console.error("Upload process failed:", err);
+    alert("Network error. Check your connection or Cloudinary settings.");
   } finally {
     setLoading(false);
   }
