@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react';
 
 function AdminDashboard({ admin, setView, onLogout }) {
-  // 1. All States at the top
+  // 1. STATE
   const [activeTab, setActiveTab] = useState('overview');
-  const [statusFilter, setStatusFilter] = useState('pending'); // pending | verified
+  const [statusFilter, setStatusFilter] = useState('pending');
   const [listData, setListData] = useState([]);
   const [tickets, setTickets] = useState([]);
-  const [feedbackFilter, setFeedbackFilter] = useState('registered'); // 'registered' | 'public'
+  const [feedbackFilter, setFeedbackFilter] = useState('registered');
   const [loading, setLoading] = useState(false);
   const [audience, setAudience] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,15 +17,30 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [adminSubTab, setAdminSubTab] = useState('list');
   const [announcementSearch, setAnnouncementSearch] = useState('');
 
-  // NEW: announcements primary mode + subviews
+  // Announcements primary mode + subviews
   const [announcementMode, setAnnouncementMode] = useState('announcements'); // 'announcements' | 'tickers'
   const [subView, setSubView] = useState('post'); // 'post' | 'history'
 
-  // NEW: tickers state
+  // Tickers
   const [tickers, setTickers] = useState([]);
   const [editingTicker, setEditingTicker] = useState(null);
 
-  // NEW: tab permissions configuration
+  // Media Management
+  const [mediaTab, setMediaTab] = useState('gallery'); // 'gallery' | 'magazine'
+  const [galleryItems, setGalleryItems] = useState([]); // reserved for future
+  const [newGalleryItem, setNewGalleryItem] = useState({
+    title: '',
+    desc: '',
+    image: null,
+  });
+  const [magazineUpload, setMagazineUpload] = useState({
+    pdf: null,
+    cover: null,
+    p1: null,
+    p2: null,
+  });
+
+  // Tab permissions config (used in ManageAdmins)
   const AVAILABLE_TABS = [
     { id: 'overview', label: 'Overview / Stats' },
     { id: 'announcements', label: 'Announcements & Tickers' },
@@ -33,9 +48,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
     { id: 'students', label: 'Student Verification' },
     { id: 'feedback', label: 'Issues & Feedback' },
     { id: 'logs', label: 'Security Logs' },
+    // optionally: { id: 'media', label: 'Media Management' },
   ];
 
-  // Default selection for new admins
   const [selectedPerms, setSelectedPerms] = useState(['overview']);
 
   const togglePermission = (tabId) => {
@@ -49,14 +64,13 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const adminData = JSON.parse(localStorage.getItem('admin'));
   const adminId = adminData?._id;
 
-  // 2. Helper Functions & API Calls
+  // 2. HELPERS & API
+
   const fetchStats = async () => {
     try {
       const res = await fetch(
         'https://alumni-connect-fegi.onrender.com/api/admin/stats',
-        {
-          headers: { 'admin-id': adminId },
-        }
+        { headers: { 'admin-id': adminId } }
       );
       if (res.ok) setStats(await res.json());
     } catch (err) {
@@ -67,7 +81,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const getApiUrl = () => {
     if (activeTab === 'logs') return '/api/admin/logs';
 
-    // Only fetch announcements list when in history subView & announcements mode
     if (
       activeTab === 'announcements' &&
       announcementMode === 'announcements' &&
@@ -81,15 +94,15 @@ function AdminDashboard({ admin, setView, onLogout }) {
   };
 
   const fetchCurrentList = async () => {
-    // Do not fetch list for overview, manage-admins, feedback
     if (
       activeTab === 'overview' ||
       activeTab === 'manage-admins' ||
-      activeTab === 'feedback'
-    )
+      activeTab === 'feedback' ||
+      activeTab === 'media'
+    ) {
       return;
+    }
 
-    // For announcements tab, only fetch when we are in announcements/history
     if (
       activeTab === 'announcements' &&
       !(announcementMode === 'announcements' && subView === 'history')
@@ -145,14 +158,11 @@ function AdminDashboard({ admin, setView, onLogout }) {
     if (res.ok) fetchAllAdmins();
   };
 
-  // NEW: ticker helpers
   const fetchTickers = async () => {
     try {
       const res = await fetch(
         'https://alumni-connect-fegi.onrender.com/api/admin/tickers',
-        {
-          headers: { 'admin-id': adminId },
-        }
+        { headers: { 'admin-id': adminId } }
       );
       if (res.ok) {
         const data = await res.json();
@@ -172,7 +182,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
 
   const handleTickerSubmit = async (e) => {
     e.preventDefault();
-
     if (!editingTicker || !editingTicker.text?.trim()) {
       alert('Please enter ticker text.');
       return;
@@ -181,7 +190,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
     const url = editingTicker?._id
       ? `https://alumni-connect-fegi.onrender.com/api/admin/tickers/${editingTicker._id}`
       : `https://alumni-connect-fegi.onrender.com/api/admin/tickers`;
-
     const method = editingTicker?._id ? 'PUT' : 'POST';
 
     const res = await fetch(url, {
@@ -215,75 +223,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
     if (res.ok) fetchTickers();
   };
 
-  // 3. Derived Data
-  const filteredData = listData.filter((item) => {
-    if (!searchTerm) return true;
-    const search = searchTerm.toLowerCase();
-    return (
-      item.name?.toLowerCase().includes(search) ||
-      item.email?.toLowerCase().includes(search) ||
-      item.displayName?.toLowerCase().includes(search) ||
-      item.alumniName?.toLowerCase().includes(search) ||
-      item.title?.toLowerCase().includes(search)
-    );
-  });
-
-  const filteredAnnouncements = listData.filter((item) => {
-    const search = (announcementSearch || '').toLowerCase();
-    if (!search) return true;
-
-    return (
-      item.title?.toLowerCase().includes(search) ||
-      item.subject?.toLowerCase().includes(search)
-    );
-  });
-
-  const filteredTickets = tickets.filter((t) =>
-    feedbackFilter === 'registered' ? t.isRegistered : !t.isRegistered
-  );
-
-  // 4. UseEffects
-
-  // Stats: once on mount
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  // Feedback tickets: only when switching into the feedback tab
-  useEffect(() => {
-    if (activeTab === 'feedback') {
-      fetchTickets();
-    }
-  }, [activeTab]);
-
-  // Lists for other tabs: when tab or statusFilter or announcement mode changes
-  useEffect(() => {
-    if (
-      activeTab !== 'overview' &&
-      activeTab !== 'manage-admins' &&
-      activeTab !== 'feedback'
-    ) {
-      fetchCurrentList();
-    }
-  }, [activeTab, statusFilter, announcementMode, subView]);
-
-  // Fetch admins when the tab is active
-  useEffect(() => {
-    if (activeTab === 'manage-admins') fetchAllAdmins();
-  }, [activeTab]);
-
-  // Fetch tickers when in ticker history view
-  useEffect(() => {
-    if (
-      activeTab === 'announcements' &&
-      announcementMode === 'tickers' &&
-      subView === 'history'
-    ) {
-      fetchTickers();
-    }
-  }, [activeTab, announcementMode, subView]);
-
-  // 5. Action Handlers
   const handleAction = async (id, action) => {
     if (action === 'delete-announcement') {
       if (!window.confirm('Delete this announcement?')) return;
@@ -300,6 +239,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     const confirmMsg =
       action === 'approve' ? 'Approve user?' : 'Permanently delete?';
     if (!window.confirm(confirmMsg)) return;
+
     const url =
       action === 'approve'
         ? `/api/verify-user/${id}`
@@ -311,6 +251,127 @@ function AdminDashboard({ admin, setView, onLogout }) {
       alert('Action successful!');
       fetchCurrentList();
       fetchStats();
+    }
+  };
+
+  // CLOUDINARY HELPERS
+
+  const handleGallerySubmit = async () => {
+    if (!newGalleryItem.image || !newGalleryItem.title) {
+      alert('Fill all fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', newGalleryItem.image);
+      formData.append('upload_preset', 'your_gallery_preset'); // TODO
+
+      const cloudRes = await fetch(
+        'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
+        { method: 'POST', body: formData }
+      );
+      const cloudData = await cloudRes.json();
+      if (!cloudData.secure_url) throw new Error('Cloudinary upload failed');
+
+      const backendRes = await fetch('/api/media/gallery-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newGalleryItem.title,
+          desc: newGalleryItem.desc,
+          imageUrl: cloudData.secure_url,
+        }),
+      });
+
+      if (!backendRes.ok) throw new Error('Backend gallery update failed');
+
+      alert('Gallery Updated Successfully!');
+      setNewGalleryItem({ title: '', desc: '', image: null });
+    } catch (err) {
+      console.error('Upload Error:', err);
+      alert('Failed to upload gallery item');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMagazineSubmit = async () => {
+    if (!magazineUpload.pdf || !magazineUpload.cover) {
+      alert('Please select both PDF and Cover Image');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // PDF
+      const pdfForm = new FormData();
+      pdfForm.append('file', magazineUpload.pdf);
+      pdfForm.append('upload_preset', 'your_magazine_preset');
+      const pdfRes = await fetch(
+        'https://api.cloudinary.com/v1_1/your_cloud_name/raw/upload',
+        { method: 'POST', body: pdfForm }
+      );
+      const pdfData = await pdfRes.json();
+
+      // Cover
+      const coverForm = new FormData();
+      coverForm.append('file', magazineUpload.cover);
+      coverForm.append('upload_preset', 'your_magazine_preset');
+      const coverRes = await fetch(
+        'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
+        { method: 'POST', body: coverForm }
+      );
+      const coverData = await coverRes.json();
+
+      let p1Url = null;
+      let p2Url = null;
+
+      if (magazineUpload.p1) {
+        const p1Form = new FormData();
+        p1Form.append('file', magazineUpload.p1);
+        p1Form.append('upload_preset', 'your_magazine_preset');
+        const p1Res = await fetch(
+          'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
+          { method: 'POST', body: p1Form }
+        );
+        const p1Data = await p1Res.json();
+        p1Url = p1Data.secure_url;
+      }
+
+      if (magazineUpload.p2) {
+        const p2Form = new FormData();
+        p2Form.append('file', magazineUpload.p2);
+        p2Form.append('upload_preset', 'your_magazine_preset');
+        const p2Res = await fetch(
+          'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
+          { method: 'POST', body: p2Form }
+        );
+        const p2Data = await p2Res.json();
+        p2Url = p2Data.secure_url;
+      }
+
+      const backendRes = await fetch('/api/media/magazine-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pdfUrl: pdfData.secure_url,
+          coverUrl: coverData.secure_url,
+          p1Url,
+          p2Url,
+        }),
+      });
+
+      if (!backendRes.ok) throw new Error('Backend magazine update failed');
+
+      alert('Magazine Published!');
+      setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
+    } catch (err) {
+      console.error('Magazine upload error:', err);
+      alert('Failed to publish magazine');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -336,7 +397,67 @@ function AdminDashboard({ admin, setView, onLogout }) {
     }
   };
 
-  // 6. Sub-Components
+  // 3. DERIVED DATA
+  const filteredData = listData.filter((item) => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(search) ||
+      item.email?.toLowerCase().includes(search) ||
+      item.displayName?.toLowerCase().includes(search) ||
+      item.alumniName?.toLowerCase().includes(search) ||
+      item.title?.toLowerCase().includes(search)
+    );
+  });
+
+  const filteredAnnouncements = listData.filter((item) => {
+    const search = (announcementSearch || '').toLowerCase();
+    if (!search) return true;
+    return (
+      item.title?.toLowerCase().includes(search) ||
+      item.subject?.toLowerCase().includes(search)
+    );
+  });
+
+  const filteredTickets = tickets.filter((t) =>
+    feedbackFilter === 'registered' ? t.isRegistered : !t.isRegistered
+  );
+
+  // 4. EFFECTS
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'feedback') fetchTickets();
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (
+      activeTab !== 'overview' &&
+      activeTab !== 'manage-admins' &&
+      activeTab !== 'feedback' &&
+      activeTab !== 'media'
+    ) {
+      fetchCurrentList();
+    }
+  }, [activeTab, statusFilter, announcementMode, subView]);
+
+  useEffect(() => {
+    if (activeTab === 'manage-admins') fetchAllAdmins();
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (
+      activeTab === 'announcements' &&
+      announcementMode === 'tickers' &&
+      subView === 'history'
+    ) {
+      fetchTickers();
+    }
+  }, [activeTab, announcementMode, subView]);
+
+  // 5. SUBCOMPONENTS
   const PortalOverview = () => (
     <div className="admin-overview-container">
       <div className="overview-header">
@@ -453,8 +574,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
               {selectedTicket.senderEmail || 'N/A'})
             </p>
             <p>
-              <strong>Type:</strong> {selectedTicket.type}
-            </p>
+              <strong>Type:</strong> {selectedTicket.type}</p>
             <p>
               <strong>Sent At:</strong>{' '}
               {selectedTicket.createdAt
@@ -626,7 +746,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     );
   };
 
-  // Helper: who can see which tab
+  // PERMISSIONS
   const canSeeTab = (permissionKey) => {
     if (admin?.role === 'GodMode') return true;
     const perms = admin?.permissions;
@@ -634,7 +754,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     return perms.includes(permissionKey);
   };
 
-  // 7. FINAL RETURN STATEMENT
+  // 6. RETURN
   return (
     <div className="admin-dashboard-page">
       <nav className="admin-navbar">
@@ -693,6 +813,14 @@ function AdminDashboard({ admin, setView, onLogout }) {
             </button>
           )}
 
+          {/* Media tab (no permission key yet; add if needed) */}
+          <button
+            className={activeTab === 'media' ? 'active' : ''}
+            onClick={() => setActiveTab('media')}
+          >
+            Media
+          </button>
+
           {canSeeTab('logs') && (
             <button
               className={activeTab === 'logs' ? 'active' : ''}
@@ -733,7 +861,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
       </nav>
 
       <main className="admin-content-wrapper">
-        {/* Toolbar for search + status filters for user/logs views */}
+        {/* Toolbar for search + status filters */}
         {['alumni', 'students', 'logs'].includes(activeTab) && (
           <div className="content-toolbar">
             <input
@@ -743,7 +871,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="admin-search-input"
             />
-
             {['alumni', 'students'].includes(activeTab) && (
               <div className="filter-group">
                 <button
@@ -763,10 +890,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
           </div>
         )}
 
-        {/* Nested Tabs for Announcements vs Tickers */}
+        {/* Announcements & Tickers */}
         {activeTab === 'announcements' && (
           <div className="nested-tabs-container">
-            {/* PRIMARY TABS: Announcements vs Tickers */}
             <div className="content-toolbar main-subtabs">
               <button
                 className={announcementMode === 'announcements' ? 'sel' : ''}
@@ -788,7 +914,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
               </button>
             </div>
 
-            {/* SECONDARY TABS: Dynamic based on mode */}
             <div
               className="content-toolbar secondary-subtabs"
               style={{ marginTop: '10px', background: '#f0f0f0' }}
@@ -828,95 +953,85 @@ function AdminDashboard({ admin, setView, onLogout }) {
               )}
             </div>
 
-            {/* CONTENT AREA */}
             <div className="tab-content-area" style={{ marginTop: '20px' }}>
-              {/* 1. ANNOUNCEMENTS MODE */}
-              {announcementMode === 'announcements' &&
-                subView === 'post' && (
-                  <div className="admin-card-simple">
-                    <form
-                      onSubmit={handlePostAnnouncement}
-                      className="admin-form-clean"
+              {announcementMode === 'announcements' && subView === 'post' && (
+                <div className="admin-card-simple">
+                  <form
+                    onSubmit={handlePostAnnouncement}
+                    className="admin-form-clean"
+                  >
+                    <input name="title" placeholder="Title" required />
+                    <input name="subject" placeholder="Subject" required />
+                    <textarea
+                      name="content"
+                      placeholder="Announcement Content..."
+                      rows="4"
+                      required
+                    />
+                    <select
+                      value={audience}
+                      onChange={(e) => setAudience(e.target.value)}
                     >
-                      <input name="title" placeholder="Title" required />
-                      <input name="subject" placeholder="Subject" required />
-                      <textarea
-                        name="content"
-                        placeholder="Announcement Content..."
-                        rows="4"
-                        required
-                      />
-                      <select
-                        value={audience}
-                        onChange={(e) => setAudience(e.target.value)}
-                      >
-                        <option value="all">Everyone</option>
-                        <option value="alumni">Alumni Only</option>
-                        <option value="students">Students Only</option>
-                      </select>
-                      <button type="submit" className="approve-btn">
-                        Publish
-                      </button>
-                    </form>
-                  </div>
-                )}
+                      <option value="all">Everyone</option>
+                      <option value="alumni">Alumni Only</option>
+                      <option value="students">Students Only</option>
+                    </select>
+                    <button type="submit" className="approve-btn">
+                      Publish
+                    </button>
+                  </form>
+                </div>
+              )}
 
-              {announcementMode === 'announcements' &&
-                subView === 'history' && (
-                  <div className="data-table-container">
-                    <table className="admin-table">
-                      <thead>
-                        <tr>
-                          <th>Date</th>
-                          <th>Title</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredAnnouncements.map((item) => (
-                          <tr key={item._id}>
-                            <td>
-                              {item.date
-                                ? new Date(
-                                    item.date
-                                  ).toLocaleDateString()
-                                : ''}
-                            </td>
-                            <td>{item.title}</td>
-                            <td>
-                              <button
-                                className="delete-btn"
-                                onClick={() =>
-                                  handleAction(
-                                    item._id,
-                                    'delete-announcement'
-                                  )
-                                }
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {!loading && filteredAnnouncements.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={3}
-                              style={{
-                                textAlign: 'center',
-                                padding: '20px',
-                              }}
+              {announcementMode === 'announcements' && subView === 'history' && (
+                <div className="data-table-container">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Title</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredAnnouncements.map((item) => (
+                        <tr key={item._id}>
+                          <td>
+                            {item.date
+                              ? new Date(item.date).toLocaleDateString()
+                              : ''}
+                          </td>
+                          <td>{item.title}</td>
+                          <td>
+                            <button
+                              className="delete-btn"
+                              onClick={() =>
+                                handleAction(
+                                  item._id,
+                                  'delete-announcement'
+                                )
+                              }
                             >
-                              No records found.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      {!loading && filteredAnnouncements.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={3}
+                            style={{ textAlign: 'center', padding: '20px' }}
+                          >
+                            No records found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
-              {/* 2. TICKERS MODE */}
               {announcementMode === 'tickers' && subView === 'post' && (
                 <div className="admin-card-simple">
                   <h3>
@@ -930,7 +1045,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                   >
                     <input
                       required
-                      placeholder="Ticker Text (e.g., 'Final Year Exams starting from May 5th...')"
+                      placeholder="Ticker Text..."
                       value={editingTicker?.text || ''}
                       onChange={(e) =>
                         setEditingTicker({
@@ -951,16 +1066,13 @@ function AdminDashboard({ admin, setView, onLogout }) {
                     >
                       <input
                         type="number"
-                        placeholder="Priority (e.g. 10)"
+                        placeholder="Priority"
                         style={{ width: '120px' }}
                         value={editingTicker?.priority ?? ''}
                         onChange={(e) =>
                           setEditingTicker({
                             ...(editingTicker || {}),
-                            priority: parseInt(
-                              e.target.value || '0',
-                              10
-                            ),
+                            priority: parseInt(e.target.value || '0', 10),
                             text: editingTicker?.text || '',
                             isActive: editingTicker?.isActive ?? true,
                           })
@@ -982,9 +1094,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                         Show on Home Page
                       </label>
                       <button type="submit" className="approve-btn">
-                        {editingTicker?._id
-                          ? 'Update Ticker'
-                          : 'Add Ticker'}
+                        {editingTicker?._id ? 'Update Ticker' : 'Add Ticker'}
                       </button>
                       {editingTicker && (
                         <button
@@ -1038,9 +1148,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                             </button>
                             <button
                               className="delete-btn"
-                              onClick={() =>
-                                handleTickerDelete(t._id)
-                              }
+                              onClick={() => handleTickerDelete(t._id)}
                             >
                               Delete
                             </button>
@@ -1051,10 +1159,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                         <tr>
                           <td
                             colSpan={4}
-                            style={{
-                              textAlign: 'center',
-                              padding: 16,
-                            }}
+                            style={{ textAlign: 'center', padding: 16 }}
                           >
                             No tickers found.
                           </td>
@@ -1068,7 +1173,182 @@ function AdminDashboard({ admin, setView, onLogout }) {
           </div>
         )}
 
-        {/* Main Table for Users / Logs when not in announcements nested views */}
+        {/* Media Management Tab */}
+        {activeTab === 'media' && (
+          <div className="media-mgmt-container">
+            <div
+              className="tab-header-actions"
+              style={{ marginBottom: '20px' }}
+            >
+              <div className="sub-tab-nav">
+                <button
+                  className={mediaTab === 'gallery' ? 'active' : ''}
+                  onClick={() => setMediaTab('gallery')}
+                >
+                  Campus Gallery
+                </button>
+                <button
+                  className={mediaTab === 'magazine' ? 'active' : ''}
+                  onClick={() => setMediaTab('magazine')}
+                >
+                  E-Magazine
+                </button>
+              </div>
+            </div>
+
+            {mediaTab === 'gallery' ? (
+              <div
+                className="post-announcement-card"
+                style={{ maxWidth: '600px' }}
+              >
+                <h3>Add Gallery Highlight</h3>
+                <div
+                  className="form-grid"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '15px',
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Event Title"
+                    className="search-input"
+                    value={newGalleryItem.title}
+                    onChange={(e) =>
+                      setNewGalleryItem({
+                        ...newGalleryItem,
+                        title: e.target.value,
+                      })
+                    }
+                  />
+                  <textarea
+                    placeholder="Brief description for the landing page..."
+                    className="search-input"
+                    style={{ height: '80px' }}
+                    value={newGalleryItem.desc}
+                    onChange={(e) =>
+                      setNewGalleryItem({
+                        ...newGalleryItem,
+                        desc: e.target.value,
+                      })
+                    }
+                  />
+                  <div className="file-upload-zone">
+                    <label>Select Image (Landscape preferred):</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        setNewGalleryItem({
+                          ...newGalleryItem,
+                          image: e.target.files[0],
+                        })
+                      }
+                    />
+                  </div>
+                  <button
+                    className="post-btn"
+                    disabled={loading}
+                    onClick={handleGallerySubmit}
+                  >
+                    {loading
+                      ? 'Uploading to Cloudinary...'
+                      : 'Update Homepage Gallery'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="post-announcement-card"
+                style={{ maxWidth: '600px' }}
+              >
+                <h3>Update Alumni Connect Magazine</h3>
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: '#666',
+                    marginBottom: '15px',
+                  }}
+                >
+                  Upload the PDF and a cover screenshot. These will reflect
+                  immediately on the site.
+                </p>
+                <div
+                  className="form-grid"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '15px',
+                  }}
+                >
+                  <label>1. Main Magazine PDF</label>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) =>
+                      setMagazineUpload({
+                        ...magazineUpload,
+                        pdf: e.target.files[0],
+                      })
+                    }
+                  />
+
+                  <label>2. Cover Preview Image (Screenshot)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setMagazineUpload({
+                        ...magazineUpload,
+                        cover: e.target.files[0],
+                      })
+                    }
+                  />
+
+                  <div className="flex-row">
+                    <div style={{ flex: 1 }}>
+                      <label>Page 1 Preview</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          setMagazineUpload({
+                            ...magazineUpload,
+                            p1: e.target.files[0],
+                          })
+                        }
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label>Page 2 Preview</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          setMagazineUpload({
+                            ...magazineUpload,
+                            p2: e.target.files[0],
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    className="post-btn"
+                    onClick={handleMagazineSubmit}
+                    disabled={loading}
+                  >
+                    {loading ? 'Syncing Files...' : 'Publish New Magazine'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Main table area */}
         <div className="tab-render-area">
           {activeTab === 'overview' && <PortalOverview />}
           {activeTab === 'manage-admins' && <ManageAdmins />}
@@ -1094,9 +1374,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                         <th>Contact</th>
                         <th>Details</th>
                         <th>
-                          {activeTab === 'alumni'
-                            ? 'Company'
-                            : 'Roll No'}
+                          {activeTab === 'alumni' ? 'Company' : 'Roll No'}
                         </th>
                         <th>Actions</th>
                       </tr>
@@ -1112,9 +1390,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                             <td>{item.ipAddress}</td>
                             <td>
                               {item.timestamp
-                                ? new Date(
-                                    item.timestamp
-                                  ).toLocaleString()
+                                ? new Date(item.timestamp).toLocaleString()
                                 : ''}
                             </td>
                           </>
@@ -1133,10 +1409,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                                 <button
                                   className="approve-btn"
                                   onClick={() =>
-                                    handleAction(
-                                      item._id,
-                                      'approve'
-                                    )
+                                    handleAction(item._id, 'approve')
                                   }
                                 >
                                   Approve
@@ -1145,10 +1418,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                               <button
                                 className="delete-btn"
                                 onClick={() =>
-                                  handleAction(
-                                    item._id,
-                                    'reject'
-                                  )
+                                  handleAction(item._id, 'reject')
                                 }
                               >
                                 Delete
@@ -1162,10 +1432,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
                       <tr>
                         <td
                           colSpan={activeTab === 'logs' ? 4 : 5}
-                          style={{
-                            textAlign: 'center',
-                            padding: '20px',
-                          }}
+                          style={{ textAlign: 'center', padding: '20px' }}
                         >
                           No records found.
                         </td>

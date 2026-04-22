@@ -264,14 +264,58 @@ function App() {
     }
   };
 
-  // Sample data - replace with your actual image names
-  const galleryItems = [
-    { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
-    { img: "/assets/event1.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
-    { img: "/assets/lab1.jpg", text: "Our newly renovated digital library and research wing." }
-  ];
+const [galleryItems, setGalleryItems] = useState([]);
+const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
 
-  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
+// 2) Fetch homepage media (gallery + magazine) once on mount
+useEffect(() => {
+  const fetchMedia = async () => {
+    try {
+      const response = await fetch('/api/media/home-data'); // backend should return { gallery: [...], magazine: {...} }
+      const data = await response.json();
+
+      if (Array.isArray(data.gallery) && data.gallery.length > 0) {
+        // Expecting each item like { imageUrl, title, desc } from Mongo/Cloudinary
+        const mapped = data.gallery.map((item) => ({
+          img: item.imageUrl,
+          text: item.desc || item.title || '',
+        }));
+        setGalleryItems(mapped);
+      } else {
+        // fallback to your old static data if nothing in DB
+        setGalleryItems([
+          { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
+          { img: "/assets/event1.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
+          { img: "/assets/lab1.jpg", text: "Our newly renovated digital library and research wing." }
+        ]);
+      }
+
+      // If your API also returns magazine data, you can set it here:
+      // setMagazineData(data.magazine);
+    } catch (err) {
+      console.error("Failed to fetch media", err);
+      // On error, still show static fallback so hero doesn’t break
+      setGalleryItems([
+        { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
+        { img: "/assets/event1.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
+        { img: "/assets/lab1.jpg", text: "Our newly renovated digital library and research wing." }
+      ]);
+    }
+  };
+
+  fetchMedia();
+}, []);
+
+// 3) Keep your existing autoplay, but make it depend on galleryItems.length
+useEffect(() => {
+  if (galleryItems.length === 0) return;
+  const interval = setInterval(() => {
+    setCurrentGalleryIndex((prev) =>
+      prev === galleryItems.length - 1 ? 0 : prev + 1
+    );
+  }, 5000);
+  return () => clearInterval(interval);
+}, [galleryItems.length]);
 
   // Auto-play logic
   useEffect(() => {

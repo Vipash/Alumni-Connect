@@ -17,6 +17,8 @@ const notificationRoutes = require('./notificationRoutes');
 const Admin = require('./Admin');
 const User = require('./alumni');
 const Support = require('./Support');
+const mediaRoutes = require('./mediaRoutes');
+app.use('/api/media', mediaRoutes);
 
 const app = express();
 
