@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import './index.css';
 import './App.css';
 import './Portal.css';
-import './featurestrip.css';
+import './FeatureStrip.css';
 import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';
@@ -638,7 +638,14 @@ function App() {
                           src={galleryItems[currentGalleryIndex].img} 
                           alt="Campus Highlight" 
                           className="hero-img-transition" 
-                          key={currentGalleryIndex} 
+                          key={currentGalleryIndex}
+                          // ADD THIS STYLE OBJECT BELOW:
+                          style={{ 
+                            width: '250px', 
+                            height: '180px', 
+                            objectFit: 'cover',
+                            display: 'block' 
+                          }} 
                         />
                       </div>
 
