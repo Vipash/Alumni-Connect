@@ -738,52 +738,51 @@ const downloadMagazine = () => {
                     )}
                   </section>
                   
-                  <section className="magazine-hero-section">
-                    <div className="magazine-container">
-                      
-                      <div className="magazine-visual-stack">
-                        {/* Manually exported JPGs for performance */}
-                        <div className="mag-page page-3"><img src="/mag-page2.jpg" alt="" /></div>
-                        <div className="mag-page page-2"><img src="/mag-page1.jpg" alt="" /></div>
-                        <div className="mag-page page-1">
-                          <div className="mag-page page-1">
-                            {/* Replace static /mag-cover.jpg with dynamic data */}
-                            <img src={magazineData?.coverUrl || "/mag-cover.jpg"} alt="Magazine Cover" />
-                            <div className="mag-badge">New Issue</div>
-                          </div>
+                 <section className="magazine-hero-section">
+                  <div className="magazine-container">
+                    
+                    <div className="magazine-visual-stack">
+                      {/* Manually exported JPGs for performance */}
+                      <div className="mag-page page-3"><img src="/mag-page2.jpg" alt="" /></div>
+                      <div className="mag-page page-2"><img src="/mag-page1.jpg" alt="" /></div>
+                      <div className="mag-page page-1">
+                        {/* Replace static /mag-cover.jpg with dynamic data */}
+                        <img src={magazineData?.coverUrl || "/mag-cover.jpg"} alt="Magazine Cover" />
+                        <div className="mag-badge">New Issue</div>
                       </div>
+                    </div> {/* ADDED: Closes magazine-visual-stack */}
 
-                      <div className="magazine-info">
-                        <h3 className="section-subtitle">E-Magazine</h3>
-                        <h2>The Alumni Connect</h2>
-                        <p>Explore the latest breakthroughs in research, campus life, and student achievements in our monthly digital edition.</p>
-                        
-                        <div className="magazine-actions">
-                          <button className="mag-btn primary" onClick={() => setIsMagOpen(true)}>
-                            View Online
-                          </button>
-                          <button className="mag-btn secondary" onClick={downloadMagazine}>
-                            Download PDF
-                          </button>
-                        </div>
+                    <div className="magazine-info">
+                      <h3 className="section-subtitle">E-Magazine</h3>
+                      <h2>The Alumni Connect</h2>
+                      <p>Explore the latest breakthroughs in research, campus life, and student achievements in our monthly digital edition.</p>
+                      
+                      <div className="magazine-actions">
+                        <button className="mag-btn primary" onClick={() => setIsMagOpen(true)}>
+                          View Online
+                        </button>
+                        <button className="mag-btn secondary" onClick={downloadMagazine}>
+                          Download PDF
+                        </button>
                       </div>
                     </div>
+                  </div> {/* ADDED: Closes magazine-container */}
 
-                    {/* Classy PDF Viewer Modal */}
-                    {isMagOpen && (
-                      <div className="mag-modal-overlay" onClick={() => setIsMagOpen(false)}>
-                        <div className="mag-modal-content" onClick={e => e.stopPropagation()}>
-                          <button className="close-mag" onClick={() => setIsMagOpen(false)}>×</button>
-                          <iframe 
-                            src={`${magazineData?.pdfUrl || '/magazine.pdf'}#toolbar=0`} 
-                            title="Magazine Viewer"
-                            width="100%" 
-                            height="100%"
-                          ></iframe>
-                        </div>
+                  {/* Classy PDF Viewer Modal */}
+                  {isMagOpen && (
+                    <div className="mag-modal-overlay" onClick={() => setIsMagOpen(false)}>
+                      <div className="mag-modal-content" onClick={e => e.stopPropagation()}>
+                        <button className="close-mag" onClick={() => setIsMagOpen(false)}>×</button>
+                        <iframe 
+                          src={`${magazineData?.pdfUrl || '/magazine.pdf'}#toolbar=0`} 
+                          title="Magazine Viewer"
+                          width="100%" 
+                          height="100%"
+                        ></iframe>
                       </div>
-                    )}
-                  </section>
+                    </div>
+                  )}
+                </section>
 
                   <footer className="landing-footer">
                     © 2026 MBM University Alumni Association |
