@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Gallery, Magazine } = require('../models/Media');
+const { Gallery, Magazine } = require('./Media');
 
 // POST: Add new gallery item
 router.post('/gallery-update', async (req, res) => {
