@@ -26,7 +26,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [editingTicker, setEditingTicker] = useState(null);
 
   // Media Management
-  const [mediaTab, setMediaTab] = useState('gallery'); // 'gallery' | 'magazine'
   const [galleryItems, setGalleryItems] = useState([]); // reserved for future
   const [newGalleryItem, setNewGalleryItem] = useState({
     title: '',
