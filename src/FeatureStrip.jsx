@@ -27,37 +27,38 @@ const FeatureStrip = () => {
   };
 
   return (
-  /* The main colored horizontal strip */
   <div className="campus-hero-strip">
-    <div className="campus-hero-main">
-      
-      {/* 1. THE BOX: Image strictly contained on the left */}
-      <div className="campus-hero-image-frame">
-        <img 
-          src={galleryData[currentIndex].img} 
-          alt="Campus Highlight" 
-          className="hero-img-transition" 
-          key={currentIndex} 
-        />
-      </div>
+  <div className="campus-hero-main">
+    
+    {/* Image Frame */}
+    <div className="campus-hero-image-frame" style={{ width: '250px', height: '180px' }}>
+      <img 
+        src={galleryItems[currentGalleryIndex].img} 
+        alt="Campus" 
+        className="hero-img-transition" 
+        key={currentGalleryIndex}
+        /* INLINE STYLE OVERRIDE: Forces the image to behave */
+        style={{ width: '250px', height: '180px', objectFit: 'cover' }} 
+      />
+    </div>
 
-      {/* 2. THE TEXT AREA: Side-by-side with the image */}
-      <div className="campus-hero-text-area">
-        <p>{galleryData[currentIndex].text}</p>
-        
-        {/* Navigation Controls on the far right */}
-        <div className="campus-hero-nav">
-          <button onClick={handlePrev}>❮</button>
-          <button onClick={handleNext}>❯</button>
-        </div>
+    {/* Text Area */}
+    <div className="campus-hero-text-area">
+      <p>{galleryItems[currentGalleryIndex].text}</p>
+      
+      <div className="campus-hero-nav">
+        <button onClick={handlePrev}>❮</button>
+        <button onClick={handleNext}>❯</button>
       </div>
     </div>
-    
-    {/* Visual Progress Bar at the bottom of the strip */}
+
+  </div>
+  {/* Visual Progress Bar at the bottom of the strip */}
     <div className="campus-hero-progress-bar" 
          style={{ width: `${((currentIndex + 1) / galleryData.length) * 100}%` }}>
     </div>
-  </div>
+</div>
+
 );
 };
 
