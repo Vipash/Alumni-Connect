@@ -316,7 +316,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     try {
       // PDF
       const pdfForm = new FormData();
-      pdfForm.append('file', magazineUpload.pdf);
+      pdfForm.append('file', magazineUpload.pdf);``
       pdfForm.append('upload_preset', 'your_magazine_preset');
       const pdfRes = await fetch(
         'https://api.cloudinary.com/v1_1/duoofmsri/raw/upload',
