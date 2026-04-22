@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import './index.css';
 import './App.css';
 import './Portal.css';
+import './featurestrip.css';
 import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';
