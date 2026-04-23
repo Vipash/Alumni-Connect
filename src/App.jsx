@@ -119,6 +119,7 @@ function App() {
   const [hubCategory, setHubCategory] = useState('All');
   const [announcementSubTab, setAnnouncementSubTab] = useState('post');
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [currentMagPage, setCurrentMagPage] = useState(0); // 0: cover, 1: p1, 2: p2 [cite: 290]
 
   // Optional: these are not used in App itself; safe to remove if unused
   const [tickers, setTickers] = useState([]);
@@ -740,44 +741,67 @@ const downloadMagazine = () => {
                   
                  <section className="magazine-hero-section">
                   <div className="magazine-container">
-                    
                     <div className="magazine-visual-stack">
-                      {/* Manually exported JPGs for performance */}
-                      <div className="mag-page page-3"><img src="/mag-page2.jpg" alt="" /></div>
-                      <div className="mag-page page-2"><img src="/mag-page1.jpg" alt="" /></div>
-                      <div className="mag-page page-1">
-                        {/* Replace static /mag-cover.jpg with dynamic data */}
-                        <img src={magazineData?.coverUrl || "/mag-cover.jpg"} alt="Magazine Cover" />
-                        <div className="mag-badge">New Issue</div>
+                      {/* Cycling logic: We map through the available images. 
+                          The 'active' page gets the top position.
+                      */}
+                      {[
+                        magazineData?.coverUrl || "/mag-cover.jpg",
+                        magazineData?.p1Url || "/mag-page1.jpg",
+                        magazineData?.p2Url || "/mag-page2.jpg"
+                      ].map((imgUrl, index) => {
+                        let positionClass = "mag-page";
+                        if (index === currentMagPage) positionClass += " page-1"; // Front
+                        else if (index === (currentMagPage + 1) % 3) positionClass += " page-2"; // Middle
+                        else positionClass += " page-3"; // Back
+
+                        return (
+                          <div key={index} className={positionClass}>
+                            <img src={imgUrl} alt={`Magazine Page ${index}`} />
+                            {index === 0 && <div className="mag-badge">New Issue</div>}
+                          </div>
+                        );
+                      })}
+
+                      {/* Navigation arrows for the magazine stack */}
+                      <div className="mag-stack-nav">
+                        <button 
+                          onClick={() => setCurrentMagPage((prev) => (prev === 0 ? 2 : prev - 1))}
+                          className="mag-nav-btn prev"
+                        >❮</button>
+                        <button 
+                          onClick={() => setCurrentMagPage((prev) => (prev === 2 ? 0 : prev + 1))}
+                          className="mag-nav-btn next"
+                        >❯</button>
                       </div>
-                    </div> {/* ADDED: Closes magazine-visual-stack */}
+                    </div>
 
                     <div className="magazine-info">
                       <h3 className="section-subtitle">E-Magazine</h3>
                       <h2>The Alumni Connect</h2>
                       <p>Explore the latest breakthroughs in research, campus life, and student achievements in our monthly digital edition.</p>
-                      
                       <div className="magazine-actions">
                         <button className="mag-btn primary" onClick={() => setIsMagOpen(true)}>
                           View Online
                         </button>
+                        {/* Restore Download PDF Button  */}
                         <button className="mag-btn secondary" onClick={downloadMagazine}>
                           Download PDF
                         </button>
                       </div>
                     </div>
-                  </div> {/* ADDED: Closes magazine-container */}
+                  </div>
 
-                  {/* Classy PDF Viewer Modal */}
+                  {/* Classy PDF Viewer Modal [cite: 320] */}
                   {isMagOpen && (
                     <div className="mag-modal-overlay" onClick={() => setIsMagOpen(false)}>
                       <div className="mag-modal-content" onClick={e => e.stopPropagation()}>
                         <button className="close-mag" onClick={() => setIsMagOpen(false)}>×</button>
                         <iframe 
                           src={`${magazineData?.pdfUrl || '/magazine.pdf'}#toolbar=0`} 
-                          title="Magazine Viewer"
+                          title="Magazine Viewer" 
                           width="100%" 
-                          height="100%"
+                          height="100%" 
                         ></iframe>
                       </div>
                     </div>

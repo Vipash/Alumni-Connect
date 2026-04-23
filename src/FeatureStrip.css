@@ -373,3 +373,40 @@
 .mag-modal-content iframe {
   border: none;
 }
+
+.magazine-visual-stack {
+  position: relative;
+}
+
+.mag-stack-nav {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+  z-index: 10; /* Ensure buttons are above the images */
+  pointer-events: none; /* Let clicks pass through the container */
+}
+
+.mag-nav-btn {
+  pointer-events: auto; /* Re-enable clicks for buttons */
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.mag-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.mag-nav-btn.prev { margin-left: -20px; }
+.mag-nav-btn.next { margin-right: -20px; }
