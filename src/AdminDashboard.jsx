@@ -26,13 +26,14 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [editingTicker, setEditingTicker] = useState(null);
 
   // Media Management
-  const [galleryItems, setGalleryItems] = useState([]); // reserved for future
+  const [galleryItems, setGalleryItems] = useState([]); // reserved (not used now)
   const [newGalleryItem, setNewGalleryItem] = useState({
     title: '',
     desc: '',
     image: null,
   });
-  const [mediaTab, setMediaTab] = useState('gallery');
+
+  const [mediaTab, setMediaTab] = useState('gallery'); // 'gallery' | 'magazine'
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [existingMedia, setExistingMedia] = useState([]);
   const [magazineUpload, setMagazineUpload] = useState({
@@ -41,21 +42,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     p1: null,
     p2: null,
   });
-  const MAX_GALLERY_IMAGES = 12;
-
-  const [magazineUpload, setMagazineUpload] = useState({
-    pdf: null,
-    cover: null,
-    p1: null,
-    p2: null,
-  });
-
-  const [magazineUpload, setMagazineUpload] = useState({
-    pdf: null,
-    cover: null,
-    p1: null,
-    p2: null,
-  });
+  const MAX_IMAGES = 12;
 
   // Tab permissions config (used in ManageAdmins)
   const AVAILABLE_TABS = [
@@ -142,117 +129,159 @@ function AdminDashboard({ admin, setView, onLogout }) {
     }
   };
 
-  // Media Fetching
-  const fetchExistingMedia = async () => {
-    try {
-      const res = await fetch('/api/media/home-data');
-      const data = await res.json();
-      setExistingMedia(data.gallery || []);
-    } catch (err) {
-      console.error("Fetch failed", err);
-    }
-  };
+  // MEDIA & MAGAZINE MANAGEMENT
 
+  // Fetch existing media whenever the media tab is active
   useEffect(() => {
     if (activeTab === 'media') {
       fetchExistingMedia();
     }
   }, [activeTab]);
 
-  // Gallery Bulk Upload
+  const fetchExistingMedia = async () => {
+    try {
+      const res = await fetch('/api/media/home-data');
+      const data = await res.json();
+      setExistingMedia(data.gallery || []);
+    } catch (err) {
+      console.error('Failed to fetch gallery items', err);
+    }
+  };
+
+  // Consolidated Bulk Upload Logic
   const handleBulkUpload = async () => {
-    if (selectedFiles.length === 0) return alert("Select images first");
+    if (selectedFiles.length === 0) return alert('Select images first');
+    if (existingMedia.length + selectedFiles.length > MAX_IMAGES) {
+      return alert(
+        `Limit reached. You can only have ${MAX_IMAGES} images on the landing page.`
+      );
+    }
+
     setLoading(true);
     try {
       const uploadPromises = Array.from(selectedFiles).map(async (file) => {
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', 'profile');
+        formData.append('upload_preset', 'profile'); // Confirmed working preset
         formData.append('cloud_name', 'duoofmsri');
 
-        const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
-          method: 'POST',
-          body: formData,
-        });
+        const cloudRes = await fetch(
+          'https://api.cloudinary.com/v1_1/duoofmsri/auto/upload',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
         const cloudData = await cloudRes.json();
 
         return fetch('/api/media/gallery-update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            title: "New Highlight",
-            desc: "Campus event",
+            title: 'New Highlight',
+            desc: 'Campus event detail',
             imageUrl: cloudData.secure_url,
           }),
         });
       });
+
       await Promise.all(uploadPromises);
-      alert("Gallery Updated!");
+      alert(`${selectedFiles.length} images published successfully!`);
       setSelectedFiles([]);
       fetchExistingMedia();
     } catch (err) {
-      alert("Upload failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Magazine Submit
-  const handleMagazineSubmit = async () => {
-    if (!magazineUpload.pdf || !magazineUpload.cover) return alert("PDF and Cover are required");
-    setLoading(true);
-    try {
-      const upload = async (file) => {
-        const f = new FormData();
-        f.append('file', file);
-        f.append('upload_preset', 'profile');
-        const res = await fetch(`https://api.cloudinary.com/v1_1/duoofmsri/${file.type.includes('pdf') ? 'raw' : 'image'}/upload`, {
-          method: 'POST',
-          body: f
-        });
-        return res.json();
-      };
-
-      const [pdf, cover, p1, p2] = await Promise.all([
-        upload(magazineUpload.pdf),
-        upload(magazineUpload.cover),
-        magazineUpload.p1 ? upload(magazineUpload.p1) : { secure_url: null },
-        magazineUpload.p2 ? upload(magazineUpload.p2) : { secure_url: null },
-      ]);
-
-      await fetch('/api/media/magazine-update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pdfUrl: pdf.secure_url,
-          coverUrl: cover.secure_url,
-          p1Url: p1.secure_url,
-          p2Url: p2.secure_url,
-        }),
-      });
-      alert("Magazine Published!");
-      setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
-    } catch (err) {
-      alert("Magazine upload failed");
+      alert('Bulk upload failed. Check your Cloudinary settings.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteMedia = async (id) => {
-    if (!window.confirm("Delete this image?")) return;
-    await fetch(`/api/media/gallery/${id}`, { method: 'DELETE' });
-    fetchExistingMedia();
+    if (!window.confirm('Remove this image from the landing page?')) return;
+    try {
+      const res = await fetch(`/api/media/gallery/${id}`, { method: 'DELETE' });
+      if (res.ok) fetchExistingMedia();
+      else alert('Could not delete item.');
+    } catch (err) {
+      console.error('Delete failed', err);
+      alert('Could not delete item.');
+    }
   };
 
-  const updateMediaData = async (id, fields) => {
-    await fetch(`/api/media/gallery/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fields),
-    });
+  const updateMediaData = async (id, updatedFields) => {
+    try {
+      await fetch(`/api/media/gallery/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedFields),
+      });
+    } catch (err) {
+      console.error('Update failed', err);
+    }
   };
-  
+
+  const handleMagazineSubmit = async () => {
+    if (!magazineUpload.pdf || !magazineUpload.cover) {
+      return alert('Please select at least the PDF and a Cover Image.');
+    }
+
+    setLoading(true);
+    try {
+      const uploadFile = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'profile'); // Use your verified preset
+        formData.append('cloud_name', 'duoofmsri');
+
+        const res = await fetch(
+          'https://api.cloudinary.com/v1_1/duoofmsri/auto/upload',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
+        return res.json();
+      };
+
+      // 1. Upload all files to Cloudinary
+      const [pdfRes, coverRes, p1Res, p2Res] = await Promise.all([
+        uploadFile(magazineUpload.pdf),
+        uploadFile(magazineUpload.cover),
+        magazineUpload.p1
+          ? uploadFile(magazineUpload.p1)
+          : Promise.resolve({ secure_url: '' }),
+        magazineUpload.p2
+          ? uploadFile(magazineUpload.p2)
+          : Promise.resolve({ secure_url: '' }),
+      ]);
+
+      // 2. Send the resulting URLs to your mediaroutes.js
+      const response = await fetch('/api/media/magazine-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pdfUrl: pdfRes.secure_url,
+          coverUrl: coverRes.secure_url,
+          page1Url: p1Res.secure_url,
+          page2Url: p2Res.secure_url,
+        }),
+      });
+
+      if (response.ok) {
+        alert('Magazine Published Successfully!');
+        setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
+      } else {
+        alert('Failed to publish magazine.');
+      }
+    } catch (err) {
+      console.error('Magazine upload failed:', err);
+      alert('Failed to publish magazine.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Tickets & admins
   const fetchTickets = async () => {
     try {
       const res = await fetch('/api/admin/support-tickets');
@@ -286,6 +315,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     if (res.ok) fetchAllAdmins();
   };
 
+  // Tickers
   const fetchTickers = async () => {
     try {
       const res = await fetch(
@@ -381,152 +411,6 @@ function AdminDashboard({ admin, setView, onLogout }) {
       fetchStats();
     }
   };
-
-// --- MEDIA & MAGAZINE MANAGEMENT ---
-const [existingMedia, setExistingMedia] = useState([]);
-const [selectedFiles, setSelectedFiles] = useState([]);
-const [mediaTab, setMediaTab] = useState('gallery');
-const [magazineUpload, setMagazineUpload] = useState({
-    pdf: null,
-    cover: null,
-    p1: null,
-    p2: null,
-  });
-const MAX_IMAGES = 12;
-
-// Fetch existing media whenever the media tab is active
-useEffect(() => {
-  if (activeTab === 'media') {
-    fetchExistingMedia();
-  }
-}, [activeTab]);
-
-const fetchExistingMedia = async () => {
-  try {
-    const res = await fetch('/api/media/home-data');
-    const data = await res.json();
-    setExistingMedia(data.gallery || []);
-  } catch (err) {
-    console.error("Failed to fetch gallery items", err);
-  }
-};
-
-// Consolidated Bulk Upload Logic
-const handleBulkUpload = async () => {
-  if (selectedFiles.length === 0) return alert("Select images first");
-  if (existingMedia.length + selectedFiles.length > MAX_IMAGES) {
-    return alert(`Limit reached. You can only have ${MAX_IMAGES} images on the landing page.`);
-  }
-
-  setLoading(true);
-  try {
-    const uploadPromises = Array.from(selectedFiles).map(async (file) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'profile'); // Confirmed working preset
-      formData.append('cloud_name', 'duoofmsri');
-
-      const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const cloudData = await cloudRes.json();
-
-      return fetch('/api/media/gallery-update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: "New Highlight",
-          desc: "Campus event detail",
-          imageUrl: cloudData.secure_url,
-        }),
-      });
-    });
-
-    await Promise.all(uploadPromises);
-    alert(`${selectedFiles.length} images published successfully!`);
-    setSelectedFiles([]);
-    fetchExistingMedia(); 
-  } catch (err) {
-    alert("Bulk upload failed. Check your Cloudinary settings.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleDeleteMedia = async (id) => {
-  if (!window.confirm("Remove this image from the landing page?")) return;
-  try {
-    const res = await fetch(`/api/media/gallery/${id}`, { method: 'DELETE' });
-    if (res.ok) fetchExistingMedia();
-  } catch (err) {
-    alert("Could not delete item.");
-  }
-};
-
-const updateMediaData = async (id, updatedFields) => {
-  try {
-    await fetch(`/api/media/gallery/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedFields),
-    });
-  } catch (err) {
-    console.error("Update failed", err);
-  }
-};
-
-const handleMagazineSubmit = async () => {
-  if (!magazineUpload.pdf || !magazineUpload.cover) {
-    return alert("Please select at least the PDF and a Cover Image.");
-  }
-
-  setLoading(true);
-  try {
-    const uploadFile = async (file) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'profile'); // Use your verified preset
-      formData.append('cloud_name', 'duoofmsri');
-
-      const res = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      return res.json();
-    };
-
-    // 1. Upload all files to Cloudinary
-    const [pdfRes, coverRes, p1Res, p2Res] = await Promise.all([
-      uploadFile(magazineUpload.pdf),
-      uploadFile(magazineUpload.cover),
-      magazineUpload.p1 ? uploadFile(magazineUpload.p1) : Promise.resolve({ secure_url: '' }),
-      magazineUpload.p2 ? uploadFile(magazineUpload.p2) : Promise.resolve({ secure_url: '' }),
-    ]);
-
-    // 2. Send the resulting URLs to your mediaroutes.js
-    const response = await fetch('/api/media/magazine-update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pdfUrl: pdfRes.secure_url,
-        coverUrl: coverRes.secure_url,
-        page1Url: p1Res.secure_url,
-        page2Url: p2Res.secure_url,
-      }),
-    });
-
-    if (response.ok) {
-      alert("Magazine Published Successfully!");
-      setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
-    }
-  } catch (err) {
-    console.error("Magazine upload failed:", err);
-    alert("Failed to publish magazine.");
-  } finally {
-    setLoading(false);
-  }
-};
 
   const handlePostAnnouncement = async (e) => {
     e.preventDefault();
@@ -727,7 +611,8 @@ const handleMagazineSubmit = async () => {
               {selectedTicket.senderEmail || 'N/A'})
             </p>
             <p>
-              <strong>Type:</strong> {selectedTicket.type}</p>
+              <strong>Type:</strong> {selectedTicket.type}
+            </p>
             <p>
               <strong>Sent At:</strong>{' '}
               {selectedTicket.createdAt
@@ -1048,7 +933,9 @@ const handleMagazineSubmit = async () => {
           <div className="nested-tabs-container">
             <div className="content-toolbar main-subtabs">
               <button
-                className={announcementMode === 'announcements' ? 'sel' : ''}
+                className={
+                  announcementMode === 'announcements' ? 'sel' : ''
+                }
                 onClick={() => {
                   setAnnouncementMode('announcements');
                   setSubView('post');
@@ -1093,98 +980,116 @@ const handleMagazineSubmit = async () => {
                   : 'Post History'}
               </button>
 
-              {announcementMode === 'announcements' && subView === 'history' && (
-                <div className="filter-group">
-                  <input
-                    type="text"
-                    placeholder="Search announcements..."
-                    value={announcementSearch}
-                    onChange={(e) => setAnnouncementSearch(e.target.value)}
-                    className="search-input"
-                  />
-                </div>
-              )}
+              {announcementMode === 'announcements' &&
+                subView === 'history' && (
+                  <div className="filter-group">
+                    <input
+                      type="text"
+                      placeholder="Search announcements..."
+                      value={announcementSearch}
+                      onChange={(e) =>
+                        setAnnouncementSearch(e.target.value)
+                      }
+                      className="search-input"
+                    />
+                  </div>
+                )}
             </div>
 
             <div className="tab-content-area" style={{ marginTop: '20px' }}>
-              {announcementMode === 'announcements' && subView === 'post' && (
-                <div className="admin-card-simple">
-                  <form
-                    onSubmit={handlePostAnnouncement}
-                    className="admin-form-clean"
-                  >
-                    <input name="title" placeholder="Title" required />
-                    <input name="subject" placeholder="Subject" required />
-                    <textarea
-                      name="content"
-                      placeholder="Announcement Content..."
-                      rows="4"
-                      required
-                    />
-                    <select
-                      value={audience}
-                      onChange={(e) => setAudience(e.target.value)}
+              {/* Create Announcement */}
+              {announcementMode === 'announcements' &&
+                subView === 'post' && (
+                  <div className="admin-card-simple">
+                    <form
+                      onSubmit={handlePostAnnouncement}
+                      className="admin-form-clean"
                     >
-                      <option value="all">Everyone</option>
-                      <option value="alumni">Alumni Only</option>
-                      <option value="students">Students Only</option>
-                    </select>
-                    <button type="submit" className="approve-btn">
-                      Publish
-                    </button>
-                  </form>
-                </div>
-              )}
+                      <input name="title" placeholder="Title" required />
+                      <input
+                        name="subject"
+                        placeholder="Subject"
+                        required
+                      />
+                      <textarea
+                        name="content"
+                        placeholder="Announcement Content..."
+                        rows="4"
+                        required
+                      />
+                      <select
+                        value={audience}
+                        onChange={(e) => setAudience(e.target.value)}
+                      >
+                        <option value="all">Everyone</option>
+                        <option value="alumni">Alumni Only</option>
+                        <option value="students">Students Only</option>
+                      </select>
+                      <button type="submit" className="approve-btn">
+                        Publish
+                      </button>
+                    </form>
+                  </div>
+                )}
 
-              {announcementMode === 'announcements' && subView === 'history' && (
-                <div className="data-table-container">
-                  <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Title</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredAnnouncements.map((item) => (
-                        <tr key={item._id}>
-                          <td>
-                            {item.date
-                              ? new Date(item.date).toLocaleDateString()
-                              : ''}
-                          </td>
-                          <td>{item.title}</td>
-                          <td>
-                            <button
-                              className="delete-btn"
-                              onClick={() =>
-                                handleAction(
-                                  item._id,
-                                  'delete-announcement'
-                                )
-                              }
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                      {!loading && filteredAnnouncements.length === 0 && (
+              {/* Announcement History */}
+              {announcementMode === 'announcements' &&
+                subView === 'history' && (
+                  <div className="data-table-container">
+                    <table className="admin-table">
+                      <thead>
                         <tr>
-                          <td
-                            colSpan={3}
-                            style={{ textAlign: 'center', padding: '20px' }}
-                          >
-                            No records found.
-                          </td>
+                          <th>Date</th>
+                          <th>Title</th>
+                          <th>Action</th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody>
+                        {filteredAnnouncements.map((item) => (
+                          <tr key={item._id}>
+                            <td>
+                              {item.date
+                                ? new Date(
+                                    item.date
+                                  ).toLocaleDateString()
+                                : ''}
+                            </td>
+                            <td>{item.title}</td>
+                            <td>
+                              <button
+                                className="delete-btn"
+                                onClick={() =>
+                                  handleAction(
+                                    item._id,
+                                    'delete-announcement'
+                                  )
+                                }
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {!loading &&
+                          filteredAnnouncements.length === 0 && (
+                            <tr>
+                              <td
+                                colSpan={3}
+                                style={{
+                                  textAlign: 'center',
+                                  padding: '20px',
+                                }}
+                              >
+                                No records found.
+                              </td>
+                            </tr>
+                          )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
 
+              {/* Ticker form */}
               {announcementMode === 'tickers' && subView === 'post' && (
                 <div className="admin-card-simple">
                   <h3>
@@ -1225,9 +1130,13 @@ const handleMagazineSubmit = async () => {
                         onChange={(e) =>
                           setEditingTicker({
                             ...(editingTicker || {}),
-                            priority: parseInt(e.target.value || '0', 10),
+                            priority: parseInt(
+                              e.target.value || '0',
+                              10
+                            ),
                             text: editingTicker?.text || '',
-                            isActive: editingTicker?.isActive ?? true,
+                            isActive:
+                              editingTicker?.isActive ?? true,
                           })
                         }
                       />
@@ -1240,14 +1149,17 @@ const handleMagazineSubmit = async () => {
                               ...(editingTicker || {}),
                               isActive: e.target.checked,
                               text: editingTicker?.text || '',
-                              priority: editingTicker?.priority ?? 0,
+                              priority:
+                                editingTicker?.priority ?? 0,
                             })
                           }
                         />{' '}
                         Show on Home Page
                       </label>
                       <button type="submit" className="approve-btn">
-                        {editingTicker?._id ? 'Update Ticker' : 'Add Ticker'}
+                        {editingTicker?._id
+                          ? 'Update Ticker'
+                          : 'Add Ticker'}
                       </button>
                       {editingTicker && (
                         <button
@@ -1262,313 +1174,209 @@ const handleMagazineSubmit = async () => {
                 </div>
               )}
 
-              {announcementMode === 'tickers' && subView === 'history' && (
-                <div className="data-table-container">
-                  <h3>Active Tickers</h3>
-                  <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>Order</th>
-                        <th>Ticker Message</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {tickers.map((t) => (
-                        <tr key={t._id}>
-                          <td>
-                            <strong>#{t.priority}</strong>
-                          </td>
-                          <td>{t.text}</td>
-                          <td>
-                            <span
-                              className={`badge-pill ${
-                                t.isActive
-                                  ? 'status-verified'
-                                  : 'status-pending'
-                              }`}
-                            >
-                              {t.isActive ? 'Active' : 'Hidden'}
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              className="edit-btn-sm"
-                              onClick={() => handleEditClick(t)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="delete-btn"
-                              onClick={() => handleTickerDelete(t._id)}
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                      {tickers.length === 0 && (
+              {/* Ticker history */}
+              {announcementMode === 'tickers' &&
+                subView === 'history' && (
+                  <div className="data-table-container">
+                    <table className="admin-table">
+                      <thead>
                         <tr>
-                          <td
-                            colSpan={4}
-                            style={{ textAlign: 'center', padding: 16 }}
-                          >
-                            No tickers found.
-                          </td>
+                          <th>Text</th>
+                          <th>Priority</th>
+                          <th>Active</th>
+                          <th>Actions</th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Main table area */}
-        <div className="tab-render-area">
-          {activeTab === 'overview' && <PortalOverview />}
-          {activeTab === 'manage-admins' && <ManageAdmins />}
-          {activeTab === 'feedback' && <FeedbackView />}
-
-          {/* Media Management Tab */}
-        {activeTab === 'media' && (
-  <div className="media-mgmt-container">
-    {/* Sub-navigation for Media Types */}
-    <div className="tab-header-actions" style={{ marginBottom: '20px' }}>
-      <div className="sub-tab-nav">
-        <button 
-          className={mediaTab === 'gallery' ? 'active' : ''} 
-          onClick={() => setMediaTab('gallery')}
-        >
-          Campus Gallery
-        </button>
-        <button 
-          className={mediaTab === 'magazine' ? 'active' : ''} 
-          onClick={() => setMediaTab('magazine')}
-        >
-          E-Magazine
-        </button>
-      </div>
-    </div>
-
-    {mediaTab === 'gallery' ? (
-      <div className="management-suite">
-        {/* Gallery Bulk Upload Card */}
-        <div className="post-announcement-card" style={{ maxWidth: '100%', marginBottom: '30px' }}>
-          <h3>Bulk Gallery Upload</h3>
-          <p className="limit-text" style={{ fontSize: '0.85rem', color: '#666' }}>
-            Manage the landing page carousel. Current: {existingMedia.length} / {MAX_IMAGES} images
-          </p>
-          <div className="bulk-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', marginTop: '15px' }}>
-            <input 
-              type="file" 
-              id="multi-file" 
-              multiple 
-              accept="image/*" 
-              hidden 
-              onChange={(e) => setSelectedFiles(e.target.files)}
-            />
-            <label htmlFor="multi-file" className="mbm-btn-outline" style={{ cursor: 'pointer' }}>
-              {selectedFiles.length > 0 ? `${selectedFiles.length} Selected` : 'Select Images'}
-            </label>
-            <button 
-              className="mbm-btn-primary" 
-              onClick={handleBulkUpload} 
-              disabled={loading || selectedFiles.length === 0}
-            >
-              {loading ? 'Uploading...' : 'Publish to Homepage'}
-            </button>
-          </div>
-        </div>
-
-        {/* Gallery Grid Management */}
-        <div className="media-management-grid">
-          {existingMedia.map((item) => (
-            <div key={item._id} className="media-item-card">
-              <div className="media-preview">
-                <img src={item.imageUrl} alt="Gallery" />
-                <button 
-                  className="media-delete-overlay" 
-                  onClick={() => handleDeleteMedia(item._id)}
-                  title="Remove Image"
-                >
-                  ×
-                </button>
-              </div>
-              <div className="media-details">
-                <input 
-                  type="text" 
-                  defaultValue={item.title} 
-                  onBlur={(e) => updateMediaData(item._id, { title: e.target.value })}
-                  placeholder="Event Title"
-                  className="grid-input"
-                />
-                <textarea 
-                  defaultValue={item.desc} 
-                  onBlur={(e) => updateMediaData(item._id, { desc: e.target.value })}
-                  placeholder="Short description..."
-                  className="grid-textarea"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    ) : (
-      /* E-Magazine Management Section */
-      <div className="post-announcement-card" style={{ maxWidth: '600px' }}>
-        <h3>Update Alumni Connect Magazine</h3>
-        <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>
-          Upload the PDF and a cover screenshot. These will reflect immediately on the site.
-        </p>
-        <div className="form-grid" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          
-          <div className="file-input-group">
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>1. Main Magazine PDF</label>
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={(e) => setMagazineUpload({ ...magazineUpload, pdf: e.target.files[0] })}
-            />
-          </div>
-
-          <div className="file-input-group">
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>2. Cover Preview Image (Screenshot)</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setMagazineUpload({ ...magazineUpload, cover: e.target.files[0] })}
-            />
-          </div>
-
-          <div className="flex-row" style={{ display: 'flex', gap: '15px' }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 1 Preview</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setMagazineUpload({ ...magazineUpload, p1: e.target.files[0] })}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 2 Preview</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setMagazineUpload({ ...magazineUpload, p2: e.target.files[0] })}
-              />
-            </div>
-          </div>
-
-          <button
-            className="mbm-btn-primary"
-            onClick={handleMagazineSubmit}
-            disabled={loading}
-            style={{ marginTop: '10px' }}
-          >
-            {loading ? 'Syncing Files...' : 'Publish New Magazine'}
-          </button>
-        </div>
-      </div>
-    )}
-  </div>
-)}
-
-          {['alumni', 'students', 'logs'].includes(activeTab) && (
-            <div className="data-table-container">
-              {loading ? (
-                <p>Loading...</p>
-              ) : (
-                <table className="admin-table">
-                  <thead>
-                    {activeTab === 'logs' ? (
-                      <tr>
-                        <th>Viewer</th>
-                        <th>Alumni</th>
-                        <th>IP</th>
-                        <th>Time</th>
-                      </tr>
-                    ) : (
-                      <tr>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Details</th>
-                        <th>
-                          {activeTab === 'alumni' ? 'Company' : 'Roll No'}
-                        </th>
-                        <th>Actions</th>
-                      </tr>
-                    )}
-                  </thead>
-                  <tbody>
-                    {filteredData.map((item) => (
-                      <tr key={item._id}>
-                        {activeTab === 'logs' ? (
-                          <>
-                            <td>{item.viewerName}</td>
-                            <td>{item.alumniName}</td>
-                            <td>{item.ipAddress}</td>
+                      </thead>
+                      <tbody>
+                        {tickers.map((t) => (
+                          <tr key={t._id}>
+                            <td>{t.text}</td>
+                            <td>{t.priority}</td>
+                            <td>{t.isActive ? 'Yes' : 'No'}</td>
                             <td>
-                              {item.timestamp
-                                ? new Date(item.timestamp).toLocaleString()
-                                : ''}
-                            </td>
-                          </>
-                        ) : (
-                          <>
-                            <td>{item.name}</td>
-                            <td>{item.email}</td>
-                            <td>{item.branch}</td>
-                            <td>
-                              {activeTab === 'alumni'
-                                ? item.company
-                                : item.rollNumber}
-                            </td>
-                            <td>
-                              {statusFilter === 'pending' && (
-                                <button
-                                  className="approve-btn"
-                                  onClick={() =>
-                                    handleAction(item._id, 'approve')
-                                  }
-                                >
-                                  Approve
-                                </button>
-                              )}
+                              <button
+                                onClick={() => handleEditClick(t)}
+                              >
+                                Edit
+                              </button>
                               <button
                                 className="delete-btn"
                                 onClick={() =>
-                                  handleAction(item._id, 'reject')
+                                  handleTickerDelete(t._id)
                                 }
                               >
                                 Delete
                               </button>
                             </td>
-                          </>
+                          </tr>
+                        ))}
+                        {!loading && tickers.length === 0 && (
+                          <tr>
+                            <td
+                              colSpan={4}
+                              style={{
+                                textAlign: 'center',
+                                padding: '20px',
+                              }}
+                            >
+                              No tickers found.
+                            </td>
+                          </tr>
                         )}
-                      </tr>
-                    ))}
-                    {!loading && filteredData.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={activeTab === 'logs' ? 4 : 5}
-                          style={{ textAlign: 'center', padding: '20px' }}
-                        >
-                          No records found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
             </div>
+          </div>
+        )}
+
+       {/* Media Management Tab */}
+{activeTab === 'media' && (
+  <div className="media-management-container">
+    <div className="content-toolbar">
+      <button
+        className={mediaTab === 'gallery' ? 'sel' : ''}
+        onClick={() => setMediaTab('gallery')}
+      >
+        Gallery
+      </button>
+      <button
+        className={mediaTab === 'magazine' ? 'sel' : ''}
+        onClick={() => setMediaTab('magazine')}
+      >
+        Magazine
+      </button>
+    </div>
+
+    {mediaTab === 'gallery' && (
+      <div className="tab-content-area" style={{ marginTop: 20 }}>
+        <h3>Landing Page Gallery</h3>
+        <p>
+          Current images: {existingMedia.length} / {MAX_IMAGES}
+        </p>
+
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => setSelectedFiles(e.target.files)}
+        />
+
+        <button
+          disabled={loading}
+          onClick={handleBulkUpload}
+          style={{ marginTop: 10 }}
+        >
+          {loading ? 'Uploading...' : 'Publish Images'}
+        </button>
+
+        <div className="gallery-grid">
+          {existingMedia.map((item) => (
+            <div key={item._id} className="gallery-card">
+              <img src={item.imageUrl} alt={item.title} />
+              <h4>{item.title}</h4>
+              <p>{item.desc}</p>
+              <button
+                className="delete-btn"
+                onClick={() => handleDeleteMedia(item._id)}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          {existingMedia.length === 0 && (
+            <p style={{ marginTop: 16 }}>No images yet.</p>
           )}
         </div>
-      </main>
-    </div>
-  );
+      </div>
+    )}
+
+    {mediaTab === 'magazine' && (
+      <div className="tab-content-area" style={{ marginTop: 20 }}>
+        <h3>Publish Magazine</h3>
+        <p>Select the latest issue PDF and cover images.</p>
+
+        <div className="magazine-upload-grid">
+          <div>
+            <label>Magazine PDF *</label>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(e) =>
+                setMagazineUpload({
+                  ...magazineUpload,
+                  pdf: e.target.files[0],
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label>Cover Image *</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setMagazineUpload({
+                  ...magazineUpload,
+                  cover: e.target.files[0],
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label>Page 1 (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setMagazineUpload({
+                  ...magazineUpload,
+                  p1: e.target.files[0],
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label>Page 2 (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setMagazineUpload({
+                  ...magazineUpload,
+                  p2: e.target.files[0],
+                })
+              }
+            />
+          </div>
+        </div>
+
+        <button
+          disabled={loading}
+          onClick={handleMagazineSubmit}
+          style={{ marginTop: 16 }}
+        >
+          {loading ? 'Publishing...' : 'Publish Magazine'}
+        </button>
+      </div>
+    )}
+  </div>
+)}
+
+{activeTab === 'overview' && <PortalOverview />}
+
+{activeTab === 'feedback' && <FeedbackView />}
+
+{activeTab === 'manage-admins' && <ManageAdmins />}
+
+/* TODO: render alumni/students/logs tables using filteredData here */
+</main>
+</div>
+);
 }
 
 export default AdminDashboard;
