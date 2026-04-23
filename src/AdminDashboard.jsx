@@ -169,7 +169,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
   if (magazineUpload.p2) formData.append('p2', magazineUpload.p2);
 
   try {
-    const res = await fetch('/api/admin/magazine-upload', {
+    const res = await fetch('/api/media/magazine-update', {
       method: 'POST',
       body: formData,
     });
