@@ -742,8 +742,8 @@ const downloadMagazine = () => {
                  <section className="magazine-hero-section">
                   <div className="magazine-container">
                     <div className="magazine-visual-stack">
-                      {/* Cycling logic: We map through the available images. 
-                          The 'active' page gets the top position.
+                      {/* Logic: We map through the three magazine images (Cover, Page 1, Page 2).
+                          The 'currentMagPage' state determines which image is in the front (page-1).
                       */}
                       {[
                         magazineData?.coverUrl || "/mag-cover.jpg",
@@ -751,9 +751,15 @@ const downloadMagazine = () => {
                         magazineData?.p2Url || "/mag-page2.jpg"
                       ].map((imgUrl, index) => {
                         let positionClass = "mag-page";
-                        if (index === currentMagPage) positionClass += " page-1"; // Front
-                        else if (index === (currentMagPage + 1) % 3) positionClass += " page-2"; // Middle
-                        else positionClass += " page-3"; // Back
+                        
+                        // Dynamic assignment of stack classes based on current index
+                        if (index === currentMagPage) {
+                          positionClass += " page-1"; // Front
+                        } else if (index === (currentMagPage + 1) % 3) {
+                          positionClass += " page-2"; // Middle
+                        } else {
+                          positionClass += " page-3"; // Back
+                        }
 
                         return (
                           <div key={index} className={positionClass}>
@@ -763,7 +769,7 @@ const downloadMagazine = () => {
                         );
                       })}
 
-                      {/* Navigation arrows for the magazine stack */}
+                      {/* Navigation arrows for cycling through pages */}
                       <div className="mag-stack-nav">
                         <button 
                           onClick={() => setCurrentMagPage((prev) => (prev === 0 ? 2 : prev - 1))}
@@ -784,7 +790,7 @@ const downloadMagazine = () => {
                         <button className="mag-btn primary" onClick={() => setIsMagOpen(true)}>
                           View Online
                         </button>
-                        {/* Restore Download PDF Button  */}
+                        {/* Restore Download PDF Button */}
                         <button className="mag-btn secondary" onClick={downloadMagazine}>
                           Download PDF
                         </button>
@@ -792,7 +798,7 @@ const downloadMagazine = () => {
                     </div>
                   </div>
 
-                  {/* Classy PDF Viewer Modal [cite: 320] */}
+                  {/* Classy PDF Viewer Modal */}
                   {isMagOpen && (
                     <div className="mag-modal-overlay" onClick={() => setIsMagOpen(false)}>
                       <div className="mag-modal-content" onClick={e => e.stopPropagation()}>
@@ -807,7 +813,6 @@ const downloadMagazine = () => {
                     </div>
                   )}
                 </section>
-
                   <footer className="landing-footer">
                     © 2026 MBM University Alumni Association |
                     <span
