@@ -2,6 +2,22 @@ const express = require('express');
 const router = express.Router();
 const { Gallery, Magazine } = require('./Media');
 
+const handleMagazineSubmit = async () => {
+  try {
+    const res = await fetch('/api/media/magazine-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pdfUrl: magUrl, // The URL from Cloudinary
+        coverUrl: magCoverUrl, // Optional screenshot of cover
+      }),
+    });
+    if (res.ok) alert("Magazine Published!");
+  } catch (err) {
+    console.error("Upload failed", err);
+  }
+};
+
 // POST: Add new gallery item
 router.post('/gallery-update', async (req, res) => {
   try {

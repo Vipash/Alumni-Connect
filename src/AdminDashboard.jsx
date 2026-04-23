@@ -39,6 +39,13 @@ function AdminDashboard({ admin, setView, onLogout }) {
     p2: null,
   });
 
+  const [magazineUpload, setMagazineUpload] = useState({
+    pdf: null,
+    cover: null,
+    p1: null,
+    p2: null,
+  });
+
   // Tab permissions config (used in ManageAdmins)
   const AVAILABLE_TABS = [
     { id: 'overview', label: 'Overview / Stats' },
@@ -47,7 +54,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
     { id: 'students', label: 'Student Verification' },
     { id: 'feedback', label: 'Issues & Feedback' },
     { id: 'logs', label: 'Security Logs' },
-    // optionally: { id: 'media', label: 'Media Management' },
+    { id: 'media', label: 'Media Management' },
   ];
 
   const [selectedPerms, setSelectedPerms] = useState(['overview']);
@@ -338,6 +345,59 @@ const updateMediaData = async (id, updatedFields) => {
     });
   } catch (err) {
     console.error("Update failed", err);
+  }
+};
+
+const handleMagazineSubmit = async () => {
+  // Ensure files are selected
+  if (!magazineUpload.pdf || !magazineUpload.cover) {
+    return alert("Please select at least the PDF and a Cover Image.");
+  }
+
+  setLoading(true);
+  try {
+    const uploadFile = async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'profile'); // Use your verified preset
+      formData.append('cloud_name', 'duoofmsri');
+
+      const res = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      return res.json();
+    };
+
+    // 1. Upload all files to Cloudinary
+    const [pdfRes, coverRes, p1Res, p2Res] = await Promise.all([
+      uploadFile(magazineUpload.pdf),
+      uploadFile(magazineUpload.cover),
+      magazineUpload.p1 ? uploadFile(magazineUpload.p1) : Promise.resolve({ secure_url: '' }),
+      magazineUpload.p2 ? uploadFile(magazineUpload.p2) : Promise.resolve({ secure_url: '' }),
+    ]);
+
+    // 2. Send the resulting URLs to your mediaroutes.js
+    const response = await fetch('/api/media/magazine-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pdfUrl: pdfRes.secure_url,
+        coverUrl: coverRes.secure_url,
+        page1Url: p1Res.secure_url,
+        page2Url: p2Res.secure_url,
+      }),
+    });
+
+    if (response.ok) {
+      alert("Magazine Published Successfully!");
+      setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
+    }
+  } catch (err) {
+    console.error("Magazine upload failed:", err);
+    alert("Failed to publish magazine.");
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -1139,7 +1199,13 @@ const updateMediaData = async (id, updatedFields) => {
           </div>
         )}
 
-        {/* Media Management Tab */}
+        {/* Main table area */}
+        <div className="tab-render-area">
+          {activeTab === 'overview' && <PortalOverview />}
+          {activeTab === 'manage-admins' && <ManageAdmins />}
+          {activeTab === 'feedback' && <FeedbackView />}
+
+          {/* Media Management Tab */}
         {activeTab === 'media' && (
   <div className="media-mgmt-container">
     {/* Sub-navigation for Media Types */}
@@ -1282,12 +1348,6 @@ const updateMediaData = async (id, updatedFields) => {
     )}
   </div>
 )}
-
-        {/* Main table area */}
-        <div className="tab-render-area">
-          {activeTab === 'overview' && <PortalOverview />}
-          {activeTab === 'manage-admins' && <ManageAdmins />}
-          {activeTab === 'feedback' && <FeedbackView />}
 
           {['alumni', 'students', 'logs'].includes(activeTab) && (
             <div className="data-table-container">
