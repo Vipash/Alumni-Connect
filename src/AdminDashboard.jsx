@@ -1033,125 +1033,161 @@ function AdminDashboard({ admin, setView, onLogout }) {
     </div>
 
     {mediaTab === 'gallery' ? (
-      <div className="management-suite">
-        {/* Gallery Bulk Upload Card */}
-        <div className="post-announcement-card" style={{ maxWidth: '100%', marginBottom: '30px' }}>
-          <h3>Bulk Gallery Upload</h3>
-          <p className="limit-text" style={{ fontSize: '0.85rem', color: '#666' }}>
-            Manage the landing page carousel. Current: {existingMedia.length} / {MAX_IMAGES} images
-          </p>
-          <div className="bulk-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', marginTop: '15px' }}>
-            <input 
-              type="file" 
-              id="multi-file" 
-              multiple 
-              accept="image/*" 
-              hidden 
-              onChange={(e) => setSelectedFiles(e.target.files)}
-            />
-            <label htmlFor="multi-file" className="mbm-btn-outline" style={{ cursor: 'pointer' }}>
-              {selectedFiles.length > 0 ? `${selectedFiles.length} Selected` : 'Select Images'}
-            </label>
+  <div className="management-suite">
+    {/* Gallery Bulk Upload Card */}
+    <div className="post-announcement-card" style={{ maxWidth: '100%', marginBottom: '30px' }}>
+      <h3>Bulk Gallery Upload</h3>
+      <p className="limit-text" style={{ fontSize: '0.85rem', color: '#666' }}>
+        Manage the landing page carousel. Current: {existingMedia.gallery?.length || 0} / {MAX_IMAGES} images
+      </p>
+      <div className="bulk-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', marginTop: '15px' }}>
+        <input 
+          type="file" 
+          id="multi-file" 
+          multiple 
+          accept="image/*" 
+          hidden 
+          onChange={(e) => setSelectedFiles(e.target.files)}
+        />
+        <label htmlFor="multi-file" className="mbm-btn-outline" style={{ cursor: 'pointer' }}>
+          {selectedFiles.length > 0 ? `${selectedFiles.length} Selected` : 'Select Images'}
+        </label>
+        <button 
+          className="mbm-btn-primary" 
+          onClick={handleBulkUpload} 
+          disabled={loading || selectedFiles.length === 0}
+        >
+          {loading ? 'Uploading...' : 'Publish to Homepage'}
+        </button>
+      </div>
+    </div>
+
+    {/* Gallery Grid Management */}
+    <div className="media-management-grid">
+      {existingMedia.gallery?.map((item) => (
+        <div key={item._id} className="media-item-card">
+          <div className="media-preview">
+            <img src={item.imageUrl} alt="Gallery" />
             <button 
-              className="mbm-btn-primary" 
-              onClick={handleBulkUpload} 
-              disabled={loading || selectedFiles.length === 0}
+              className="media-delete-overlay" 
+              onClick={() => handleDeleteMedia(item._id)}
+              title="Remove Image"
             >
-              {loading ? 'Uploading...' : 'Publish to Homepage'}
+              ×
             </button>
           </div>
-        </div>
-
-        {/* Gallery Grid Management */}
-        <div className="media-management-grid">
-          {existingMedia.map((item) => (
-            <div key={item._id} className="media-item-card">
-              <div className="media-preview">
-                <img src={item.imageUrl} alt="Gallery" />
-                <button 
-                  className="media-delete-overlay" 
-                  onClick={() => handleDeleteMedia(item._id)}
-                  title="Remove Image"
-                >
-                  ×
-                </button>
-              </div>
-              <div className="media-details">
-                <input 
-                  type="text" 
-                  defaultValue={item.title} 
-                  onBlur={(e) => updateMediaData(item._id, { title: e.target.value })}
-                  placeholder="Event Title"
-                  className="grid-input"
-                />
-                <textarea 
-                  defaultValue={item.desc} 
-                  onBlur={(e) => updateMediaData(item._id, { desc: e.target.value })}
-                  placeholder="Short description..."
-                  className="grid-textarea"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    ) : (
-      /* E-Magazine Management Section */
-      <div className="post-announcement-card" style={{ maxWidth: '600px' }}>
-        <h3>Update Alumni Connect Magazine</h3>
-        <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>
-          Upload the PDF and a cover screenshot. These will reflect immediately on the site.
-        </p>
-        <div className="form-grid" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          
-          <div className="file-input-group">
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>1. Main Magazine PDF</label>
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={(e) => setMagazineUpload({ ...magazineUpload, pdf: e.target.files[0] })}
+          <div className="media-details">
+            <input 
+              type="text" 
+              defaultValue={item.title} 
+              onBlur={(e) => updateMediaData(item._id, { title: e.target.value })}
+              placeholder="Event Title"
+              className="grid-input"
+            />
+            <textarea 
+              defaultValue={item.desc} 
+              onBlur={(e) => updateMediaData(item._id, { desc: e.target.value })}
+              placeholder="Short description..."
+              className="grid-textarea"
             />
           </div>
-
-          <div className="file-input-group">
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>2. Cover Preview Image (Screenshot)</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setMagazineUpload({ ...magazineUpload, cover: e.target.files[0] })}
-            />
+        </div>
+      ))}
+    </div>
+  </div>
+) : (
+  /* E-Magazine Management Section */
+  <div className="magazine-manager">
+    {/* 1. ACTIVE MAGAZINE PREVIEW SECTION */}
+    {existingMedia.magazine && (
+      <div className="post-announcement-card" style={{ maxWidth: '800px', marginBottom: '30px', borderLeft: '4px solid #007bff' }}>
+        <h3>Current Active Magazine</h3>
+        <div className="mag-preview-grid" style={{ display: 'flex', gap: '20px', margin: '20px 0', overflowX: 'auto', paddingBottom: '10px' }}>
+          <div className="mag-preview-item" style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '5px' }}>COVER</p>
+            <img src={existingMedia.magazine.coverUrl} alt="Cover" style={{ height: '120px', borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }} />
           </div>
-
-          <div className="flex-row" style={{ display: 'flex', gap: '15px' }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 1 Preview</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setMagazineUpload({ ...magazineUpload, p1: e.target.files[0] })}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 2 Preview</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setMagazineUpload({ ...magazineUpload, p2: e.target.files[0] })}
-              />
-            </div>
+          <div className="mag-preview-item" style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '5px' }}>PAGE 1</p>
+            <img src={existingMedia.magazine.p1Url || "/no-image.jpg"} alt="P1" style={{ height: '120px', borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }} />
           </div>
-
-          <button
-            className="mbm-btn-primary"
-            onClick={handleMagazineSubmit}
-            disabled={loading}
-            style={{ marginTop: '10px' }}
+          <div className="mag-preview-item" style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '5px' }}>PAGE 2</p>
+            <img src={existingMedia.magazine.p2Url || "/no-image.jpg"} alt="P2" style={{ height: '120px', borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <a href={existingMedia.magazine.pdfUrl} target="_blank" rel="noreferrer" className="mbm-btn-outline" style={{ textDecoration: 'none', fontSize: '0.85rem' }}>
+            View Current PDF
+          </a>
+          <button 
+            onClick={handleDeleteMagazine} 
+            className="mbm-btn-outline" 
+            style={{ color: '#dc3545', borderColor: '#dc3545', fontSize: '0.85rem' }}
           >
-            {loading ? 'Syncing Files...' : 'Publish New Magazine'}
+            Delete Issue
           </button>
         </div>
       </div>
     )}
+
+    {/* 2. UPLOAD/UPDATE FORM */}
+    <div className="post-announcement-card" style={{ maxWidth: '600px' }}>
+      <h3>{existingMedia.magazine ? 'Replace Magazine Issue' : 'Upload New Magazine'}</h3>
+      <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>
+        Upload the PDF and preview images. Page 1 and 2 are used for the "stack" effect on the landing page.
+      </p>
+      <div className="form-grid" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        
+        <div className="file-input-group">
+          <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>1. Main Magazine PDF</label>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={(e) => setMagazineUpload({ ...magazineUpload, pdf: e.target.files[0] })}
+          />
+        </div>
+
+        <div className="file-input-group">
+          <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>2. Cover Preview Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setMagazineUpload({ ...magazineUpload, cover: e.target.files[0] })}
+          />
+        </div>
+
+        <div className="flex-row" style={{ display: 'flex', gap: '15px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 1 Preview</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setMagazineUpload({ ...magazineUpload, p1: e.target.files[0] })}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 2 Preview</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setMagazineUpload({ ...magazineUpload, p2: e.target.files[0] })}
+            />
+          </div>
+        </div>
+
+        <button
+          className="mbm-btn-primary"
+          onClick={handleMagazineSubmit}
+          disabled={loading}
+          style={{ marginTop: '10px' }}
+        >
+          {loading ? 'Publishing...' : 'Publish Magazine'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
   </div>
 )}
 
