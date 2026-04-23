@@ -26,7 +26,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
   const [editingTicker, setEditingTicker] = useState(null);
 
   // Media & Magazine Management
-  const [existingMedia, setExistingMedia] = useState([]);
+  const [existingMedia, setExistingMedia] = useState({ gallery: [], magazine: null });
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [mediaTab, setMediaTab] = useState('gallery');
   const [magazineUpload, setMagazineUpload] = useState({
@@ -100,14 +100,18 @@ function AdminDashboard({ admin, setView, onLogout }) {
   };
 
   const fetchExistingMedia = async () => {
-    try {
-      const res = await fetch('/api/media/home-data');
-      const data = await res.json();
-      setExistingMedia(data.gallery || []);
-    } catch (err) {
-      console.error("Fetch failed", err);
-    }
-  };
+  try {
+    const res = await fetch('/api/media/home-data');
+    const data = await res.json();
+    // Update to store the whole object which contains both 'gallery' and 'magazine'
+    setExistingMedia({
+      gallery: data.gallery || [],
+      magazine: data.magazine || null
+    });
+  } catch (err) {
+    console.error("Fetch failed", err);
+  }
+};
 
   const handleBulkUpload = async () => {
     if (selectedFiles.length === 0) return alert("Select images first");
@@ -191,11 +195,18 @@ function AdminDashboard({ admin, setView, onLogout }) {
     }
   };
 
-  const handleDeleteMedia = async (id) => {
-    if (!window.confirm("Delete this image?")) return;
-    await fetch(`/api/media/gallery/${id}`, { method: 'DELETE' });
-    fetchExistingMedia();
-  };
+  const handleDeleteMagazine = async () => {
+  if (!window.confirm("Are you sure you want to delete the current magazine issue?")) return;
+  try {
+    const res = await fetch('/api/media/magazine-delete', { method: 'DELETE' });
+    if (res.ok) {
+      alert("Magazine issue deleted");
+      fetchExistingMedia();
+    }
+  } catch (err) {
+    console.error("Delete failed", err);
+  }
+};
 
   const updateMediaData = async (id, fields) => {
     await fetch(`/api/media/gallery/${id}`, {
