@@ -32,6 +32,17 @@ function AdminDashboard({ admin, setView, onLogout }) {
     desc: '',
     image: null,
   });
+  const [mediaTab, setMediaTab] = useState('gallery');
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [existingMedia, setExistingMedia] = useState([]);
+  const [magazineUpload, setMagazineUpload] = useState({
+    pdf: null,
+    cover: null,
+    p1: null,
+    p2: null,
+  });
+  const MAX_GALLERY_IMAGES = 12;
+
   const [magazineUpload, setMagazineUpload] = useState({
     pdf: null,
     cover: null,
@@ -131,6 +142,117 @@ function AdminDashboard({ admin, setView, onLogout }) {
     }
   };
 
+  // Media Fetching
+  const fetchExistingMedia = async () => {
+    try {
+      const res = await fetch('/api/media/home-data');
+      const data = await res.json();
+      setExistingMedia(data.gallery || []);
+    } catch (err) {
+      console.error("Fetch failed", err);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'media') {
+      fetchExistingMedia();
+    }
+  }, [activeTab]);
+
+  // Gallery Bulk Upload
+  const handleBulkUpload = async () => {
+    if (selectedFiles.length === 0) return alert("Select images first");
+    setLoading(true);
+    try {
+      const uploadPromises = Array.from(selectedFiles).map(async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'profile');
+        formData.append('cloud_name', 'duoofmsri');
+
+        const cloudRes = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const cloudData = await cloudRes.json();
+
+        return fetch('/api/media/gallery-update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: "New Highlight",
+            desc: "Campus event",
+            imageUrl: cloudData.secure_url,
+          }),
+        });
+      });
+      await Promise.all(uploadPromises);
+      alert("Gallery Updated!");
+      setSelectedFiles([]);
+      fetchExistingMedia();
+    } catch (err) {
+      alert("Upload failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Magazine Submit
+  const handleMagazineSubmit = async () => {
+    if (!magazineUpload.pdf || !magazineUpload.cover) return alert("PDF and Cover are required");
+    setLoading(true);
+    try {
+      const upload = async (file) => {
+        const f = new FormData();
+        f.append('file', file);
+        f.append('upload_preset', 'profile');
+        const res = await fetch(`https://api.cloudinary.com/v1_1/duoofmsri/${file.type.includes('pdf') ? 'raw' : 'image'}/upload`, {
+          method: 'POST',
+          body: f
+        });
+        return res.json();
+      };
+
+      const [pdf, cover, p1, p2] = await Promise.all([
+        upload(magazineUpload.pdf),
+        upload(magazineUpload.cover),
+        magazineUpload.p1 ? upload(magazineUpload.p1) : { secure_url: null },
+        magazineUpload.p2 ? upload(magazineUpload.p2) : { secure_url: null },
+      ]);
+
+      await fetch('/api/media/magazine-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pdfUrl: pdf.secure_url,
+          coverUrl: cover.secure_url,
+          p1Url: p1.secure_url,
+          p2Url: p2.secure_url,
+        }),
+      });
+      alert("Magazine Published!");
+      setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
+    } catch (err) {
+      alert("Magazine upload failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteMedia = async (id) => {
+    if (!window.confirm("Delete this image?")) return;
+    await fetch(`/api/media/gallery/${id}`, { method: 'DELETE' });
+    fetchExistingMedia();
+  };
+
+  const updateMediaData = async (id, fields) => {
+    await fetch(`/api/media/gallery/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields),
+    });
+  };
+  
   const fetchTickets = async () => {
     try {
       const res = await fetch('/api/admin/support-tickets');
@@ -264,6 +386,12 @@ function AdminDashboard({ admin, setView, onLogout }) {
 const [existingMedia, setExistingMedia] = useState([]);
 const [selectedFiles, setSelectedFiles] = useState([]);
 const [mediaTab, setMediaTab] = useState('gallery');
+const [magazineUpload, setMagazineUpload] = useState({
+    pdf: null,
+    cover: null,
+    p1: null,
+    p2: null,
+  });
 const MAX_IMAGES = 12;
 
 // Fetch existing media whenever the media tab is active
@@ -349,7 +477,6 @@ const updateMediaData = async (id, updatedFields) => {
 };
 
 const handleMagazineSubmit = async () => {
-  // Ensure files are selected
   if (!magazineUpload.pdf || !magazineUpload.cover) {
     return alert("Please select at least the PDF and a Cover Image.");
   }

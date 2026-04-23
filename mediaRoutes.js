@@ -1,24 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { Gallery, Magazine } = require('./Media');
+const { Gallery, Magazine } = require('./Media'); // Ensure this points to your Models
 
-const handleMagazineSubmit = async () => {
-  try {
-    const res = await fetch('/api/media/magazine-update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pdfUrl: magUrl, // The URL from Cloudinary
-        coverUrl: magCoverUrl, // Optional screenshot of cover
-      }),
-    });
-    if (res.ok) alert("Magazine Published!");
-  } catch (err) {
-    console.error("Upload failed", err);
-  }
-};
-
-// POST: Add new gallery item
+// POST: Add gallery item
 router.post('/gallery-update', async (req, res) => {
   try {
     const newItem = new Gallery(req.body);
@@ -29,10 +13,9 @@ router.post('/gallery-update', async (req, res) => {
   }
 });
 
-// POST: Update Magazine (Overwrites old one)
+// POST: Update Magazine
 router.post('/magazine-update', async (req, res) => {
   try {
-    // We use findOneAndUpdate so there's only ever ONE magazine record
     await Magazine.findOneAndUpdate({}, req.body, { upsert: true });
     res.status(200).json({ message: "Magazine published!" });
   } catch (err) {
@@ -40,7 +23,7 @@ router.post('/magazine-update', async (req, res) => {
   }
 });
 
-// GET: Fetch all for Homepage
+// GET: Home Data
 router.get('/home-data', async (req, res) => {
   try {
     const gallery = await Gallery.find().sort({ createdAt: -1 });
@@ -51,13 +34,13 @@ router.get('/home-data', async (req, res) => {
   }
 });
 
-// DELETE an image
+// DELETE
 router.delete('/gallery/:id', async (req, res) => {
   await Gallery.findByIdAndDelete(req.params.id);
   res.json({ message: "Deleted" });
 });
 
-// UPDATE text
+// PATCH
 router.patch('/gallery/:id', async (req, res) => {
   await Gallery.findByIdAndUpdate(req.params.id, req.body);
   res.json({ message: "Updated" });
