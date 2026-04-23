@@ -726,15 +726,12 @@ const downloadMagazine = () => {
                         <div className="gallery-modal-content">
                           <button className="close-modal" onClick={() => setIsGalleryOpen(false)}>×</button>
                           <h2>Campus Gallery</h2>
-                          <div className="gallery-grid">
-                            {galleryItems.map((item, i) => (
-                              <div key={i} className="gallery-card-item">
-                                <img src={item.img} alt="" />
-                                <p>{item.text}</p>
-                              </div>
+                          <div className="gallery-grid-full">
+                            {galleryData.map((item, index) => (
+                              <img key={index} src={item.imageUrl} alt={item.title} />
                             ))}
                           </div>
-                        </div>
+                       </div>
                       </div>
                     )}
                   </section>
