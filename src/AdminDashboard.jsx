@@ -155,45 +155,42 @@ function AdminDashboard({ admin, setView, onLogout }) {
   };
 
   const handleMagazineSubmit = async () => {
-    if (!magazineUpload.pdf || !magazineUpload.cover) return alert("PDF and Cover are required");
-    setLoading(true);
-    try {
-      const upload = async (file) => {
-        const f = new FormData();
-        f.append('file', file);
-        f.append('upload_preset', 'profile');
-        const res = await fetch(`https://api.cloudinary.com/v1_1/duoofmsri/auto/upload`, {
-          method: 'POST',
-          body: f
-        });
-        return res.json();
-      };
+  // Check if at least ONE file is selected
+  const hasFiles = magazineUpload.pdf || magazineUpload.cover || magazineUpload.p1 || magazineUpload.p2;
+  if (!hasFiles) return alert("Please select at least one file to update.");
 
-      const [pdf, cover, p1, p2] = await Promise.all([
-        upload(magazineUpload.pdf),
-        upload(magazineUpload.cover),
-        magazineUpload.p1 ? upload(magazineUpload.p1) : { secure_url: '' },
-        magazineUpload.p2 ? upload(magazineUpload.p2) : { secure_url: '' },
-      ]);
+  setLoading(true);
+  const formData = new FormData();
 
-      await fetch('/api/media/magazine-update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pdfUrl: pdf.secure_url,
-          coverUrl: cover.secure_url,
-          page1Url: p1.secure_url,
-          page2Url: p2.secure_url,
-        }),
-      });
-      alert("Magazine Published!");
+  // Only append files that the user has actually selected
+  if (magazineUpload.pdf) formData.append('pdf', magazineUpload.pdf);
+  if (magazineUpload.cover) formData.append('cover', magazineUpload.cover);
+  if (magazineUpload.p1) formData.append('p1', magazineUpload.p1);
+  if (magazineUpload.p2) formData.append('p2', magazineUpload.p2);
+
+  try {
+    const res = await fetch('/api/admin/magazine-upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (res.ok) {
+      alert("Magazine updated successfully!");
+      // Reset the local upload state
       setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
-    } catch (err) {
-      alert("Magazine upload failed");
-    } finally {
-      setLoading(false);
+      fetchExistingMedia();
+    } else {
+      const errData = await res.json();
+      alert(`Upload failed: ${errData.message}`);
     }
-  };
+  } catch (err) {
+    console.error("Magazine upload error:", err);
+    alert("An error occurred during upload.");
+  } finally {
+    setLoading(true); // Should be false, fixed below
+    setLoading(false);
+  }
+};
 
   const handleDeleteMagazine = async () => {
   if (!window.confirm("Are you sure you want to delete the current magazine issue?")) return;
@@ -1140,7 +1137,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
       <div className="form-grid" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         
         <div className="file-input-group">
-          <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>1. Main Magazine PDF</label>
+          <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>
+            1. Main Magazine PDF {existingMedia.magazine?.pdfUrl && "(Optional - Select to Replace)"}
+          </label>
           <input
             type="file"
             accept=".pdf"
@@ -1149,7 +1148,9 @@ function AdminDashboard({ admin, setView, onLogout }) {
         </div>
 
         <div className="file-input-group">
-          <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>2. Cover Preview Image</label>
+          <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>
+            2. Cover Preview Image {existingMedia.magazine?.coverUrl && "(Optional - Select to Replace)"}
+          </label>
           <input
             type="file"
             accept="image/*"

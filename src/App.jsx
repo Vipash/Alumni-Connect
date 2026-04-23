@@ -790,8 +790,7 @@ const downloadMagazine = () => {
                         <button className="mag-btn primary" onClick={() => setIsMagOpen(true)}>
                           View Online
                         </button>
-                        {/* Restore Download PDF Button */}
-                        <button className="mag-btn secondary" onClick={downloadMagazine}>
+                        <button className="mag-btn primary" onClick={downloadMagazine}>
                           Download PDF
                         </button>
                       </div>
