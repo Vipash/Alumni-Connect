@@ -3,14 +3,11 @@ const express = require('express');
 const router = express.Router();
 const { Gallery, Magazine } = require('./Media'); 
 
-// POST: Add gallery item (Supports file upload)
-router.post('/gallery-update', upload.single('image'), async (req, res) => {
+// Revised gallery route in mediaRoutes.js
+router.post('/gallery-update', async (req, res) => {
   try {
-    const updateData = { ...req.body };
-    if (req.file) {
-      updateData.imageUrl = req.file.path;
-    }
-    const newItem = new Gallery(updateData);
+    // AdminDashboard sends { imageUrl, title, desc } in the body 
+    const newItem = new Gallery(req.body); 
     await newItem.save();
     res.status(200).json({ message: 'Gallery updated!', item: newItem });
   } catch (err) {
