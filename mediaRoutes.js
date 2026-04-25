@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const { Gallery, Magazine } = require('./Media'); 
-const upload = require('./multer');
 
 // POST: Add gallery item (Supports file upload)
 router.post('/gallery-update', upload.single('image'), async (req, res) => {

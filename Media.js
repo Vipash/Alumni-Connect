@@ -10,7 +10,9 @@ const GallerySchema = new mongoose.Schema({
 
 const MagazineSchema = new mongoose.Schema({
   pdfUrl: String,
-  coverUrl: String, // Cloudinary screenshot URL
+  coverUrl: String,
+  p1Url: String, // Add this for Page 1 preview
+  p2Url: String, // Add this for Page 2 preview
   updatedAt: { type: Date, default: Date.now }
 });
 
