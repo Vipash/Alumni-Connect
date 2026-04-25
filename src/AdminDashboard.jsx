@@ -155,39 +155,38 @@ function AdminDashboard({ admin, setView, onLogout }) {
   };
 
   const handleMagazineSubmit = async () => {
-  // Check if at least ONE file is selected
-  const hasFiles = magazineUpload.pdf || magazineUpload.cover || magazineUpload.p1 || magazineUpload.p2;
-  if (!hasFiles) return alert("Please select at least one file to update.");
-
   setLoading(true);
-  const formData = new FormData();
-
-  // Only append files that the user has actually selected
-  if (magazineUpload.pdf) formData.append('pdf', magazineUpload.pdf);
-  if (magazineUpload.cover) formData.append('cover', magazineUpload.cover);
-  if (magazineUpload.p1) formData.append('p1', magazineUpload.p1);
-  if (magazineUpload.p2) formData.append('p2', magazineUpload.p2);
-
   try {
+    const uploadFile = async (file) => {
+      if (!file) return null;
+      const data = new FormData();
+      data.append('file', file);
+      data.append('upload_preset', 'profile'); // Using your existing preset 
+      const res = await fetch('https://api.cloudinary.com/v1_1/duoofmsri/auto/upload', {
+        method: 'POST',
+        body: data
+      });
+      const json = await res.json();
+      return json.secure_url;
+    };
+
+    // Upload all files first to get their Cloudinary URLs
+    const pdfUrl = await uploadFile(magazineUpload.pdf);
+    const coverUrl = await uploadFile(magazineUpload.cover);
+    const p1Url = await uploadFile(magazineUpload.p1);
+    const p2Url = await uploadFile(magazineUpload.p2);
+
+    // Send only the URLs to your backend
     const res = await fetch('/api/media/magazine-update', {
       method: 'POST',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pdfUrl, coverUrl, p1Url, p2Url }),
     });
 
-    if (res.ok) {
-      alert("Magazine updated successfully!");
-      // Reset the local upload state
-      setMagazineUpload({ pdf: null, cover: null, p1: null, p2: null });
-      fetchExistingMedia();
-    } else {
-      const errData = await res.json();
-      alert(`Upload failed: ${errData.message}`);
-    }
+    if (res.ok) alert("Success!");
   } catch (err) {
-    console.error("Magazine upload error:", err);
-    alert("An error occurred during upload.");
+    console.error(err);
   } finally {
-    setLoading(true); // Should be false, fixed below
     setLoading(false);
   }
 };

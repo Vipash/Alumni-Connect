@@ -20,44 +20,19 @@ router.post('/gallery-update', upload.single('image'), async (req, res) => {
   }
 });
 
-// POST: Update Magazine
-router.post(
-  '/magazine-update',
-  upload.fields([
-    { name: 'pdf', maxCount: 1 },
-    { name: 'cover', maxCount: 1 },
-    { name: 'p1', maxCount: 1 },
-    { name: 'p2', maxCount: 1 },
-  ]),
-  async (req, res) => {
-    try {
-      const updateData = {};
-      
-      // Safety check for req.files before accessing
-      if (req.files) {
-        if (req.files['pdf']) updateData.pdfUrl = req.files['pdf'][0].path;
-        if (req.files['cover']) updateData.coverUrl = req.files['cover'][0].path;
-        if (req.files['p1']) updateData.p1Url = req.files['p1'][0].path;
-        if (req.files['p2']) updateData.p2Url = req.files['p2'][0].path;
-      }
-
-      if (req.body) {
-        Object.assign(updateData, req.body);
-      }
-
-      const updated = await Magazine.findOneAndUpdate(
-        {},
-        { $set: updateData },
-        { upsert: true, new: true }
-      );
-
-      res.status(200).json({ message: 'Magazine published successfully!', magazine: updated });
-    } catch (err) {
-      console.error('Magazine Route Error:', err);
-      res.status(500).json({ message: 'Internal Server Error', error: err.message });
-    }
+router.post('/magazine-update', async (req, res) => {
+  try {
+    const updateData = req.body; // Contains the URLs sent from the frontend
+    const updated = await Magazine.findOneAndUpdate(
+      {},
+      { $set: updateData },
+      { upsert: true, new: true }
+    );
+    res.status(200).json({ message: 'Updated!', magazine: updated });
+  } catch (err) {
+    res.status(500).json({ message: 'Error', error: err.message });
   }
-);
+});
 
 // DELETE: Magazine Issue (MISSING ROUTE ADDED HERE)
 router.delete('/magazine-delete', async (req, res) => {
