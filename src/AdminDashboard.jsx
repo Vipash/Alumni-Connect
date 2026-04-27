@@ -1124,294 +1124,666 @@ const saveNewsChanges = async () => {
     {/* Sub-navigation for Media Types */}
     <div className="tab-header-actions" style={{ marginBottom: '20px' }}>
       <div className="sub-tab-nav">
-        <button 
-          className={mediaTab === 'gallery' ? 'active' : ''} 
+        <button
+          className={mediaTab === 'gallery' ? 'active' : ''}
           onClick={() => setMediaTab('gallery')}
         >
           Campus Gallery
         </button>
-        <button 
-          className={mediaTab === 'magazine' ? 'active' : ''} 
+        <button
+          className={mediaTab === 'magazine' ? 'active' : ''}
           onClick={() => setMediaTab('magazine')}
         >
           E-Magazine
         </button>
-        <button 
-        className={mediaTab === 'news' ? 'active' : ''} 
-        onClick={() => setMediaTab('news')}
-         >
-        Campus News
-      </button>
-      </div>
-    </div>
-
-    {mediaTab === 'gallery' ? (
-  <div className="management-suite">
-    {/* 1. Bulk Upload Card (Keep this as is) */}
-    <div className="post-announcement-card" style={{ maxWidth: '100%', marginBottom: '30px' }}>
-      <h3>Bulk Gallery Upload</h3>
-      <p className="limit-text" style={{ fontSize: '0.85rem', color: '#666' }}>
-        Manage the landing page carousel. Current: {existingMedia.gallery?.length || 0} / {MAX_IMAGES} images
-      </p>
-      <div className="bulk-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', marginTop: '15px' }}>
-        <input 
-          type="file" 
-          id="multi-file" 
-          multiple 
-          accept="image/*" 
-          hidden 
-          onChange={(e) => setSelectedFiles(e.target.files)}
-        />
-        <label htmlFor="multi-file" className="mbm-btn-outline" style={{ cursor: 'pointer' }}>
-          {selectedFiles.length > 0 ? `${selectedFiles.length} Selected` : 'Select Images'}
-        </label>
-        <button 
-          className="mbm-btn-primary" 
-          onClick={handleBulkUpload} 
-          disabled={loading || selectedFiles.length === 0}
+        <button
+          className={mediaTab === 'news' ? 'active' : ''}
+          onClick={() => setMediaTab('news')}
         >
-          {loading ? 'Uploading...' : 'Publish to Homepage'}
+          Campus News
         </button>
       </div>
     </div>
 
-    {/* 2. NEW: Gallery Management Header with Save Button */}
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-      <h3 style={{ margin: 0 }}>Arrange & Edit Gallery</h3>
-      <button 
-        className="mbm-btn-primary" 
-        onClick={saveGalleryChanges} 
-        disabled={loading || !editableGallery.length}
-        style={{ width: 'auto', padding: '10px 25px', backgroundColor: '#28a745' }}
-      >
-        {loading ? "Saving..." : "Save All Changes"}
-      </button>
-    </div>
-
-    {/* 3. UPDATED: Gallery Grid Management */}
-    <div className="media-management-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-      {editableGallery.map((item, index) => (
-        <div key={item._id} className="media-item-card" style={{ background: '#fff', borderRadius: '8px', border: '1px solid #eee', overflow: 'hidden' }}>
-          <div className="media-preview" style={{ position: 'relative' }}>
-            <img src={item.imageUrl} alt="Gallery" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
-            <button 
-              className="media-delete-overlay" 
-              onClick={() => handleDeleteMedia(item._id)}
-              style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(220, 53, 69, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '25px', height: '25px', cursor: 'pointer' }}
+    {/* --- GALLERY TAB --- */}
+    {mediaTab === 'gallery' && (
+      <div className="management-suite">
+        {/* 1. Bulk Upload Card */}
+        <div
+          className="post-announcement-card"
+          style={{ maxWidth: '100%', marginBottom: '30px' }}
+        >
+          <h3>Bulk Gallery Upload</h3>
+          <p
+            className="limit-text"
+            style={{ fontSize: '0.85rem', color: '#666' }}
+          >
+            Manage the landing page carousel. Current:{' '}
+            {existingMedia.gallery?.length || 0} / {MAX_IMAGES} images
+          </p>
+          <div
+            className="bulk-actions"
+            style={{
+              display: 'flex',
+              gap: '15px',
+              alignItems: 'center',
+              marginTop: '15px',
+            }}
+          >
+            <input
+              type="file"
+              id="multi-file"
+              multiple
+              accept="image/*"
+              hidden
+              onChange={(e) => setSelectedFiles(e.target.files)}
+            />
+            <label
+              htmlFor="multi-file"
+              className="mbm-btn-outline"
+              style={{ cursor: 'pointer' }}
             >
-              ×
+              {selectedFiles.length > 0
+                ? `${selectedFiles.length} Selected`
+                : 'Select Images'}
+            </label>
+            <button
+              className="mbm-btn-primary"
+              onClick={handleBulkUpload}
+              disabled={loading || selectedFiles.length === 0}
+            >
+              {loading ? 'Uploading...' : 'Publish to Homepage'}
             </button>
           </div>
-          
-          <div className="media-details" style={{ padding: '15px' }}>
-            <input 
-              type="text" 
-              value={item.title || ""} 
-              onChange={(e) => handleGalleryTextChange(item._id, 'title', e.target.value)}
-              placeholder="Event Title"
-              className="grid-input"
-              style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
-            />
-            <textarea 
-              value={item.desc || ""} 
-              onChange={(e) => handleGalleryTextChange(item._id, 'desc', e.target.value)}
-              placeholder="Short description..."
-              className="grid-textarea"
-              style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', minHeight: '60px' }}
-            />
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', gap: '5px' }}>
-                <button 
-                  className="mbm-btn-outline" 
-                  style={{ padding: '2px 10px', fontSize: '14px' }}
-                  onClick={() => moveItem(index, -1)}
-                  disabled={index === 0}
+        </div>
+
+        {/* 2. Gallery Management Header with Save Button */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+          }}
+        >
+          <h3 style={{ margin: 0 }}>Arrange & Edit Gallery</h3>
+          <button
+            className="mbm-btn-primary"
+            onClick={saveGalleryChanges}
+            disabled={loading || !editableGallery.length}
+            style={{
+              width: 'auto',
+              padding: '10px 25px',
+              backgroundColor: '#28a745',
+            }}
+          >
+            {loading ? 'Saving...' : 'Save All Changes'}
+          </button>
+        </div>
+
+        {/* 3. Gallery Grid Management */}
+        <div
+          className="media-management-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '20px',
+          }}
+        >
+          {editableGallery.map((item, index) => (
+            <div
+              key={item._id}
+              className="media-item-card"
+              style={{
+                background: '#fff',
+                borderRadius: '8px',
+                border: '1px solid #eee',
+                overflow: 'hidden',
+              }}
+            >
+              <div className="media-preview" style={{ position: 'relative' }}>
+                <img
+                  src={item.imageUrl}
+                  alt="Gallery"
+                  style={{
+                    width: '100%',
+                    height: '160px',
+                    objectFit: 'cover',
+                  }}
+                />
+                <button
+                  className="media-delete-overlay"
+                  onClick={() => handleDeleteMedia(item._id)}
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    background: 'rgba(220, 53, 69, 0.9)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '25px',
+                    height: '25px',
+                    cursor: 'pointer',
+                  }}
                 >
-                  ▲
-                </button>
-                <button 
-                  className="mbm-btn-outline" 
-                  style={{ padding: '2px 10px', fontSize: '14px' }}
-                  onClick={() => moveItem(index, 1)}
-                  disabled={index === editableGallery.length - 1}
-                >
-                  ▼
+                  ×
                 </button>
               </div>
-              <span style={{ fontSize: '12px', color: '#999' }}>Pos: {index + 1}</span>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-    {/* 1. Upload Form */}
-    <div className="post-announcement-card" style={{ maxWidth: '100%', marginBottom: '30px' }}>
-      <h3>Post Campus News</h3>
-      <div className="news-form-grid" style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '15px' }}>
-        <input 
-          type="text" 
-          placeholder="News Headline" 
-          className="partition-input"
-          value={newsUpload.headline}
-          onChange={(e) => setNewsUpload({...newsUpload, headline: e.target.value})}
-        />
-        <textarea 
-          placeholder="Full News Content..." 
-          className="partition-input"
-          style={{ minHeight: '120px' }}
-          value={newsUpload.content}
-          onChange={(e) => setNewsUpload({...newsUpload, content: e.target.value})}
-        />
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-          <input 
-            type="file" 
-            accept="image/*" 
-            id="news-img" 
-            hidden 
-            onChange={(e) => setNewsUpload({...newsUpload, image: e.target.files[0]})}
-          />
-          <label htmlFor="news-img" className="mbm-btn-outline" style={{ cursor: 'pointer' }}>
-            {newsUpload.image ? "Image Selected" : "Select Banner Image"}
-          </label>
-          <button className="mbm-btn-primary" onClick={handleNewsSubmit} disabled={loading}>
-            {loading ? "Publishing..." : "Publish News"}
-          </button>
-        </div>
-      </div>
-    </div>
 
-    {/* 2. Management List */}
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-      <h3 style={{ margin: 0 }}>Manage Existing News</h3>
-      <button className="mbm-btn-primary" onClick={saveNewsChanges} style={{ backgroundColor: '#28a745' }}>
-        Save Order & Edits
-      </button>
-    </div>
+              <div className="media-details" style={{ padding: '15px' }}>
+                <input
+                  type="text"
+                  value={item.title || ''}
+                  onChange={(e) =>
+                    handleGalleryTextChange(
+                      item._id,
+                      'title',
+                      e.target.value
+                    )
+                  }
+                  placeholder="Event Title"
+                  className="grid-input"
+                  style={{
+                    width: '100%',
+                    marginBottom: '10px',
+                    padding: '8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd',
+                  }}
+                />
+                <textarea
+                  value={item.desc || ''}
+                  onChange={(e) =>
+                    handleGalleryTextChange(item._id, 'desc', e.target.value)
+                  }
+                  placeholder="Short description..."
+                  className="grid-textarea"
+                  style={{
+                    width: '100%',
+                    marginBottom: '10px',
+                    padding: '8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd',
+                    minHeight: '60px',
+                  }}
+                />
 
-    <div className="news-admin-list" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-      {editableNews.map((item, index) => (
-        <div key={item._id} className="news-admin-card" style={{ display: 'flex', gap: '20px', background: '#fff', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
-          <img src={item.imageUrl} style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} alt="" />
-          <div style={{ flex: 1 }}>
-            <input 
-              type="text" 
-              className="grid-input" 
-              value={item.headline} 
-              onChange={(e) => {
-                const updated = [...editableNews];
-                updated[index].headline = e.target.value;
-                setEditableNews(updated);
-              }}
-            />
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-              <button className="mbm-btn-outline" onClick={() => moveNewsItem(index, -1)} disabled={index === 0}>▲</button>
-              <button className="mbm-btn-outline" onClick={() => moveNewsItem(index, 1)} disabled={index === editableNews.length - 1}>▼</button>
-              <button className="delete-btn" onClick={() => deleteNewsItem(item._id)}>Delete</button>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    <button
+                      className="mbm-btn-outline"
+                      style={{ padding: '2px 10px', fontSize: '14px' }}
+                      onClick={() => moveItem(index, -1)}
+                      disabled={index === 0}
+                    >
+                      ▲
+                    </button>
+                    <button
+                      className="mbm-btn-outline"
+                      style={{ padding: '2px 10px', fontSize: '14px' }}
+                      onClick={() => moveItem(index, 1)}
+                      disabled={index === editableGallery.length - 1}
+                    >
+                      ▼
+                    </button>
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#999' }}>
+                    Pos: {index + 1}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-) : (
-  /* E-Magazine Management Section */
-  <div className="magazine-manager">
-    {/* 1. ACTIVE MAGAZINE PREVIEW SECTION */}
-    {existingMedia.magazine && (
-      <div className="post-announcement-card" style={{ maxWidth: '800px', marginBottom: '30px', borderLeft: '4px solid #007bff' }}>
-        <h3>Current Active Magazine</h3>
-        <div className="mag-preview-grid" style={{ display: 'flex', gap: '20px', margin: '20px 0', overflowX: 'auto', paddingBottom: '10px' }}>
-          <div className="mag-preview-item" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '5px' }}>COVER</p>
-            <img src={existingMedia.magazine.coverUrl} alt="Cover" style={{ height: '120px', borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }} />
-          </div>
-          <div className="mag-preview-item" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '5px' }}>PAGE 1</p>
-            <img src={existingMedia.magazine.p1Url || "/no-image.jpg"} alt="P1" style={{ height: '120px', borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }} />
-          </div>
-          <div className="mag-preview-item" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '5px' }}>PAGE 2</p>
-            <img src={existingMedia.magazine.p2Url || "/no-image.jpg"} alt="P2" style={{ height: '120px', borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }} />
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <a href={existingMedia.magazine.pdfUrl} target="_blank" rel="noreferrer" className="mbm-btn-outline" style={{ textDecoration: 'none', fontSize: '0.85rem' }}>
-            View Current PDF
-          </a>
-          <button 
-            onClick={handleDeleteMagazine} 
-            className="mbm-btn-outline" 
-            style={{ color: '#dc3545', borderColor: '#dc3545', fontSize: '0.85rem' }}
-          >
-            Delete Issue
-          </button>
+          ))}
         </div>
       </div>
     )}
 
-    {/* 2. UPLOAD/UPDATE FORM */}
-    <div className="post-announcement-card" style={{ maxWidth: '600px' }}>
-      <h3>{existingMedia.magazine ? 'Replace Magazine Issue' : 'Upload New Magazine'}</h3>
-      <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>
-        Upload the PDF and preview images. Page 1 and 2 are used for the "stack" effect on the landing page.
-      </p>
-      <div className="form-grid" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        
-        <div className="file-input-group">
-          <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>
-            1. Main Magazine PDF {existingMedia.magazine?.pdfUrl && "(Optional - Select to Replace)"}
-          </label>
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(e) => setMagazineUpload({ ...magazineUpload, pdf: e.target.files[0] })}
-          />
-        </div>
-
-        <div className="file-input-group">
-          <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>
-            2. Cover Preview Image {existingMedia.magazine?.coverUrl && "(Optional - Select to Replace)"}
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setMagazineUpload({ ...magazineUpload, cover: e.target.files[0] })}
-          />
-        </div>
-
-        <div className="flex-row" style={{ display: 'flex', gap: '15px' }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 1 Preview</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setMagazineUpload({ ...magazineUpload, p1: e.target.files[0] })}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '5px' }}>Page 2 Preview</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setMagazineUpload({ ...magazineUpload, p2: e.target.files[0] })}
-            />
-          </div>
-        </div>
-
-        <button
-          className="mbm-btn-primary"
-          onClick={handleMagazineSubmit}
-          disabled={loading}
-          style={{ marginTop: '10px' }}
+    {/* --- NEWS TAB --- */}
+    {mediaTab === 'news' && (
+      <div className="management-suite">
+        {/* 1. Upload Form */}
+        <div
+          className="post-announcement-card"
+          style={{ maxWidth: '100%', marginBottom: '30px' }}
         >
-          {loading ? 'Publishing...' : 'Publish Magazine'}
-        </button>
+          <h3>Post Campus News</h3>
+          <div
+            className="news-form-grid"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '15px',
+              marginTop: '15px',
+            }}
+          >
+            <input
+              type="text"
+              placeholder="News Headline"
+              className="partition-input"
+              value={newsUpload.headline}
+              onChange={(e) =>
+                setNewsUpload({
+                  ...newsUpload,
+                  headline: e.target.value,
+                })
+              }
+            />
+            <textarea
+              placeholder="Full News Content..."
+              className="partition-input"
+              style={{ minHeight: '120px' }}
+              value={newsUpload.content}
+              onChange={(e) =>
+                setNewsUpload({
+                  ...newsUpload,
+                  content: e.target.value,
+                })
+              }
+            />
+            <div
+              style={{
+                display: 'flex',
+                gap: '15px',
+                alignItems: 'center',
+              }}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                id="news-img"
+                hidden
+                onChange={(e) =>
+                  setNewsUpload({
+                    ...newsUpload,
+                    image: e.target.files[0],
+                  })
+                }
+              />
+              <label
+                htmlFor="news-img"
+                className="mbm-btn-outline"
+                style={{ cursor: 'pointer' }}
+              >
+                {newsUpload.image
+                  ? 'Image Selected'
+                  : 'Select Banner Image'}
+              </label>
+              <button
+                className="mbm-btn-primary"
+                onClick={handleNewsSubmit}
+                disabled={loading}
+              >
+                {loading ? 'Publishing...' : 'Publish News'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Management List */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+          }}
+        >
+          <h3 style={{ margin: 0 }}>Manage Existing News</h3>
+          <button
+            className="mbm-btn-primary"
+            onClick={saveNewsChanges}
+            style={{ backgroundColor: '#28a745' }}
+          >
+            Save Order & Edits
+          </button>
+        </div>
+
+        <div
+          className="news-admin-list"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px',
+          }}
+        >
+          {editableNews.map((item, index) => (
+            <div
+              key={item._id}
+              className="news-admin-card"
+              style={{
+                display: 'flex',
+                gap: '20px',
+                background: '#fff',
+                padding: '15px',
+                borderRadius: '8px',
+                border: '1px solid #eee',
+              }}
+            >
+              <img
+                src={item.imageUrl}
+                style={{
+                  width: '120px',
+                  height: '80px',
+                  objectFit: 'cover',
+                  borderRadius: '4px',
+                }}
+                alt=""
+              />
+              <div style={{ flex: 1 }}>
+                <input
+                  type="text"
+                  className="grid-input"
+                  value={item.headline}
+                  onChange={(e) => {
+                    const updated = [...editableNews];
+                    updated[index].headline = e.target.value;
+                    setEditableNews(updated);
+                  }}
+                />
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '10px',
+                    marginTop: '10px',
+                  }}
+                >
+                  <button
+                    className="mbm-btn-outline"
+                    onClick={() => moveNewsItem(index, -1)}
+                    disabled={index === 0}
+                  >
+                    ▲
+                  </button>
+                  <button
+                    className="mbm-btn-outline"
+                    onClick={() => moveNewsItem(index, 1)}
+                    disabled={index === editableNews.length - 1}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => deleteNewsItem(item._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  </div>
-)
-}
+    )}
+
+    {/* --- MAGAZINE TAB --- */}
+    {mediaTab === 'magazine' && (
+      <div className="magazine-manager">
+        {/* 1. ACTIVE MAGAZINE PREVIEW SECTION */}
+        {existingMedia.magazine && (
+          <div
+            className="post-announcement-card"
+            style={{
+              maxWidth: '800px',
+              marginBottom: '30px',
+              borderLeft: '4px solid #007bff',
+            }}
+          >
+            <h3>Current Active Magazine</h3>
+            <div
+              className="mag-preview-grid"
+              style={{
+                display: 'flex',
+                gap: '20px',
+                margin: '20px 0',
+                overflowX: 'auto',
+                paddingBottom: '10px',
+              }}
+            >
+              <div
+                className="mag-preview-item"
+                style={{ textAlign: 'center' }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    marginBottom: '5px',
+                  }}
+                >
+                  COVER
+                </p>
+                <img
+                  src={existingMedia.magazine.coverUrl}
+                  alt="Cover"
+                  style={{
+                    height: '120px',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                  }}
+                />
+              </div>
+              <div
+                className="mag-preview-item"
+                style={{ textAlign: 'center' }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    marginBottom: '5px',
+                  }}
+                >
+                  PAGE 1
+                </p>
+                <img
+                  src={
+                    existingMedia.magazine.p1Url || '/no-image.jpg'
+                  }
+                  alt="P1"
+                  style={{
+                    height: '120px',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                  }}
+                />
+              </div>
+              <div
+                className="mag-preview-item"
+                style={{ textAlign: 'center' }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    marginBottom: '5px',
+                  }}
+                >
+                  PAGE 2
+                </p>
+                <img
+                  src={
+                    existingMedia.magazine.p2Url || '/no-image.jpg'
+                  }
+                  alt="P2"
+                  style={{
+                    height: '120px',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                  }}
+                />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <a
+                href={existingMedia.magazine.pdfUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mbm-btn-outline"
+                style={{
+                  textDecoration: 'none',
+                  fontSize: '0.85rem',
+                }}
+              >
+                View Current PDF
+              </a>
+              <button
+                onClick={handleDeleteMagazine}
+                className="mbm-btn-outline"
+                style={{
+                  color: '#dc3545',
+                  borderColor: '#dc3545',
+                  fontSize: '0.85rem',
+                }}
+              >
+                Delete Issue
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 2. UPLOAD/UPDATE FORM */}
+        <div
+          className="post-announcement-card"
+          style={{ maxWidth: '600px' }}
+        >
+          <h3>
+            {existingMedia.magazine
+              ? 'Replace Magazine Issue'
+              : 'Upload New Magazine'}
+          </h3>
+          <p
+            style={{
+              fontSize: '0.85rem',
+              color: '#666',
+              marginBottom: '15px',
+            }}
+          >
+            Upload the PDF and preview images. Page 1 and 2 are used for
+            the "stack" effect on the landing page.
+          </p>
+          <div
+            className="form-grid"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '15px',
+            }}
+          >
+            <div className="file-input-group">
+              <label
+                style={{
+                  display: 'block',
+                  fontWeight: '600',
+                  marginBottom: '5px',
+                }}
+              >
+                1. Main Magazine PDF{' '}
+                {existingMedia.magazine?.pdfUrl &&
+                  '(Optional - Select to Replace)'}
+              </label>
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={(e) =>
+                  setMagazineUpload({
+                    ...magazineUpload,
+                    pdf: e.target.files[0],
+                  })
+                }
+              />
+            </div>
+
+            <div className="file-input-group">
+              <label
+                style={{
+                  display: 'block',
+                  fontWeight: '600',
+                  marginBottom: '5px',
+                }}
+              >
+                2. Cover Preview Image{' '}
+                {existingMedia.magazine?.coverUrl &&
+                  '(Optional - Select to Replace)'}
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setMagazineUpload({
+                    ...magazineUpload,
+                    cover: e.target.files[0],
+                  })
+                }
+              />
+            </div>
+
+            <div
+              className="flex-row"
+              style={{ display: 'flex', gap: '15px' }}
+            >
+              <div style={{ flex: 1 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontWeight: '600',
+                    marginBottom: '5px',
+                  }}
+                >
+                  Page 1 Preview
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setMagazineUpload({
+                      ...magazineUpload,
+                      p1: e.target.files[0],
+                    })
+                  }
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontWeight: '600',
+                    marginBottom: '5px',
+                  }}
+                >
+                  Page 2 Preview
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setMagazineUpload({
+                      ...magazineUpload,
+                      p2: e.target.files[0],
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <button
+              className="mbm-btn-primary"
+              onClick={handleMagazineSubmit}
+              disabled={loading}
+              style={{ marginTop: '10px' }}
+            >
+              {loading ? 'Publishing...' : 'Publish Magazine'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   </div>
 )}
 
