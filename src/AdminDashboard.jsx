@@ -111,7 +111,8 @@ function AdminDashboard({ admin, setView, onLogout }) {
     // Update to store the whole object which contains both 'gallery' and 'magazine'
     setExistingMedia({
       gallery: data.gallery || [],
-      magazine: data.magazine || null
+      magazine: data.magazine || null,
+      news: data.news || []
     });
   } catch (err) {
     console.error("Fetch failed", err);
@@ -220,7 +221,7 @@ const saveGalleryChanges = async () => {
       const json = await res.json();
       return json.secure_url;
     };
-    
+
   const handleMagazineSubmit = async () => {
   setLoading(true);
   try {
@@ -276,31 +277,39 @@ const saveGalleryChanges = async () => {
     }
   };
 
-  // 1. Upload new news item
+// 1. Upload new news item
 const handleNewsSubmit = async () => {
-  if (!newsUpload.headline || !newsUpload.image) return alert("Headline and Image required");
+  if (!newsUpload.headline || !newsUpload.image) {
+    alert('Headline and Image required');
+    return;
+  }
+
   setLoading(true);
   try {
-    // Reuse your existing uploadFile helper!
-    const imageUrl = await uploadFile(newsUpload.image); 
-    
+    // Reuse your existing Cloudinary helper, or implement it if missing
+    const imageUrl = await uploadFile(newsUpload.image);
+
     const res = await fetch('/api/media/news-update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        headline: newsUpload.headline, 
-        content: newsUpload.content, 
-        imageUrl 
+      body: JSON.stringify({
+        headline: newsUpload.headline,
+        content: newsUpload.content,
+        imageUrl,
       }),
     });
 
-    if (res.ok) {
-      alert("News Published!");
-      setNewsUpload({ headline: '', content: '', image: null });
-      fetchExistingMedia(); // Refresh list
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || 'News publish failed');
     }
+
+    alert('News Published!');
+    setNewsUpload({ headline: '', content: '', image: null });
+    fetchExistingMedia(); // refresh gallery + news + magazine
   } catch (err) {
-    console.error(err);
+    console.error('News upload error:', err);
+    alert('Failed to publish news');
   } finally {
     setLoading(false);
   }
@@ -311,23 +320,46 @@ const moveNewsItem = (index, direction) => {
   const newItems = [...editableNews];
   const nextIndex = index + direction;
   if (nextIndex < 0 || nextIndex >= newItems.length) return;
-  [newItems[index], newItems[nextIndex]] = [newItems[nextIndex], newItems[index]];
-  setEditableNews(newItems.map((item, idx) => ({ ...item, order: idx })));
+
+  [newItems[index], newItems[nextIndex]] = [
+    newItems[nextIndex],
+    newItems[index],
+  ];
+
+  // Update local order field so backend can persist it
+  setEditableNews(
+    newItems.map((item, idx) => ({
+      ...item,
+      order: idx,
+    }))
+  );
 };
 
-// 3. Save News changes (Titles/Content/Order)
+// 3. Save News changes (Titles/Order)
 const saveNewsChanges = async () => {
+  if (!editableNews.length) {
+    alert('No news items to save');
+    return;
+  }
+
   setLoading(true);
   try {
-    await fetch('/api/media/news/reorder', {
+    const res = await fetch('/api/media/news/reorder', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: editableNews }),
     });
-    alert("News sequence saved!");
+
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || 'Reorder failed');
+    }
+
+    alert('News sequence saved!');
     fetchExistingMedia();
   } catch (err) {
-    console.error(err);
+    console.error('Save news changes error:', err);
+    alert('Failed to save news changes');
   } finally {
     setLoading(false);
   }
@@ -1346,181 +1378,209 @@ const saveNewsChanges = async () => {
     )}
 
     {/* --- NEWS TAB --- */}
-    {mediaTab === 'news' && (
-      <div className="management-suite">
-        {/* 1. Upload Form */}
+{mediaTab === 'news' && (
+  <div className="management-suite">
+    {/* 1. Upload Form */}
+    <div
+      className="post-announcement-card"
+      style={{ maxWidth: '100%', marginBottom: '30px' }}
+    >
+      <h3>Post Campus News</h3>
+      <div
+        className="news-form-grid"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '15px',
+          marginTop: '15px',
+        }}
+      >
+        <input
+          type="text"
+          placeholder="News Headline"
+          className="partition-input"
+          value={newsUpload.headline}
+          onChange={(e) =>
+            setNewsUpload({
+              ...newsUpload,
+              headline: e.target.value,
+            })
+          }
+        />
+        <textarea
+          placeholder="Full News Content..."
+          className="partition-input"
+          style={{ minHeight: '120px' }}
+          value={newsUpload.content}
+          onChange={(e) =>
+            setNewsUpload({
+              ...newsUpload,
+              content: e.target.value,
+            })
+          }
+        />
+
+        {/* PREVIEW BLOCK GOES HERE */}
+        {newsUpload.image && (
+          <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+            <p
+              style={{
+                fontSize: '0.8rem',
+                color: '#666',
+                marginBottom: '5px',
+              }}
+            >
+              Banner Preview:
+            </p>
+            <img
+              src={URL.createObjectURL(newsUpload.image)}
+              alt="Preview"
+              style={{
+                width: '100%',
+                maxHeight: '200px',
+                objectFit: 'cover',
+                borderRadius: '8px',
+                border: '1px solid #ddd',
+              }}
+            />
+          </div>
+        )}
+
+        {/* FILE INPUT + BUTTON ROW */}
         <div
-          className="post-announcement-card"
-          style={{ maxWidth: '100%', marginBottom: '30px' }}
+          style={{
+            display: 'flex',
+            gap: '15px',
+            alignItems: 'center',
+          }}
         >
-          <h3>Post Campus News</h3>
-          <div
-            className="news-form-grid"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '15px',
-              marginTop: '15px',
-            }}
+          <input
+            type="file"
+            accept="image/*"
+            id="news-img"
+            hidden
+            onChange={(e) =>
+              setNewsUpload({
+                ...newsUpload,
+                image: e.target.files[0],
+              })
+            }
+          />
+          <label
+            htmlFor="news-img"
+            className="mbm-btn-outline"
+            style={{ cursor: 'pointer' }}
           >
+            {newsUpload.image
+              ? 'Image Selected'
+              : 'Select Banner Image'}
+          </label>
+          <button
+            className="mbm-btn-primary"
+            onClick={handleNewsSubmit}
+            disabled={loading}
+          >
+            {loading ? 'Publishing...' : 'Publish News'}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {/* 2. Management List */}
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+      }}
+    >
+      <h3 style={{ margin: 0 }}>Manage Existing News</h3>
+      <button
+        className="mbm-btn-primary"
+        onClick={saveNewsChanges}
+        style={{ backgroundColor: '#28a745' }}
+      >
+        Save Order & Edits
+      </button>
+    </div>
+
+    <div
+      className="news-admin-list"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '15px',
+      }}
+    >
+      {editableNews.map((item, index) => (
+        <div
+          key={item._id}
+          className="news-admin-card"
+          style={{
+            display: 'flex',
+            gap: '20px',
+            background: '#fff',
+            padding: '15px',
+            borderRadius: '8px',
+            border: '1px solid #eee',
+          }}
+        >
+          <img
+            src={item.imageUrl}
+            style={{
+              width: '120px',
+              height: '80px',
+              objectFit: 'cover',
+              borderRadius: '4px',
+            }}
+            alt=""
+          />
+          <div style={{ flex: 1 }}>
             <input
               type="text"
-              placeholder="News Headline"
-              className="partition-input"
-              value={newsUpload.headline}
-              onChange={(e) =>
-                setNewsUpload({
-                  ...newsUpload,
-                  headline: e.target.value,
-                })
-              }
-            />
-            <textarea
-              placeholder="Full News Content..."
-              className="partition-input"
-              style={{ minHeight: '120px' }}
-              value={newsUpload.content}
-              onChange={(e) =>
-                setNewsUpload({
-                  ...newsUpload,
-                  content: e.target.value,
-                })
-              }
+              className="grid-input"
+              value={item.headline}
+              onChange={(e) => {
+                const updated = [...editableNews];
+                updated[index].headline = e.target.value;
+                setEditableNews(updated);
+              }}
             />
             <div
               style={{
                 display: 'flex',
-                gap: '15px',
-                alignItems: 'center',
+                gap: '10px',
+                marginTop: '10px',
               }}
             >
-              <input
-                type="file"
-                accept="image/*"
-                id="news-img"
-                hidden
-                onChange={(e) =>
-                  setNewsUpload({
-                    ...newsUpload,
-                    image: e.target.files[0],
-                  })
-                }
-              />
-              <label
-                htmlFor="news-img"
-                className="mbm-btn-outline"
-                style={{ cursor: 'pointer' }}
-              >
-                {newsUpload.image
-                  ? 'Image Selected'
-                  : 'Select Banner Image'}
-              </label>
               <button
-                className="mbm-btn-primary"
-                onClick={handleNewsSubmit}
-                disabled={loading}
+                className="mbm-btn-outline"
+                onClick={() => moveNewsItem(index, -1)}
+                disabled={index === 0}
               >
-                {loading ? 'Publishing...' : 'Publish News'}
+                ▲
+              </button>
+              <button
+                className="mbm-btn-outline"
+                onClick={() => moveNewsItem(index, 1)}
+                disabled={index === editableNews.length - 1}
+              >
+                ▼
+              </button>
+              <button
+                className="delete-btn"
+                onClick={() => deleteNewsItem(item._id)}
+              >
+                Delete
               </button>
             </div>
           </div>
         </div>
-
-        {/* 2. Management List */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px',
-          }}
-        >
-          <h3 style={{ margin: 0 }}>Manage Existing News</h3>
-          <button
-            className="mbm-btn-primary"
-            onClick={saveNewsChanges}
-            style={{ backgroundColor: '#28a745' }}
-          >
-            Save Order & Edits
-          </button>
-        </div>
-
-        <div
-          className="news-admin-list"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '15px',
-          }}
-        >
-          {editableNews.map((item, index) => (
-            <div
-              key={item._id}
-              className="news-admin-card"
-              style={{
-                display: 'flex',
-                gap: '20px',
-                background: '#fff',
-                padding: '15px',
-                borderRadius: '8px',
-                border: '1px solid #eee',
-              }}
-            >
-              <img
-                src={item.imageUrl}
-                style={{
-                  width: '120px',
-                  height: '80px',
-                  objectFit: 'cover',
-                  borderRadius: '4px',
-                }}
-                alt=""
-              />
-              <div style={{ flex: 1 }}>
-                <input
-                  type="text"
-                  className="grid-input"
-                  value={item.headline}
-                  onChange={(e) => {
-                    const updated = [...editableNews];
-                    updated[index].headline = e.target.value;
-                    setEditableNews(updated);
-                  }}
-                />
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '10px',
-                    marginTop: '10px',
-                  }}
-                >
-                  <button
-                    className="mbm-btn-outline"
-                    onClick={() => moveNewsItem(index, -1)}
-                    disabled={index === 0}
-                  >
-                    ▲
-                  </button>
-                  <button
-                    className="mbm-btn-outline"
-                    onClick={() => moveNewsItem(index, 1)}
-                    disabled={index === editableNews.length - 1}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => deleteNewsItem(item._id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
+      ))}
+    </div>
+  </div>
+)}
 
     {/* --- MAGAZINE TAB --- */}
     {mediaTab === 'magazine' && (

@@ -830,7 +830,7 @@ const downloadMagazine = () => {
                     {newsData.map((item) => (
                       <div key={item._id} className="news-card" onClick={() => setSelectedNews(item)}>
                         <div className="news-img-wrapper">
-                          <img src={item.image} alt={item.headline} />
+                          <img src={item.imageUrl} alt={item.headline} />
                         </div>
                         <div className="news-info">
                           <h4 className="news-headline">{item.headline}</h4>
