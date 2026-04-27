@@ -150,7 +150,7 @@ const saveGalleryChanges = async () => {
     });
     if (res.ok) {
       alert("Gallery changes saved!");
-      fetchExistingMedia(); // Refresh global state
+      fetchExistingMedia();
     }
   } catch (err) {
     console.error(err);

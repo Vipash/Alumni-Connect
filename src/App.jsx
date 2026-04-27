@@ -283,7 +283,9 @@ useEffect(() => {
       if (Array.isArray(data.gallery) && data.gallery.length > 0) {
         const mapped = data.gallery.map((item) => ({
           img: item.imageUrl,
-          text: item.desc || item.title || '',
+          title: item.title || '', 
+          desc: item.desc || '',
+          text: item.desc || item.title || '', 
         }));
         setGalleryItems(mapped);
       }
