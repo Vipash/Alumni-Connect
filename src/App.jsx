@@ -117,6 +117,7 @@ function App() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [hubSearch, setHubSearch] = useState('');
   const [hubCategory, setHubCategory] = useState('All');
+  const [announcementSearch, setAnnouncementSearch] = useState('');
   const [announcementSubTab, setAnnouncementSubTab] = useState('post');
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentMagPage, setCurrentMagPage] = useState(0); // 0: cover, 1: p1, 2: p2 [cite: 290]
@@ -707,9 +708,13 @@ const downloadMagazine = () => {
 
                       <div className="stack-text-side">
                         <div className="text-content-wrapper">
-                          <h3 className="section-subtitle">Highlights</h3>
+                          {/* Dynamic Subtitle using the title from Admin Dashboard */}
+                          <h3 className="section-subtitle">
+                            {galleryItems[currentGalleryIndex]?.title || "Highlights"}
+                          </h3>
+                          
                           <p className="hero-text-display">
-                            {galleryItems[currentGalleryIndex]?.text || "Loading Highlights..."}
+                            {galleryItems[currentGalleryIndex]?.desc || galleryItems[currentGalleryIndex]?.text || "Loading Details..."}
                           </p>
                         </div>
                       </div>
