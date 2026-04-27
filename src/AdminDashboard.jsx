@@ -113,6 +113,52 @@ function AdminDashboard({ admin, setView, onLogout }) {
   }
 };
 
+  const [editableGallery, setEditableGallery] = useState([]);
+  useEffect(() => {
+    if (existingMedia.gallery) {
+      const sorted = [...existingMedia.gallery].sort((a, b) => (a.order || 0) - (b.order || 0));
+    setEditableGallery(sorted);
+    }
+  }, [existingMedia.gallery]);
+
+  const moveItem = (index, direction) => {
+  const newItems = [...editableGallery];
+  const nextIndex = index + direction;
+  if (nextIndex < 0 || nextIndex >= newItems.length) return;
+
+  // Swap items
+  [newItems[index], newItems[nextIndex]] = [newItems[nextIndex], newItems[index]];
+  
+  // Re-assign order values based on new index
+  const updatedWithOrder = newItems.map((item, idx) => ({ ...item, order: idx }));
+  setEditableGallery(updatedWithOrder);
+};
+
+const handleGalleryTextChange = (id, field, value) => {
+  setEditableGallery(prev => 
+    prev.map(item => item._id === id ? { ...item, [field]: value } : item)
+  );
+};
+
+const saveGalleryChanges = async () => {
+  setLoading(true);
+  try {
+    const res = await fetch('/api/media/gallery/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: editableGallery }),
+    });
+    if (res.ok) {
+      alert("Gallery changes saved!");
+      fetchExistingMedia(); // Refresh global state
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
   const handleBulkUpload = async () => {
     if (selectedFiles.length === 0) return alert("Select images first");
     if (existingMedia.length + selectedFiles.length > MAX_IMAGES) {
@@ -1030,7 +1076,7 @@ function AdminDashboard({ admin, setView, onLogout }) {
 
     {mediaTab === 'gallery' ? (
   <div className="management-suite">
-    {/* Gallery Bulk Upload Card */}
+    {/* 1. Bulk Upload Card (Keep this as is) */}
     <div className="post-announcement-card" style={{ maxWidth: '100%', marginBottom: '30px' }}>
       <h3>Bulk Gallery Upload</h3>
       <p className="limit-text" style={{ fontSize: '0.85rem', color: '#666' }}>
@@ -1058,34 +1104,72 @@ function AdminDashboard({ admin, setView, onLogout }) {
       </div>
     </div>
 
-    {/* Gallery Grid Management */}
-    <div className="media-management-grid">
-      {existingMedia.gallery?.map((item) => (
-        <div key={item._id} className="media-item-card">
-          <div className="media-preview">
-            <img src={item.imageUrl} alt="Gallery" />
+    {/* 2. NEW: Gallery Management Header with Save Button */}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <h3 style={{ margin: 0 }}>Arrange & Edit Gallery</h3>
+      <button 
+        className="mbm-btn-primary" 
+        onClick={saveGalleryChanges} 
+        disabled={loading || !editableGallery.length}
+        style={{ width: 'auto', padding: '10px 25px', backgroundColor: '#28a745' }}
+      >
+        {loading ? "Saving..." : "Save All Changes"}
+      </button>
+    </div>
+
+    {/* 3. UPDATED: Gallery Grid Management */}
+    <div className="media-management-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+      {editableGallery.map((item, index) => (
+        <div key={item._id} className="media-item-card" style={{ background: '#fff', borderRadius: '8px', border: '1px solid #eee', overflow: 'hidden' }}>
+          <div className="media-preview" style={{ position: 'relative' }}>
+            <img src={item.imageUrl} alt="Gallery" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
             <button 
               className="media-delete-overlay" 
               onClick={() => handleDeleteMedia(item._id)}
-              title="Remove Image"
+              style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(220, 53, 69, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '25px', height: '25px', cursor: 'pointer' }}
             >
               ×
             </button>
           </div>
-          <div className="media-details">
+          
+          <div className="media-details" style={{ padding: '15px' }}>
             <input 
               type="text" 
-              defaultValue={item.title} 
-              onBlur={(e) => updateMediaData(item._id, { title: e.target.value })}
+              value={item.title || ""} 
+              onChange={(e) => handleGalleryTextChange(item._id, 'title', e.target.value)}
               placeholder="Event Title"
               className="grid-input"
+              style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
             />
             <textarea 
-              defaultValue={item.desc} 
-              onBlur={(e) => updateMediaData(item._id, { desc: e.target.value })}
+              value={item.desc || ""} 
+              onChange={(e) => handleGalleryTextChange(item._id, 'desc', e.target.value)}
               placeholder="Short description..."
               className="grid-textarea"
+              style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', minHeight: '60px' }}
             />
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '5px' }}>
+                <button 
+                  className="mbm-btn-outline" 
+                  style={{ padding: '2px 10px', fontSize: '14px' }}
+                  onClick={() => moveItem(index, -1)}
+                  disabled={index === 0}
+                >
+                  ▲
+                </button>
+                <button 
+                  className="mbm-btn-outline" 
+                  style={{ padding: '2px 10px', fontSize: '14px' }}
+                  onClick={() => moveItem(index, 1)}
+                  disabled={index === editableGallery.length - 1}
+                >
+                  ▼
+                </button>
+              </div>
+              <span style={{ fontSize: '12px', color: '#999' }}>Pos: {index + 1}</span>
+            </div>
           </div>
         </div>
       ))}

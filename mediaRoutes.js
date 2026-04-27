@@ -16,6 +16,36 @@ router.post('/gallery-update', async (req, res) => {
   }
 });
 
+router.post('/gallery/reorder', async (req, res) => {
+  try {
+    const { items } = req.body; // Expecting an array of { _id, order, title, desc }
+    
+    const updatePromises = items.map(item => 
+      Gallery.findByIdAndUpdate(item._id, { 
+        order: item.order,
+        title: item.title,
+        desc: item.desc
+      })
+    );
+
+    await Promise.all(updatePromises);
+    res.status(200).json({ message: 'Gallery sequence and info updated!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Update failed', error: err.message });
+  }
+});
+
+// Update the GET route to sort by order first
+router.get('/home-data', async (req, res) => {
+  try {
+    const gallery = await Gallery.find().sort({ order: 1, createdAt: -1 });
+    const magazine = await Magazine.findOne();
+    res.json({ gallery, magazine });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.post('/magazine-update', async (req, res) => {
   try {
     const updateData = req.body; // Contains the URLs sent from the frontend
