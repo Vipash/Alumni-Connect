@@ -1,7 +1,7 @@
 // mediaRoutes.js
 const express = require('express');
 const router = express.Router();
-const { Gallery, Magazine } = require('./Media'); 
+const { Gallery, Magazine, News } = require('./Media'); 
 
 // Revised gallery route in mediaRoutes.js
 router.post('/gallery-update', async (req, res) => {
@@ -38,9 +38,10 @@ router.post('/gallery/reorder', async (req, res) => {
 // Update the GET route to sort by order first
 router.get('/home-data', async (req, res) => {
   try {
-    const gallery = await Gallery.find().sort({ order: 1, createdAt: -1 });
+    const gallery = await Gallery.find().sort({ order: 1 });
     const magazine = await Magazine.findOne();
-    res.json({ gallery, magazine });
+    const news = await News.find().sort({ order: 1, date: -1 });
+    res.json({ gallery, magazine, news });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -98,6 +99,57 @@ router.patch('/gallery/:id', async (req, res) => {
   try {
     await Gallery.findByIdAndUpdate(req.params.id, req.body);
     res.json({ message: 'Updated' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST: Add/Update News
+router.post('/news-update', async (req, res) => {
+  try {
+    const newItem = new News(req.body);
+    await newItem.save();
+    res.status(200).json({ message: 'News added!', item: newItem });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST: Bulk Reorder News
+router.post('/news/reorder', async (req, res) => {
+  try {
+    const { items } = req.body;
+    const promises = items.map(item => 
+      News.findByIdAndUpdate(item._id, { 
+        order: item.order, 
+        headline: item.headline, 
+        content: item.content 
+      })
+    );
+    await Promise.all(promises);
+    res.status(200).json({ message: 'News sequence updated' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update the GET home-data to include news
+router.get('/home-data', async (req, res) => {
+  try {
+    const gallery = await Gallery.find().sort({ order: 1 });
+    const magazine = await Magazine.findOne();
+    const news = await News.find().sort({ order: 1, date: -1 }); // Get News
+    res.json({ gallery, magazine, news });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE News
+router.delete('/news/:id', async (req, res) => {
+  try {
+    await News.findByIdAndDelete(req.params.id);
+    res.json({ message: 'News deleted' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

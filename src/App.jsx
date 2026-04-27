@@ -293,6 +293,11 @@ useEffect(() => {
       if (data.magazine) {
         setMagazineData(data.magazine);
       }
+
+      if (Array.isArray(data.news)) {
+        setNewsData(data.news);
+      }
+      
     } catch (err) {
       console.error("Failed to fetch media, using fallbacks.", err);
     }
@@ -816,6 +821,39 @@ const downloadMagazine = () => {
                     </div>
                   )}
                 </section>
+
+                <section className="campus-news-section">
+                  <h2 className="section-title">Campus News</h2>
+                  <div className="news-container">
+                    {newsData.map((item) => (
+                      <div key={item._id} className="news-card" onClick={() => setSelectedNews(item)}>
+                        <div className="news-img-wrapper">
+                          <img src={item.image} alt={item.headline} />
+                        </div>
+                        <div className="news-info">
+                          <h4 className="news-headline">{item.headline}</h4>
+                          <p className="news-excerpt">{item.content.substring(0, 100)}...</p>
+                          <span className="read-more">Read Full Story →</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Mini Window / Modal */}
+                  {selectedNews && (
+                    <div className="news-modal-overlay" onClick={() => setSelectedNews(null)}>
+                      <div className="news-modal-content" onClick={e => e.stopPropagation()}>
+                        <button className="close-modal" onClick={() => setSelectedNews(null)}>×</button>
+                        <img src={selectedNews.image} alt="News" className="modal-banner" />
+                        <h2>{selectedNews.headline}</h2>
+                        <div className="modal-body">
+                          <p>{selectedNews.content}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </section>
+
                   <footer className="landing-footer">
                     © 2026 MBM University Alumni Association |
                     <span
