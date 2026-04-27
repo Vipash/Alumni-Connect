@@ -121,6 +121,8 @@ function App() {
   const [announcementSubTab, setAnnouncementSubTab] = useState('post');
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentMagPage, setCurrentMagPage] = useState(0); // 0: cover, 1: p1, 2: p2 [cite: 290]
+  const [newsData, setNewsData] = useState([]); 
+  const [selectedNews, setSelectedNews] = useState(null);
 
   // Optional: these are not used in App itself; safe to remove if unused
   const [tickers, setTickers] = useState([]);
