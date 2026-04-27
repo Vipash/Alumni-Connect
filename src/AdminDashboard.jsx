@@ -208,10 +208,7 @@ const saveGalleryChanges = async () => {
     }
   };
 
-  const handleMagazineSubmit = async () => {
-  setLoading(true);
-  try {
-    const uploadFile = async (file) => {
+  const uploadFile = async (file) => {
       if (!file) return null;
       const data = new FormData();
       data.append('file', file);
@@ -223,7 +220,10 @@ const saveGalleryChanges = async () => {
       const json = await res.json();
       return json.secure_url;
     };
-
+    
+  const handleMagazineSubmit = async () => {
+  setLoading(true);
+  try {
     // Upload all files first to get their Cloudinary URLs
     const pdfUrl = await uploadFile(magazineUpload.pdf);
     const coverUrl = await uploadFile(magazineUpload.cover);
