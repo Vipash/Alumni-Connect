@@ -365,6 +365,28 @@ const saveNewsChanges = async () => {
   }
 };
 
+const deleteNewsItem = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this news item?")) return;
+  
+  try {
+    const res = await fetch(`/api/media/news/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (res.ok) {
+      alert("News item deleted");
+      // Refresh the list locally
+      setEditableNews(prev => prev.filter(item => item._id !== id));
+    } else {
+      const errorData = await res.json();
+      alert(`Error: ${errorData.error}`);
+    }
+  } catch (err) {
+    console.error("Delete error:", err);
+    alert("Failed to delete news item");
+  }
+};
+
   const fetchAllAdmins = async () => {
     try {
       const res = await fetch('/api/admin/list', { headers: { 'admin-id': adminId } });
