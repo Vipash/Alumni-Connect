@@ -846,7 +846,7 @@ const downloadMagazine = () => {
                     <div className="news-modal-overlay" onClick={() => setSelectedNews(null)}>
                       <div className="news-modal-content" onClick={e => e.stopPropagation()}>
                         <button className="close-modal" onClick={() => setSelectedNews(null)}>×</button>
-                        <img src={selectedNews.image} alt="News" className="modal-banner" />
+                        <img src={selectedNews.imageUrl} alt="News" className="modal-banner" />
                         <h2>{selectedNews.headline}</h2>
                         <div className="modal-body">
                           <p>{selectedNews.content}</p>

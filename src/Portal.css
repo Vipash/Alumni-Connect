@@ -1196,3 +1196,48 @@
     flex: 0 0 200px;
   }
 }
+
+/* 1. Landing Page Strip Scaling */
+.news-img-wrapper {
+  width: 100%;
+  height: 200px; /* Adjust height to match your strip height */
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  background: #f0f0f0;
+}
+
+.news-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This crops the image to fill the space without distortion */
+  display: block;
+}
+
+/* 2. Mini Modal Content Scaling */
+.news-modal-content {
+  width: 90%;
+  max-width: 600px; /* Limits modal width */
+  max-height: 85vh; /* Limits modal height */
+  background: white;
+  border-radius: 12px;
+  overflow-y: auto; /* Adds scroll if content is long */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 3. Modal Banner Scaling */
+.modal-banner {
+  width: 100%;
+  height: auto;
+  max-height: 350px; /* Prevents the image from taking over the whole screen */
+  object-fit: contain; /* Shows the full image without cropping */
+  background: #000; /* Adds black bars if image aspect ratio differs */
+  display: block;
+}
+
+.modal-body {
+  padding: 20px;
+  line-height: 1.6;
+  color: #333;
+}
