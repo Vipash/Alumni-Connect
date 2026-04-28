@@ -1241,3 +1241,40 @@
   line-height: 1.6;
   color: #333;
 }
+
+/* Container for the sub-navigation */
+.sub-tab-nav {
+  display: flex;
+  gap: 10px;
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  width: fit-content;
+}
+
+/* Base button style */
+.sub-tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover state */
+.sub-tab-btn:hover {
+  background: rgba(0, 123, 255, 0.05);
+  color: #007bff;
+}
+
+/* Active/Selected state */
+.sub-tab-btn.active {
+  background: #007bff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
