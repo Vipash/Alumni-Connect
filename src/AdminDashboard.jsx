@@ -1514,70 +1514,66 @@ const saveNewsChanges = async () => {
       }}
     >
       {editableNews.map((item, index) => (
-        <div
-          key={item._id}
-          className="news-admin-card"
-          style={{
-            display: 'flex',
-            gap: '20px',
-            background: '#fff',
-            padding: '15px',
-            borderRadius: '8px',
-            border: '1px solid #eee',
-          }}
-        >
-          <img
-            src={item.imageUrl}
-            style={{
-              width: '120px',
-              height: '80px',
-              objectFit: 'cover',
-              borderRadius: '4px',
-            }}
-            alt=""
-          />
-          <div style={{ flex: 1 }}>
-            <input
-              type="text"
-              className="grid-input"
-              value={item.headline}
-              onChange={(e) => {
-                const updated = [...editableNews];
-                updated[index].headline = e.target.value;
-                setEditableNews(updated);
-              }}
-            />
-            <div
-              style={{
-                display: 'flex',
-                gap: '10px',
-                marginTop: '10px',
-              }}
-            >
-              <button
-                className="mbm-btn-outline"
-                onClick={() => moveNewsItem(index, -1)}
-                disabled={index === 0}
-              >
-                ▲
-              </button>
-              <button
-                className="mbm-btn-outline"
-                onClick={() => moveNewsItem(index, 1)}
-                disabled={index === editableNews.length - 1}
-              >
-                ▼
-              </button>
-              <button
-                className="delete-btn"
-                onClick={() => deleteNewsItem(item._id)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      ))}
+  <div key={item._id} className="news-admin-card" style={{ display: 'flex', gap: '20px', background: '#fff', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+      <img
+        src={item.imageUrl} // Strict naming
+        style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
+        alt=""
+      />
+      {/* ADDED: Change image for existing item */}
+      <input 
+        type="file" 
+        accept="image/*" 
+        id={`update-img-${index}`} 
+        hidden 
+        onChange={async (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const url = await uploadFile(file);
+            const updated = [...editableNews];
+            updated[index].imageUrl = url;
+            setEditableNews(updated);
+          }
+        }}
+      />
+      <label htmlFor={`update-img-${index}`} className="mbm-btn-outline" style={{ fontSize: '10px', padding: '2px 5px', cursor: 'pointer' }}>
+        Change Image
+      </label>
+    </div>
+
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <input
+        type="text"
+        className="grid-input"
+        placeholder="Headline"
+        value={item.headline}
+        onChange={(e) => {
+          const updated = [...editableNews];
+          updated[index].headline = e.target.value;
+          setEditableNews(updated);
+        }}
+      />
+      {/* ADDED: Description editor for existing news */}
+      <textarea
+        className="grid-input"
+        style={{ minHeight: '60px', fontSize: '0.85rem', padding: '8px' }}
+        placeholder="News Content"
+        value={item.content}
+        onChange={(e) => {
+          const updated = [...editableNews];
+          updated[index].content = e.target.value;
+          setEditableNews(updated);
+        }}
+      />
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <button className="mbm-btn-outline" onClick={() => moveNewsItem(index, -1)} disabled={index === 0}>▲</button>
+        <button className="mbm-btn-outline" onClick={() => moveNewsItem(index, 1)} disabled={index === editableNews.length - 1}>▼</button>
+        <button className="delete-btn" onClick={() => deleteNewsItem(item._id)}>Delete</button>
+      </div>
+    </div>
+  </div>
+))}
     </div>
   </div>
 )}

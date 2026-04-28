@@ -123,11 +123,12 @@ router.post('/news/reorder', async (req, res) => {
       News.findByIdAndUpdate(item._id, { 
         order: item.order, 
         headline: item.headline, 
-        content: item.content 
+        content: item.content,
+        imageUrl: item.imageUrl
       })
     );
     await Promise.all(promises);
-    res.status(200).json({ message: 'News sequence updated' });
+    res.status(200).json({ message: 'News sequence and details updated' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
