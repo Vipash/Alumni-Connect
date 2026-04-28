@@ -267,6 +267,29 @@ const saveGalleryChanges = async () => {
     });
   };
 
+  const handleDeleteMedia = async (id) => {
+  if (!window.confirm("Are you sure you want to remove this image from the gallery?")) return;
+
+  try {
+    const res = await fetch(`/api/media/gallery/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (res.ok) {
+      // Update the local state so the image disappears immediately
+      setExistingMedia(prev => ({
+        ...prev,
+        gallery: prev.gallery.filter(item => item._id !== id)
+      }));
+      alert("Image removed from gallery");
+    } else {
+      alert("Failed to delete image");
+    }
+  } catch (err) {
+    console.error("Gallery delete error:", err);
+  }
+};
+
   const fetchTickets = async () => {
     try {
       const res = await fetch('/api/admin/support-tickets');
