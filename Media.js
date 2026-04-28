@@ -18,9 +18,9 @@ const MagazineSchema = new mongoose.Schema({
 });
 
 const NewsSchema = new mongoose.Schema({
-  image: String,
+  imageUrl: String,
   headline: String,
-  content: String, // Full news details
+  content: String,
   date: { type: Date, default: Date.now },
   order: { type: Number, default: 0 }
 });

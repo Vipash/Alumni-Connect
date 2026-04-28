@@ -276,36 +276,36 @@ const [galleryItems, setGalleryItems] = useState([
 const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
 const [magazineData, setMagazineData] = useState(null); // To store DB magazine URLs
 
-useEffect(() => {
-  const fetchMedia = async () => {
-    try {
-      const response = await fetch('/api/media/home-data');
-      const data = await response.json();
+  useEffect(() => {
+    const fetchMedia = async () => {
+      try {
+        const response = await fetch('/api/media/home-data');
+        const data = await response.json();
 
-      if (Array.isArray(data.gallery) && data.gallery.length > 0) {
-        const mapped = data.gallery.map((item) => ({
-          img: item.imageUrl,
-          title: item.title || '', 
-          desc: item.desc || '',
-          text: item.desc || item.title || '', 
-        }));
-        setGalleryItems(mapped);
-      }
-      
-      if (data.magazine) {
-        setMagazineData(data.magazine);
-      }
+        if (Array.isArray(data.gallery) && data.gallery.length > 0) {
+          const mapped = data.gallery.map((item) => ({
+            img: item.imageUrl,
+            title: item.title || '', 
+            desc: item.desc || '',
+            text: item.desc || item.title || '', 
+          }));
+          setGalleryItems(mapped);
+        }
+        
+        if (data.magazine) {
+          setMagazineData(data.magazine);
+        }
 
-      if (Array.isArray(data.news)) {
-        setNewsData(data.news);
+        if (Array.isArray(data.news)) {
+          setNewsData(data.news);
+        }
+        
+      } catch (err) {
+        console.error("Failed to fetch media, using fallbacks.", err);
       }
-      
-    } catch (err) {
-      console.error("Failed to fetch media, using fallbacks.", err);
-    }
-  };
-  fetchMedia();
-}, []);
+    };
+    fetchMedia();
+  }, []);
 
 useEffect(() => {
   if (galleryItems.length <= 1) return; // Don't rotate if only 1 image
