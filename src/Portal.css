@@ -1278,3 +1278,36 @@
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
+
+/* Base style for all sub-tab buttons to remove the 'greyish' default look */
+button[className*='sel'], 
+.news-admin-card button,
+.sub-tab-nav button {
+    padding: 10px 18px;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    color: #555;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* The 'Selected' state fix */
+.sel {
+    background: #007bff !important; /* MBM Blue */
+    color: #ffffff !important;
+    border-color: #007bff !important;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+}
+
+/* Hover state for buttons that are NOT selected */
+button:hover:not(.sel) {
+    background: #f8f9fa;
+    border-color: #007bff;
+    color: #007bff;
+}
