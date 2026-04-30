@@ -1311,3 +1311,42 @@ button:hover:not(.sel) {
     border-color: #007bff;
     color: #007bff;
 }
+
+/* Target all buttons within your toolbars to fix the grey/default look */
+.content-toolbar button {
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  background: #ffffff; /* Forces out the default grey */
+  color: #444;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure the hover effect is consistent for all non-selected buttons */
+.content-toolbar button:hover:not(.sel) {
+  background: #f0f7ff;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+/* The "Selected" state - using !important to override any remaining grey defaults */
+.content-toolbar button.sel {
+  background: #007bff !important;
+  color: #ffffff !important;
+  border-color: #007bff !important;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+/* Secondary toolbar specific (optional: make it look slightly different) */
+.secondary-subtabs {
+  padding: 8px;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+}
