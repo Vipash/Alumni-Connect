@@ -31,30 +31,6 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const [scrollOpacity, setScrollOpacity] = useState(1);
-const [hasPopped, setHasPopped] = useState(false);
-
-useEffect(() => {
-  const handleScroll = () => {
-    const scrollY = window.scrollY;
-    const threshold = 500; // Point where hero is fully gone
-
-    // Calculate opacity (1 at top, 0 at threshold)
-    const newOpacity = Math.max(0, 1 - scrollY / threshold);
-    setScrollOpacity(newOpacity);
-
-    // Trigger the "Pop" when the lower part is fully up
-    if (scrollY > threshold && !hasPopped) {
-      setHasPopped(true);
-    } else if (scrollY < threshold && hasPopped) {
-      setHasPopped(false);
-    }
-  };
-
-  window.addEventListener('scroll', handleScroll);
-  return () => window.removeEventListener('scroll', handleScroll);
-}, [hasPopped]);
-
 // Public ticker section on landing page
 const TickerSection = () => {
   const [liveTickers, setLiveTickers] = useState([]);
@@ -164,6 +140,30 @@ function App() {
     password: '',
     displayName: '',
   });
+
+  const [scrollOpacity, setScrollOpacity] = useState(1);
+const [hasPopped, setHasPopped] = useState(false);
+
+useEffect(() => {
+  const handleScroll = () => {
+    const scrollY = window.scrollY;
+    const threshold = 500; // Point where hero is fully gone
+
+    // Calculate opacity (1 at top, 0 at threshold)
+    const newOpacity = Math.max(0, 1 - scrollY / threshold);
+    setScrollOpacity(newOpacity);
+
+    // Trigger the "Pop" when the lower part is fully up
+    if (scrollY > threshold && !hasPopped) {
+      setHasPopped(true);
+    } else if (scrollY < threshold && hasPopped) {
+      setHasPopped(false);
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, [hasPopped]);
 
   // --- MAP SEARCH HANDLER ---
   const handleMapSearch = async () => {
