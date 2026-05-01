@@ -690,7 +690,7 @@ const downloadMagazine = () => {
     view.startsWith('login-') ||
     view.startsWith('reg-')) && (
     <>
-    
+
       {/* FIXED HERO as background */}
 <header
   className="hero-section"
@@ -739,216 +739,229 @@ const downloadMagazine = () => {
         }}
       >
         <section className={`portal-info-section ${hasPopped ? 'content-pop' : ''}`}>
-          <section className="campus-hero-full-width compact">
-            {galleryItems.length > 0 ? (
-              <div className="campus-hero-stack-container">
-                <div className="stack-visual-wrapper">
-                  <div className="stack-visual-area compact-height">
-                    {galleryItems.map((item, index) => {
-                      let position = 'stack-hidden';
-                      if (index === currentGalleryIndex) position = 'stack-active';
-                      else if (
-                        index ===
-                        (currentGalleryIndex - 1 + galleryItems.length) %
-                          galleryItems.length
-                      )
-                        position = 'stack-prev';
-                      else if (
-                        index === (currentGalleryIndex + 1) % galleryItems.length
-                      )
-                        position = 'stack-next';
 
-                      return (
-                        <div
-                          key={index}
-                          className={`stack-card ${position}`}
-                        >
-                          <img src={item.img} alt="Campus" />
-                        </div>
-                      );
-                    })}
-                  </div>
+  {/* --- STRIP 1: CAMPUS GALLERY --- */}
+  <section className="campus-hero-full-width compact">
+    {galleryItems.length > 0 ? (
+      <div className="campus-hero-stack-container">
+        {/* Visual Stack Area */}
+        <div className="stack-visual-wrapper">
+          <div className="stack-visual-area compact-height">
+            {galleryItems.map((item, index) => {
+              let position = 'stack-hidden';
+              if (index === currentGalleryIndex) position = 'stack-active';
+              else if (
+                index ===
+                (currentGalleryIndex - 1 + galleryItems.length) %
+                  galleryItems.length
+              )
+                position = 'stack-prev';
+              else if (
+                index === (currentGalleryIndex + 1) % galleryItems.length
+              )
+                position = 'stack-next';
 
-                  <div className="stack-nav-cluster">
-                    <button onClick={handlePrev} className="stack-icon-btn">
-                      ❮
-                    </button>
-                    <button
-                      className="view-gallery-btn"
-                      onClick={() => setIsGalleryOpen(true)}
-                    >
-                      View Gallery
-                    </button>
-                    <button onClick={handleNext} className="stack-icon-btn">
-                      ❯
-                    </button>
-                  </div>
-
-                  <div className="stack-dots">
-                    {galleryItems.map((_, index) => (
-                      <span
-                        key={index}
-                        className={`stack-dot ${
-                          index === currentGalleryIndex ? 'active' : ''
-                        }`}
-                      />
-                    ))}
-                  </div>
+              return (
+                <div key={index} className={`stack-card ${position}`}>
+                  <img src={item.img} alt="Campus" />
                 </div>
+              );
+            })}
+          </div>
 
-                <div className="stack-text-side">
-                  <div className="text-content-wrapper">
-                    <h3 className="section-subtitle">
-                      {galleryItems[currentGalleryIndex]?.title || 'Highlights'}
-                    </h3>
+          <div className="stack-nav-cluster">
+            <button onClick={handlePrev} className="stack-icon-btn">
+              ❮
+            </button>
+            <button
+              className="view-gallery-btn"
+              onClick={() => setIsGalleryOpen(true)}
+            >
+              View Gallery
+            </button>
+            <button onClick={handleNext} className="stack-icon-btn">
+              ❯
+            </button>
+          </div>
 
-                    <p className="hero-text-display">
-                      {galleryItems[currentGalleryIndex]?.desc ||
-                        galleryItems[currentGalleryIndex]?.text ||
-                        'Loading Details...'}
-                    </p>
-                  </div>
-                </div>
+          <div className="stack-dots">
+            {galleryItems.map((_, index) => (
+              <span
+                key={index}
+                className={`stack-dot ${
+                  index === currentGalleryIndex ? 'active' : ''
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Text Area */}
+        <div className="stack-text-side">
+          <div className="text-content-wrapper">
+            <h3 className="section-subtitle">
+              {galleryItems[currentGalleryIndex]?.title || 'Highlights'}
+            </h3>
+            <p className="hero-text-display">
+              {galleryItems[currentGalleryIndex]?.desc ||
+                galleryItems[currentGalleryIndex]?.text ||
+                'Loading Details...'}
+            </p>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div
+        className="loading-placeholder"
+        style={{
+          color: 'white',
+          textAlign: 'center',
+          padding: '50px',
+        }}
+      >
+        <p>Loading Campus Highlights...</p>
+      </div>
+    )}
+
+    {/* MODAL VIEW: Opens when View Gallery is clicked */}
+    {isGalleryOpen && (
+      <div className="gallery-modal-overlay">
+        <div className="gallery-modal-content">
+          <button
+            className="close-modal"
+            onClick={() => setIsGalleryOpen(false)}
+          >
+            ×
+          </button>
+          <h2>Campus Gallery</h2>
+          <div className="gallery-grid-full">
+            {galleryData.map((item, index) => (
+              <img
+                key={index}
+                src={item.imageUrl}
+                alt={item.title}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+  </section>
+
+  {/* --- STRIP 2: ALUMNI MAGAZINE (New Layout) --- */}
+  <section
+    className="campus-hero-full-width magazine-strip"
+    style={{ backgroundColor: '#3d2069' }}
+  >
+    <div className="campus-hero-stack-container reverse-layout">
+      {/* Text Area */}
+      <div className="stack-text-side">
+        <div className="text-content-wrapper">
+          <h3 className="section-subtitle">ALUMNI MAGAZINE</h3>
+          <p className="hero-text-display">
+            Dive into the latest editions of our campus chronicles.
+            Stories of success, research breakthroughs, and nostalgic
+            walks down memory lane.
+          </p>
+          <div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              className="view-gallery-btn"
+              style={{ background: '#d4af37', color: '#1a1a1a' }}
+              onClick={() => setIsMagOpen(true)}
+            >
+              Read Latest Edition
+            </button>
+            <button
+              className="view-gallery-btn"
+              style={{ background: '#ffffff', color: '#3d2069' }}
+              onClick={downloadMagazine}
+            >
+              Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Visual Stack Area (Magazine Covers) */}
+      <div className="stack-visual-wrapper">
+        <div className="stack-visual-area compact-height">
+          {[
+            magazineData?.coverUrl || '/mag-cover.jpg',
+            magazineData?.p1Url || '/mag-page1.jpg',
+            magazineData?.p2Url || '/mag-page2.jpg',
+          ].map((imgUrl, index) => {
+            let positionClass = 'stack-card stack-hidden';
+            if (index === currentMagPage) {
+              positionClass = 'stack-card stack-active';
+            } else if (index === (currentMagPage + 1) % 3) {
+              positionClass = 'stack-card stack-next';
+            } else if (index === (currentMagPage + 2) % 3) {
+              positionClass = 'stack-card stack-prev';
+            }
+
+            return (
+              <div key={index} className={positionClass}>
+                <img
+                  src={imgUrl}
+                  alt={`Magazine Page ${index + 1}`}
+                  style={{ objectFit: 'contain' }}
+                />
+                {index === 0 && (
+                  <div className="mag-badge">New Issue</div>
+                )}
               </div>
-            ) : (
-              <div
-                className="loading-placeholder"
-                style={{
-                  color: 'white',
-                  textAlign: 'center',
-                  padding: '50px',
-                }}
-              >
-                <p>Loading Campus Highlights...</p>
-              </div>
-            )}
+            );
+          })}
+        </div>
 
-            {/* MODAL VIEW: Opens when View Gallery is clicked */}
-            {isGalleryOpen && (
-              <div className="gallery-modal-overlay">
-                <div className="gallery-modal-content">
-                  <button
-                    className="close-modal"
-                    onClick={() => setIsGalleryOpen(false)}
-                  >
-                    ×
-                  </button>
-                  <h2>Campus Gallery</h2>
-                  <div className="gallery-grid-full">
-                    {galleryData.map((item, index) => (
-                      <img
-                        key={index}
-                        src={item.imageUrl}
-                        alt={item.title}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
+        {/* Navigation for magazine stack */}
+        <div className="stack-nav-cluster mag-stack-nav">
+          <button
+            onClick={() =>
+              setCurrentMagPage((prev) => (prev === 0 ? 2 : prev - 1))
+            }
+            className="stack-icon-btn"
+          >
+            ❮
+          </button>
+          <button
+            onClick={() =>
+              setCurrentMagPage((prev) => (prev === 2 ? 0 : prev + 1))
+            }
+            className="stack-icon-btn"
+          >
+            ❯
+          </button>
+        </div>
+      </div>
+    </div>
 
-          <section className="magazine-hero-section">
-            <div className="magazine-container">
-              <div className="magazine-visual-stack">
-                {[
-                  magazineData?.coverUrl || '/mag-cover.jpg',
-                  magazineData?.p1Url || '/mag-page1.jpg',
-                  magazineData?.p2Url || '/mag-page2.jpg',
-                ].map((imgUrl, index) => {
-                  let positionClass = 'mag-page';
-
-                  if (index === currentMagPage) {
-                    positionClass += ' page-1'; // Front
-                  } else if (index === (currentMagPage + 1) % 3) {
-                    positionClass += ' page-2'; // Middle
-                  } else {
-                    positionClass += ' page-3'; // Back
-                  }
-
-                  return (
-                    <div key={index} className={positionClass}>
-                      <img src={imgUrl} alt={`Magazine Page ${index}`} />
-                      {index === 0 && (
-                        <div className="mag-badge">New Issue</div>
-                      )}
-                    </div>
-                  );
-                })}
-
-                <div className="mag-stack-nav">
-                  <button
-                    onClick={() =>
-                      setCurrentMagPage((prev) => (prev === 0 ? 2 : prev - 1))
-                    }
-                    className="mag-nav-btn prev"
-                  >
-                    ❮
-                  </button>
-                  <button
-                    onClick={() =>
-                      setCurrentMagPage((prev) => (prev === 2 ? 0 : prev + 1))
-                    }
-                    className="mag-nav-btn next"
-                  >
-                    ❯
-                  </button>
-                </div>
-              </div>
-
-              <div className="magazine-info">
-                <h3 className="section-subtitle">E-Magazine</h3>
-                <h2>The Alumni Connect</h2>
-                <p>
-                  Explore the latest breakthroughs in research, campus life,
-                  and student achievements in our monthly digital edition.
-                </p>
-                <div className="magazine-actions">
-                  <button
-                    className="mag-btn primary"
-                    onClick={() => setIsMagOpen(true)}
-                  >
-                    View Online
-                  </button>
-                  <button
-                    className="mag-btn primary"
-                    onClick={downloadMagazine}
-                  >
-                    Download PDF
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* PDF Viewer Modal */}
-            {isMagOpen && (
-              <div
-                className="mag-modal-overlay"
-                onClick={() => setIsMagOpen(false)}
-              >
-                <div
-                  className="mag-modal-content"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    className="close-mag"
-                    onClick={() => setIsMagOpen(false)}
-                  >
-                    ×
-                  </button>
-                  <iframe
-                    src={`${
-                      magazineData?.pdfUrl || '/magazine.pdf'
-                    }#toolbar=0`}
-                    title="Magazine Viewer"
-                    width="100%"
-                    height="100%"
-                  ></iframe>
-                </div>
-              </div>
-            )}
-          </section>
-
+    {/* PDF Viewer Modal */}
+    {isMagOpen && (
+      <div
+        className="mag-modal-overlay"
+        onClick={() => setIsMagOpen(false)}
+      >
+        <div
+          className="mag-modal-content"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="close-mag"
+            onClick={() => setIsMagOpen(false)}
+          >
+            ×
+          </button>
+          <iframe
+            src={`${magazineData?.pdfUrl || '/magazine.pdf'}#toolbar=0`}
+            title="Magazine Viewer"
+            width="100%"
+            height="100%"
+          ></iframe>
+        </div>
+      </div>
+    )}
+  </section>
           <section className="campus-news-section">
             <h2 className="section-title">Campus News</h2>
             <div className="news-container">

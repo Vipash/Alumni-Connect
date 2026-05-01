@@ -328,7 +328,8 @@ background: linear-gradient(
       rgba(72, 148, 255, 0.738)
     ),
     url('/university-background.png');
-  background-size: cover;
+  background-size: cover !important; 
+  background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   
@@ -445,38 +446,23 @@ background: linear-gradient(
 .magazine-hero-section,
 .news-strip,
 .footer-strip {
-  background-color: var(--mbm-violet) !important;
-  color: white !important;
+  background-color: var(--mbm-violet);
+  color: white;
+  padding: 60px 5%;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
 }
 
 /* The first section of the portal info */
 .portal-info-section {
   position: relative;
   z-index: 10;
-  background: #ffffff; /* Restore white background here */
-  padding: 80px 5% 120px 5%;
+  background: #ffffff;
+  padding: 0; /* Remove padding here so strips touch each other */
   display: flex;
   flex-direction: column;
-  gap: 40px;
-}
-
-/* Pop animation when section becomes active (via scrollData.popped) */
-.section-pop-active {
-  animation: revealPop 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@keyframes revealPop {
-  0% {
-    transform: translateY(100px) scale(0.95);
-    opacity: 0;
-  }
-  60% {
-    transform: translateY(-10px) scale(1.02);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
+  width: 100%;
 }
 
 /* Improve Gallery Card contrast against Violet */
