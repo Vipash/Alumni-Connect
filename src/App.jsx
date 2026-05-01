@@ -698,7 +698,7 @@ const downloadMagazine = () => {
           transform: `scale(${scrollData.scale})`,
           position: 'fixed',
           zIndex: 1,
-          pointerEvents: scrollOpacity < 0.1 ? 'none' : 'auto'
+          pointerEvents: scrollOpacity < 0.1 ? 'none' : 'auto',
           top: 0,
           left: 0,
           right: 0,
