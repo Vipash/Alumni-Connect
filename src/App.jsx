@@ -691,31 +691,45 @@ const downloadMagazine = () => {
     view.startsWith('reg-')) && (
     <>
       {/* FIXED HERO as background */}
-      <header
-        className="hero-section"
-        style={{
-          opacity: scrollOpacity,
-          transform: `scale(${0.85 + (scrollOpacity * 0.15)})`,
-          position: 'fixed',
-          zIndex: 1,
-          pointerEvents: scrollOpacity < 0.1 ? 'none' : 'auto',
-          top: 0,
-          left: 0,
-          right: 0,
-        }}
-      >
-        <div className="hero-content">
-          <img
-            src="/MBM_Logo.png"
-            alt="Floating Logo"
-            className="floating-logo"
-          />
-          <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
-          <p className="hero-subtitle">
-            Bridging Generations of Excellence
-          </p>
-        </div>
-      </header>
+      {/* FIXED HERO as background */}
+<header
+  className="hero-section"
+  style={{
+    opacity: scrollOpacity,
+    transform: `scale(${0.85 + (scrollOpacity * 0.15)})`,
+    position: 'fixed',
+    zIndex: 1,
+    pointerEvents: scrollOpacity < 0.1 ? 'none' : 'auto',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center', // Centers vertically
+    alignItems: 'center',     // Centers horizontally
+    backgroundImage: "url('/university-background.png')",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundColor: '#fff'    // Fallback color
+  }}
+>
+  <div className="hero-content" style={{ textAlign: 'center' }}>
+    <img
+      src="/MBM_Logo.png"
+      alt="Floating Logo"
+      className="floating-logo"
+      style={{ margin: '0 auto 20px auto', display: 'block' }}
+    />
+    <h1 className="hero-title" style={{ color: '#4c2882', margin: 0 }}>
+      MBM ALUMNI CONNECT
+    </h1>
+    <p className="hero-subtitle" style={{ color: '#555' }}>
+      Bridging Generations of Excellence
+    </p>
+  </div>
+</header>
 
       {/* EVERYTHING that scrolls goes inside this wrapper */}
       <div
