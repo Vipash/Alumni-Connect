@@ -690,13 +690,12 @@ const downloadMagazine = () => {
     view.startsWith('login-') ||
     view.startsWith('reg-')) && (
     <>
-      {/* FIXED HERO as background */}
+    
       {/* FIXED HERO as background */}
 <header
   className="hero-section"
   style={{
     opacity: scrollOpacity,
-    transform: `scale(${0.85 + (scrollOpacity * 0.15)})`,
     position: 'fixed',
     zIndex: 1,
     pointerEvents: scrollOpacity < 0.1 ? 'none' : 'auto',
@@ -704,28 +703,27 @@ const downloadMagazine = () => {
     left: 0,
     right: 0,
     height: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center', // Centers vertically
-    alignItems: 'center',     // Centers horizontally
-    backgroundImage: "url('/university-background.png')",
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    backgroundColor: '#fff'    // Fallback color
   }}
 >
-  <div className="hero-content" style={{ textAlign: 'center' }}>
+  {/* Wrap content in a div to scale the logo/text WITHOUT scaling the background image */}
+  <div 
+    className="hero-content" 
+    style={{ 
+      textAlign: 'center',
+      transform: `scale(${0.95 + (scrollOpacity * 0.05)})`, // Very subtle scale (95% to 100%)
+      transition: 'transform 0.1s ease-out'
+    }}
+  >
     <img
       src="/MBM_Logo.png"
-      alt="Floating Logo"
+      alt="Logo"
       className="floating-logo"
       style={{ margin: '0 auto 20px auto', display: 'block' }}
     />
     <h1 className="hero-title" style={{ color: '#4c2882', margin: 0 }}>
       MBM ALUMNI CONNECT
     </h1>
-    <p className="hero-subtitle" style={{ color: '#555' }}>
+    <p className="hero-subtitle" style={{ color: '#333', fontWeight: '500' }}>
       Bridging Generations of Excellence
     </p>
   </div>
