@@ -694,10 +694,11 @@ const downloadMagazine = () => {
       <header
         className="hero-section"
         style={{
-          opacity: scrollData.opacity,
+          opacity: scrollOpacity,
           transform: `scale(${scrollData.scale})`,
           position: 'fixed',
           zIndex: 1,
+          pointerEvents: scrollOpacity < 0.1 ? 'none' : 'auto'
           top: 0,
           left: 0,
           right: 0,
@@ -725,11 +726,7 @@ const downloadMagazine = () => {
           marginTop: '100vh',
         }}
       >
-        <section
-          className={`portal-info-section ${
-            scrollData.popped ? 'section-pop-active' : ''
-          }`}
-        >
+        <section className={`portal-info-section ${hasPopped ? 'content-pop' : ''}`}>
           <section className="campus-hero-full-width compact">
             {galleryItems.length > 0 ? (
               <div className="campus-hero-stack-container">
