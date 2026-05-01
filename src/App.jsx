@@ -31,6 +31,30 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
+const [scrollOpacity, setScrollOpacity] = useState(1);
+const [hasPopped, setHasPopped] = useState(false);
+
+useEffect(() => {
+  const handleScroll = () => {
+    const scrollY = window.scrollY;
+    const threshold = 500; // Point where hero is fully gone
+
+    // Calculate opacity (1 at top, 0 at threshold)
+    const newOpacity = Math.max(0, 1 - scrollY / threshold);
+    setScrollOpacity(newOpacity);
+
+    // Trigger the "Pop" when the lower part is fully up
+    if (scrollY > threshold && !hasPopped) {
+      setHasPopped(true);
+    } else if (scrollY < threshold && hasPopped) {
+      setHasPopped(false);
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, [hasPopped]);
+
 // Public ticker section on landing page
 const TickerSection = () => {
   const [liveTickers, setLiveTickers] = useState([]);
@@ -661,226 +685,341 @@ const downloadMagazine = () => {
           </div>
 
           <main className="content-body">
-            {(view === 'home' ||
-              view === 'login-choice' ||
-              view.startsWith('login-') ||
-              view.startsWith('reg-')) && (
-              <>
-                <header className="hero-section">
-                  <div className="hero-content">
-                    <img
-                      src="/MBM_Logo.png"
-                      alt="Floating Logo"
-                      className="floating-logo"
-                    />
-                    <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
-                    <p className="hero-subtitle">
-                      Bridging Generations of Excellence
-                    </p>
-                  </div>
-                </header>
-                <section className="portal-info-section">
-                  <section className="campus-hero-full-width compact">
-                    {galleryItems.length > 0 ? (
-                    <div className="campus-hero-stack-container">
-                      
-                      <div className="stack-visual-wrapper">
-                        <div className="stack-visual-area compact-height">
-                          {galleryItems.map((item, index) => {
-                            let position = "stack-hidden";
-                            if (index === currentGalleryIndex) position = "stack-active";
-                            else if (index === (currentGalleryIndex - 1 + galleryItems.length) % galleryItems.length) position = "stack-prev";
-                            else if (index === (currentGalleryIndex + 1) % galleryItems.length) position = "stack-next";
+  {(view === 'home' ||
+    view === 'login-choice' ||
+    view.startsWith('login-') ||
+    view.startsWith('reg-')) && (
+    <>
+      {/* FIXED HERO as background */}
+      <header
+        className="hero-section"
+        style={{
+          opacity: scrollData.opacity,
+          transform: `scale(${scrollData.scale})`,
+          position: 'fixed',
+          zIndex: 1,
+          top: 0,
+          left: 0,
+          right: 0,
+        }}
+      >
+        <div className="hero-content">
+          <img
+            src="/MBM_Logo.png"
+            alt="Floating Logo"
+            className="floating-logo"
+          />
+          <h1 className="hero-title">MBM ALUMNI CONNECT</h1>
+          <p className="hero-subtitle">
+            Bridging Generations of Excellence
+          </p>
+        </div>
+      </header>
 
-                            return (
-                              <div key={index} className={`stack-card ${position}`}>
-                                <img src={item.img} alt="Campus" />
-                              </div>
-                            );
-                          })}
+      {/* EVERYTHING that scrolls goes inside this wrapper */}
+      <div
+        className="scrollable-content-wrapper"
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          marginTop: '100vh',
+        }}
+      >
+        <section
+          className={`portal-info-section ${
+            scrollData.popped ? 'section-pop-active' : ''
+          }`}
+        >
+          <section className="campus-hero-full-width compact">
+            {galleryItems.length > 0 ? (
+              <div className="campus-hero-stack-container">
+                <div className="stack-visual-wrapper">
+                  <div className="stack-visual-area compact-height">
+                    {galleryItems.map((item, index) => {
+                      let position = 'stack-hidden';
+                      if (index === currentGalleryIndex) position = 'stack-active';
+                      else if (
+                        index ===
+                        (currentGalleryIndex - 1 + galleryItems.length) %
+                          galleryItems.length
+                      )
+                        position = 'stack-prev';
+                      else if (
+                        index === (currentGalleryIndex + 1) % galleryItems.length
+                      )
+                        position = 'stack-next';
+
+                      return (
+                        <div
+                          key={index}
+                          className={`stack-card ${position}`}
+                        >
+                          <img src={item.img} alt="Campus" />
                         </div>
-
-                        <div className="stack-nav-cluster">
-                          <button onClick={handlePrev} className="stack-icon-btn">❮</button>
-                          <button className="view-gallery-btn" onClick={() => setIsGalleryOpen(true)}>
-                            View Gallery
-                          </button>
-                          <button onClick={handleNext} className="stack-icon-btn">❯</button>
-                        </div>
-
-                        <div className="stack-dots">
-                          {galleryItems.map((_, index) => (
-                            <span key={index} className={`stack-dot ${index === currentGalleryIndex ? 'active' : ''}`} />
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="stack-text-side">
-                        <div className="text-content-wrapper">
-                          {/* Dynamic Subtitle using the title from Admin Dashboard */}
-                          <h3 className="section-subtitle">
-                            {galleryItems[currentGalleryIndex]?.title || "Highlights"}
-                          </h3>
-                          
-                          <p className="hero-text-display">
-                            {galleryItems[currentGalleryIndex]?.desc || galleryItems[currentGalleryIndex]?.text || "Loading Details..."}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    ) : (
-                      <div className="loading-placeholder" style={{ color: 'white', textAlign: 'center', padding: '50px' }}>
-                        <p>Loading Campus Highlights...</p>
-                      </div>
-                    )}
-
-                    {/* MODAL VIEW: Opens when View Gallery is clicked */}
-                    {isGalleryOpen && (
-                      <div className="gallery-modal-overlay">
-                        <div className="gallery-modal-content">
-                          <button className="close-modal" onClick={() => setIsGalleryOpen(false)}>×</button>
-                          <h2>Campus Gallery</h2>
-                          <div className="gallery-grid-full">
-                            {galleryData.map((item, index) => (
-                              <img key={index} src={item.imageUrl} alt={item.title} />
-                            ))}
-                          </div>
-                       </div>
-                      </div>
-                    )}
-                  </section>
-                  
-                 <section className="magazine-hero-section">
-                  <div className="magazine-container">
-                    <div className="magazine-visual-stack">
-                      {/* Logic: We map through the three magazine images (Cover, Page 1, Page 2).
-                          The 'currentMagPage' state determines which image is in the front (page-1).
-                      */}
-                      {[
-                        magazineData?.coverUrl || "/mag-cover.jpg",
-                        magazineData?.p1Url || "/mag-page1.jpg",
-                        magazineData?.p2Url || "/mag-page2.jpg"
-                      ].map((imgUrl, index) => {
-                        let positionClass = "mag-page";
-                        
-                        // Dynamic assignment of stack classes based on current index
-                        if (index === currentMagPage) {
-                          positionClass += " page-1"; // Front
-                        } else if (index === (currentMagPage + 1) % 3) {
-                          positionClass += " page-2"; // Middle
-                        } else {
-                          positionClass += " page-3"; // Back
-                        }
-
-                        return (
-                          <div key={index} className={positionClass}>
-                            <img src={imgUrl} alt={`Magazine Page ${index}`} />
-                            {index === 0 && <div className="mag-badge">New Issue</div>}
-                          </div>
-                        );
-                      })}
-
-                      {/* Navigation arrows for cycling through pages */}
-                      <div className="mag-stack-nav">
-                        <button 
-                          onClick={() => setCurrentMagPage((prev) => (prev === 0 ? 2 : prev - 1))}
-                          className="mag-nav-btn prev"
-                        >❮</button>
-                        <button 
-                          onClick={() => setCurrentMagPage((prev) => (prev === 2 ? 0 : prev + 1))}
-                          className="mag-nav-btn next"
-                        >❯</button>
-                      </div>
-                    </div>
-
-                    <div className="magazine-info">
-                      <h3 className="section-subtitle">E-Magazine</h3>
-                      <h2>The Alumni Connect</h2>
-                      <p>Explore the latest breakthroughs in research, campus life, and student achievements in our monthly digital edition.</p>
-                      <div className="magazine-actions">
-                        <button className="mag-btn primary" onClick={() => setIsMagOpen(true)}>
-                          View Online
-                        </button>
-                        <button className="mag-btn primary" onClick={downloadMagazine}>
-                          Download PDF
-                        </button>
-                      </div>
-                    </div>
+                      );
+                    })}
                   </div>
 
-                  {/* Classy PDF Viewer Modal */}
-                  {isMagOpen && (
-                    <div className="mag-modal-overlay" onClick={() => setIsMagOpen(false)}>
-                      <div className="mag-modal-content" onClick={e => e.stopPropagation()}>
-                        <button className="close-mag" onClick={() => setIsMagOpen(false)}>×</button>
-                        <iframe 
-                          src={`${magazineData?.pdfUrl || '/magazine.pdf'}#toolbar=0`} 
-                          title="Magazine Viewer" 
-                          width="100%" 
-                          height="100%" 
-                        ></iframe>
-                      </div>
-                    </div>
-                  )}
-                </section>
+                  <div className="stack-nav-cluster">
+                    <button onClick={handlePrev} className="stack-icon-btn">
+                      ❮
+                    </button>
+                    <button
+                      className="view-gallery-btn"
+                      onClick={() => setIsGalleryOpen(true)}
+                    >
+                      View Gallery
+                    </button>
+                    <button onClick={handleNext} className="stack-icon-btn">
+                      ❯
+                    </button>
+                  </div>
 
-                <section className="campus-news-section">
-                  <h2 className="section-title">Campus News</h2>
-                  <div className="news-container">
-                    {newsData.map((item) => (
-                      <div key={item._id} className="news-card" onClick={() => setSelectedNews(item)}>
-                        <div className="news-img-wrapper">
-                          <img src={item.imageUrl} alt={item.headline} />
-                        </div>
-                        <div className="news-info">
-                          <h4 className="news-headline">{item.headline}</h4>
-                          <p className="news-excerpt">{item.content.substring(0, 100)}...</p>
-                          <span className="read-more">Read Full Story →</span>
-                        </div>
-                      </div>
+                  <div className="stack-dots">
+                    {galleryItems.map((_, index) => (
+                      <span
+                        key={index}
+                        className={`stack-dot ${
+                          index === currentGalleryIndex ? 'active' : ''
+                        }`}
+                      />
                     ))}
                   </div>
+                </div>
 
-                  {/* Mini Window / Modal */}
-                  {selectedNews && (
-                    <div className="news-modal-overlay" onClick={() => setSelectedNews(null)}>
-                      <div className="news-modal-content" onClick={e => e.stopPropagation()}>
-                        <button className="close-modal" onClick={() => setSelectedNews(null)}>×</button>
-                        <img src={selectedNews.imageUrl} alt="News" className="modal-banner" />
-                        <h2>{selectedNews.headline}</h2>
-                        <div className="modal-body">
-                          <p>{selectedNews.content}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </section>
+                <div className="stack-text-side">
+                  <div className="text-content-wrapper">
+                    <h3 className="section-subtitle">
+                      {galleryItems[currentGalleryIndex]?.title || 'Highlights'}
+                    </h3>
 
-                  <footer className="landing-footer">
-                    © 2026 MBM University Alumni Association |
-                    <span
-                      onClick={() => setIsSupportOpen(true)}
-                      style={{
-                        cursor: 'pointer',
-                        marginLeft: '10px',
-                        color: '#3498db',
-                      }}
-                    >
-                      Support & Feedback
-                    </span>
-                  </footer>
-                </section>
-              </>
+                    <p className="hero-text-display">
+                      {galleryItems[currentGalleryIndex]?.desc ||
+                        galleryItems[currentGalleryIndex]?.text ||
+                        'Loading Details...'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="loading-placeholder"
+                style={{
+                  color: 'white',
+                  textAlign: 'center',
+                  padding: '50px',
+                }}
+              >
+                <p>Loading Campus Highlights...</p>
+              </div>
             )}
 
-            {view === 'manual' && <InstructionManual setView={setView} />}
-            {view === 'about' && <AboutUs setView={setView} />}
+            {/* MODAL VIEW: Opens when View Gallery is clicked */}
+            {isGalleryOpen && (
+              <div className="gallery-modal-overlay">
+                <div className="gallery-modal-content">
+                  <button
+                    className="close-modal"
+                    onClick={() => setIsGalleryOpen(false)}
+                  >
+                    ×
+                  </button>
+                  <h2>Campus Gallery</h2>
+                  <div className="gallery-grid-full">
+                    {galleryData.map((item, index) => (
+                      <img
+                        key={index}
+                        src={item.imageUrl}
+                        alt={item.title}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
 
-            {/* AUTH MODAL */}
-            {(view === 'login-choice' ||
-              view.startsWith('login-') ||
-              view.startsWith('reg-')) && (
-              <div className="modal-overlay">
+          <section className="magazine-hero-section">
+            <div className="magazine-container">
+              <div className="magazine-visual-stack">
+                {[
+                  magazineData?.coverUrl || '/mag-cover.jpg',
+                  magazineData?.p1Url || '/mag-page1.jpg',
+                  magazineData?.p2Url || '/mag-page2.jpg',
+                ].map((imgUrl, index) => {
+                  let positionClass = 'mag-page';
+
+                  if (index === currentMagPage) {
+                    positionClass += ' page-1'; // Front
+                  } else if (index === (currentMagPage + 1) % 3) {
+                    positionClass += ' page-2'; // Middle
+                  } else {
+                    positionClass += ' page-3'; // Back
+                  }
+
+                  return (
+                    <div key={index} className={positionClass}>
+                      <img src={imgUrl} alt={`Magazine Page ${index}`} />
+                      {index === 0 && (
+                        <div className="mag-badge">New Issue</div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                <div className="mag-stack-nav">
+                  <button
+                    onClick={() =>
+                      setCurrentMagPage((prev) => (prev === 0 ? 2 : prev - 1))
+                    }
+                    className="mag-nav-btn prev"
+                  >
+                    ❮
+                  </button>
+                  <button
+                    onClick={() =>
+                      setCurrentMagPage((prev) => (prev === 2 ? 0 : prev + 1))
+                    }
+                    className="mag-nav-btn next"
+                  >
+                    ❯
+                  </button>
+                </div>
+              </div>
+
+              <div className="magazine-info">
+                <h3 className="section-subtitle">E-Magazine</h3>
+                <h2>The Alumni Connect</h2>
+                <p>
+                  Explore the latest breakthroughs in research, campus life,
+                  and student achievements in our monthly digital edition.
+                </p>
+                <div className="magazine-actions">
+                  <button
+                    className="mag-btn primary"
+                    onClick={() => setIsMagOpen(true)}
+                  >
+                    View Online
+                  </button>
+                  <button
+                    className="mag-btn primary"
+                    onClick={downloadMagazine}
+                  >
+                    Download PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* PDF Viewer Modal */}
+            {isMagOpen && (
+              <div
+                className="mag-modal-overlay"
+                onClick={() => setIsMagOpen(false)}
+              >
+                <div
+                  className="mag-modal-content"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    className="close-mag"
+                    onClick={() => setIsMagOpen(false)}
+                  >
+                    ×
+                  </button>
+                  <iframe
+                    src={`${
+                      magazineData?.pdfUrl || '/magazine.pdf'
+                    }#toolbar=0`}
+                    title="Magazine Viewer"
+                    width="100%"
+                    height="100%"
+                  ></iframe>
+                </div>
+              </div>
+            )}
+          </section>
+
+          <section className="campus-news-section">
+            <h2 className="section-title">Campus News</h2>
+            <div className="news-container">
+              {newsData.map((item) => (
+                <div
+                  key={item._id}
+                  className="news-card"
+                  onClick={() => setSelectedNews(item)}
+                >
+                  <div className="news-img-wrapper">
+                    <img src={item.imageUrl} alt={item.headline} />
+                  </div>
+                  <div className="news-info">
+                    <h4 className="news-headline">{item.headline}</h4>
+                    <p className="news-excerpt">
+                      {item.content.substring(0, 100)}...
+                    </p>
+                    <span className="read-more">
+                      Read Full Story →
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {selectedNews && (
+              <div
+                className="news-modal-overlay"
+                onClick={() => setSelectedNews(null)}
+              >
+                <div
+                  className="news-modal-content"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    className="close-modal"
+                    onClick={() => setSelectedNews(null)}
+                  >
+                    ×
+                  </button>
+                  <img
+                    src={selectedNews.imageUrl}
+                    alt="News"
+                    className="modal-banner"
+                  />
+                  <h2>{selectedNews.headline}</h2>
+                  <div className="modal-body">
+                    <p>{selectedNews.content}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+
+          <footer className="landing-footer">
+            © 2026 MBM University Alumni Association |
+            <span
+              onClick={() => setIsSupportOpen(true)}
+              style={{
+                cursor: 'pointer',
+                marginLeft: '10px',
+                color: '#3498db',
+              }}
+            >
+              Support & Feedback
+            </span>
+          </footer>
+        </section>
+      </div>
+    </>
+  )}
+
+  {view === 'manual' && <InstructionManual setView={setView} />}
+  {view === 'about' && <AboutUs setView={setView} />}
+
+  {/* AUTH MODAL */}
+  {(view === 'login-choice' ||
+    view.startsWith('login-') ||
+    view.startsWith('reg-')) && (
+    <div className="modal-overlay">
                 <div className="modal-box">
                   <button
                     className="close-x"
