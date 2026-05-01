@@ -695,7 +695,7 @@ const downloadMagazine = () => {
         className="hero-section"
         style={{
           opacity: scrollOpacity,
-          transform: `scale(${scrollData.scale})`,
+          transform: `scale(${0.85 + (scrollOpacity * 0.15)})`,
           position: 'fixed',
           zIndex: 1,
           pointerEvents: scrollOpacity < 0.1 ? 'none' : 'auto',
