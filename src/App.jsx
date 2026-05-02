@@ -848,120 +848,113 @@ const downloadMagazine = () => {
     )}
   </section>
 
-  {/* --- STRIP 2: ALUMNI MAGAZINE (New Layout) --- */}
-  <section
-    className="campus-hero-full-width magazine-strip"
-    style={{ backgroundColor: '#3d2069' }}
-  >
-    <div className="campus-hero-stack-container reverse-layout">
-      {/* Text Area */}
-      <div className="stack-text-side">
-        <div className="text-content-wrapper">
-          <h3 className="section-subtitle">ALUMNI MAGAZINE</h3>
-          <p className="hero-text-display">
-            Dive into the latest editions of our campus chronicles.
-            Stories of success, research breakthroughs, and nostalgic
-            walks down memory lane.
-          </p>
-          <div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button
-              className="view-gallery-btn"
-              style={{ background: '#d4af37', color: '#1a1a1a' }}
-              onClick={() => setIsMagOpen(true)}
-            >
-              Read Latest Edition
-            </button>
-            <button
-              className="view-gallery-btn"
-              style={{ background: '#ffffff', color: '#3d2069' }}
-              onClick={downloadMagazine}
-            >
-              Download PDF
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Visual Stack Area (Magazine Covers) */}
-      <div className="stack-visual-wrapper">
-        <div className="stack-visual-area compact-height">
-          {[
-            magazineData?.coverUrl || '/mag-cover.jpg',
-            magazineData?.p1Url || '/mag-page1.jpg',
-            magazineData?.p2Url || '/mag-page2.jpg',
-          ].map((imgUrl, index) => {
-            let positionClass = 'stack-card stack-hidden';
-            if (index === currentMagPage) {
-              positionClass = 'stack-card stack-active';
-            } else if (index === (currentMagPage + 1) % 3) {
-              positionClass = 'stack-card stack-next';
-            } else if (index === (currentMagPage + 2) % 3) {
-              positionClass = 'stack-card stack-prev';
-            }
-
-            return (
-              <div key={index} className={positionClass}>
-                <img
-                  src={imgUrl}
-                  alt={`Magazine Page ${index + 1}`}
-                  style={{ objectFit: 'contain' }}
-                />
-                {index === 0 && (
-                  <div className="mag-badge">New Issue</div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Navigation for magazine stack */}
-        <div className="stack-nav-cluster mag-stack-nav">
+ {/* --- STRIP 2: ALUMNI MAGAZINE (Static Stack Layout) --- */}
+<section
+  className="campus-hero-full-width magazine-strip"
+  style={{ backgroundColor: '#3d2069', padding: '80px 5%' }}
+>
+  <div className="campus-hero-stack-container reverse-layout">
+    {/* Text Area */}
+    <div className="stack-text-side">
+      <div className="text-content-wrapper">
+        <h3
+          className="section-subtitle"
+          style={{ color: '#d4af37' }}
+        >
+          ALUMNI MAGAZINE
+        </h3>
+        <p
+          className="hero-text-display"
+          style={{ color: 'rgba(255,255,255,0.9)' }}
+        >
+          Dive into the latest editions of our campus chronicles.
+          Stories of success, research breakthroughs, and nostalgic
+          walks down memory lane.
+        </p>
+        <div
+          style={{
+            marginTop: '30px',
+            display: 'flex',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
           <button
-            onClick={() =>
-              setCurrentMagPage((prev) => (prev === 0 ? 2 : prev - 1))
-            }
-            className="stack-icon-btn"
+            className="view-gallery-btn"
+            style={{
+              background: '#d4af37',
+              color: '#1a1a1a',
+              border: 'none',
+            }}
+            onClick={() => setIsMagOpen(true)}
           >
-            ❮
+            Read Latest Edition
           </button>
           <button
-            onClick={() =>
-              setCurrentMagPage((prev) => (prev === 2 ? 0 : prev + 1))
-            }
-            className="stack-icon-btn"
+            className="view-gallery-btn"
+            style={{
+              background: '#ffffff',
+              color: '#3d2069',
+              border: 'none',
+            }}
+            onClick={downloadMagazine}
           >
-            ❯
+            Download PDF
           </button>
         </div>
       </div>
     </div>
 
-    {/* PDF Viewer Modal */}
-    {isMagOpen && (
-      <div
-        className="mag-modal-overlay"
-        onClick={() => setIsMagOpen(false)}
-      >
-        <div
-          className="mag-modal-content"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            className="close-mag"
-            onClick={() => setIsMagOpen(false)}
-          >
-            ×
-          </button>
-          <iframe
-            src={`${magazineData?.pdfUrl || '/magazine.pdf'}#toolbar=0`}
-            title="Magazine Viewer"
-            width="100%"
-            height="100%"
-          ></iframe>
+    {/* Visual Area: Static Page Stack */}
+    <div className="stack-visual-wrapper">
+      <div className="magazine-static-stack">
+        {/* Layer 3 (Bottom) */}
+        <div className="mag-stack-layer layer-bottom"></div>
+        {/* Layer 2 (Middle) */}
+        <div className="mag-stack-layer layer-middle"></div>
+        {/* Layer 1 (Top/Cover) */}
+        <div className="mag-stack-layer layer-top">
+          <img
+            src={magazineData?.coverUrl || '/mag-cover.jpg'}
+            alt="Current Magazine Cover"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+          <div className="mag-badge">New Issue</div>
         </div>
       </div>
-    )}
-  </section>
+    </div>
+  </div>
+
+  {/* PDF Viewer Modal (unchanged) */}
+  {isMagOpen && (
+    <div
+      className="mag-modal-overlay"
+      onClick={() => setIsMagOpen(false)}
+    >
+      <div
+        className="mag-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          className="close-mag"
+          onClick={() => setIsMagOpen(false)}
+        >
+          ×
+        </button>
+        <iframe
+          src={`${magazineData?.pdfUrl || '/magazine.pdf'}#toolbar=0`}
+          title="Magazine Viewer"
+          width="100%"
+          height="100%"
+        ></iframe>
+      </div>
+    </div>
+  )}
+</section>
           <section className="campus-news-section">
             <h2 className="section-title">Campus News</h2>
             <div className="news-container">
