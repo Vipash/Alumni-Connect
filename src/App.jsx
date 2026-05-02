@@ -695,7 +695,7 @@ const downloadMagazine = () => {
 <header
   className="hero-section"
   style={{
-    opacity: scrollOpacity,
+    opacity: 0.4 + (scrollOpacity * 0.6),
     position: 'fixed',
     zIndex: 1,
     pointerEvents: scrollOpacity < 0.1 ? 'none' : 'auto',
@@ -703,6 +703,8 @@ const downloadMagazine = () => {
     left: 0,
     right: 0,
     height: '100vh',
+    backgroundColor: '#000',
+    transition: 'opacity 0.1s ease-out'
   }}
 >
   {/* Wrap content in a div to scale the logo/text WITHOUT scaling the background image */}
@@ -904,21 +906,26 @@ const downloadMagazine = () => {
           );
         })}
 
-        {/* Cycle Buttons directly on the stack */}
-        <div className="stack-nav-cluster mag-stack-nav">
-          <button 
-            onClick={() => setCurrentMagPage(prev => (prev === 0 ? 2 : prev - 1))} 
-            className="stack-icon-btn"
-          >
-            ❮
-          </button>
-          <button 
-            onClick={() => setCurrentMagPage(prev => (prev === 2 ? 0 : prev + 1))} 
-            className="stack-icon-btn"
-          >
-            ❯
-          </button>
-        </div>
+       <div className="mag-stack-nav-container">
+        <button 
+          className="stack-icon-btn" 
+          onClick={(e) => {
+            e.stopPropagation();
+            setCurrentMagPage(prev => (prev === 0 ? 2 : prev - 1));
+          }}
+        >
+          ❮
+        </button>
+        <button 
+          className="stack-icon-btn" 
+          onClick={(e) => {
+            e.stopPropagation();
+            setCurrentMagPage(prev => (prev === 2 ? 0 : prev + 1));
+          }}
+        >
+          ❯
+        </button>
+      </div>
       </div>
     </div>
   </div>
