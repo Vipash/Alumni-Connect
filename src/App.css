@@ -1043,10 +1043,10 @@ input:focus,
   width: 320px;
   height: 420px;
   margin: 0 auto;
-  /* new behaviour: act as flex center for the pages and side buttons */
-  display: flex;
+  display: flex;              /* center pages + side buttons */
   align-items: center;
   justify-content: center;
+  overflow: visible;          /* allow buttons to sit outside */
 }
 
 .mag-page {
@@ -1057,12 +1057,12 @@ input:focus,
   background: white;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  box-shadow: -5px 5px 20px rgba(0, 0, 0, 0.4);
-  pointer-events: none; /* ensure images don't block side buttons */
+  box-shadow: -5px 5px 20px rgba(0,0,0,0.4);
+  pointer-events: none;       /* images don’t block side buttons */
 }
 
 .mag-page.page-1 {
-  pointer-events: auto; /* top page can still be interactive if needed */
+  pointer-events: auto;       /* top page can still be interactive */
 }
 
 .mag-page img {
@@ -1098,7 +1098,7 @@ input:focus,
   pointer-events: none;
 }
 
-/* old bottom nav kept only if still referenced, but visually replaced by side buttons */
+/* Old bottom nav kept only if still referenced */
 .mag-stack-nav {
   position: absolute;
   bottom: -60px;
@@ -1118,7 +1118,7 @@ input:focus,
   padding: 5px 20px;
   font-weight: 900;
   transform: rotate(5deg);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   font-size: 0.75rem;
 }
 
@@ -1128,7 +1128,7 @@ input:focus,
   gap: 50px;
 }
 
-/* Magazine Navigation Fix (legacy top/bottom nav container) */
+/* Magazine wrapper for the visual area */
 .magazine-preview-wrapper {
   display: flex;
   flex-direction: column;
@@ -1136,7 +1136,7 @@ input:focus,
   position: relative;
 }
 
-/* keep for compatibility if still used somewhere */
+/* Legacy bottom nav container – safe to keep */
 .mag-stack-nav-container {
   display: flex;
   gap: 20px;
@@ -1157,18 +1157,28 @@ input:focus,
   justify-content: center;
   align-items: center;
   font-size: 1.2rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   pointer-events: all !important;
 }
 
-/* --- Gallery Spacing Fixes (new) --- */
+/* --- Global Strip Spacing (NEW) --- */
+.campus-hero-full-width,
+.magazine-strip,
+.news-strip-wrapper {
+  padding-top: 30px !important;
+  padding-bottom: 30px !important;
+  margin-bottom: 40px;
+  border-radius: 4px;
+}
+
+/* --- Gallery Layout Polish (UPDATED) --- */
 .gallery-layout-adjust {
   justify-content: flex-start !important;
-  gap: 80px;
+  gap: 100px;               /* more space between stack and text */
 }
 
 .gallery-left-skew {
-  flex: 0 0 300px; /* Keep stack width fixed */
+  flex: 0 0 300px;          /* keep stack width fixed */
 }
 
 .gallery-text-expanded {
@@ -1177,43 +1187,49 @@ input:focus,
 }
 
 .large-text-area {
-  max-width: 90%;
-  font-size: 1.1rem;
-  line-height: 1.6;
+  max-width: 850px;
+  margin-top: 10px;
+  line-height: 1.5;
 }
 
-/* --- Magazine Side Buttons (new) --- */
+/* --- Magazine Side Buttons Fix (NEW) --- */
 .mag-side-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 100;
-  background: rgba(212, 175, 55, 0.9); /* MBM Gold */
+  background: #d4af37;
   color: #1a1a1a;
   border: none;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
   transition: all 0.2s ease;
 }
 
+/* Shifted further out to avoid overlapping the image */
 .mag-side-btn.prev {
-  left: -60px; /* Positions it to the left of the stack */
+  left: -70px;
 }
 
 .mag-side-btn.next {
-  right: -20px; /* Positions it to the right of the stack */
+  right: -70px;
 }
 
-.mag-side-btn:hover {
-  background: white;
-  transform: translateY(-50%) scale(1.1);
+/* Tablet/Mobile fallback: move buttons slightly closer so they don't go off-screen */
+@media (max-width: 1024px) {
+  .mag-side-btn.prev {
+    left: -50px;
+  }
+  .mag-side-btn.next {
+    right: -50px;
+  }
 }
 
 /* --- News Strip Polish --- */
@@ -1258,7 +1274,7 @@ input:focus,
 @media (max-width: 900px) {
   .compact-news,
   .full-news {
-    grid-column: span 2; /* Stack on mobile */
+    grid-column: span 2;
   }
 }
 
