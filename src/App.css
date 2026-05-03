@@ -434,23 +434,36 @@ button:hover {
   box-sizing: border-box;
 }
 
-/* Violet strips by default */
+/* Violet strips by default – unified look */
 .campus-hero-full-width,
 .magazine-hero-section,
-.news-strip,
+.magazine-strip,
+.news-strip-wrapper,
 .footer-strip {
   background-color: var(--mbm-violet);
-  color: white;
+  color: #ffffff;
   padding: 60px 5%;
   min-height: 400px;
   display: flex;
   align-items: center;
 }
 
-/* --- Global: Compact Strips (new) --- */
+/* --- Global Strip Spacing (NEW) --- */
+.campus-hero-full-width,
+.magazine-hero-section,
+.magazine-strip,
+.news-strip-wrapper,
+.footer-strip {
+  padding-top: 30px !important;
+  padding-bottom: 30px !important;
+  margin-bottom: 40px;
+  border-radius: 4px;
+}
+
+/* --- Global: Compact Strips (legacy specific helper) --- */
 .campus-hero-full-width.compact-strip,
 .magazine-strip {
-  padding: 40px 5% !important; /* Reduced from 80px to 40px */
+  padding: 40px 5% !important;
   min-height: auto !important;
 }
 
@@ -1159,16 +1172,6 @@ input:focus,
   font-size: 1.2rem;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   pointer-events: all !important;
-}
-
-/* --- Global Strip Spacing (NEW) --- */
-.campus-hero-full-width,
-.magazine-strip,
-.news-strip-wrapper {
-  padding-top: 30px !important;
-  padding-bottom: 30px !important;
-  margin-bottom: 40px;
-  border-radius: 4px;
 }
 
 /* --- Gallery Layout Polish (UPDATED) --- */
