@@ -997,59 +997,56 @@ const downloadMagazine = () => {
     </div>
   )}
 </section>
-          <section className="campus-news-section">
-            <h2 className="section-title">Campus News</h2>
-            <div className="news-container">
-              {newsData.map((item) => (
-                <div
-                  key={item._id}
-                  className="news-card"
-                  onClick={() => setSelectedNews(item)}
-                >
-                  <div className="news-img-wrapper">
-                    <img src={item.imageUrl} alt={item.headline} />
-                  </div>
-                  <div className="news-info">
-                    <h4 className="news-headline">{item.headline}</h4>
-                    <p className="news-excerpt">
-                      {item.content.substring(0, 100)}...
-                    </p>
-                    <span className="read-more">
-                      Read Full Story →
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* --- STRIP 3: CAMPUS NEWS (New Polished Strip) --- */}
+<section className="news-strip-wrapper" style={{ backgroundColor: '#2d1a4d', padding: '80px 0' }}>
+  <section className="campus-news-section polished">
+    <div className="section-header-centered">
+      <h3 className="section-subtitle" style={{ color: '#d4af37', textAlign: 'center' }}>LATEST UPDATES</h3>
+      <h2 className="section-title" style={{ color: '#fff', textAlign: 'center', marginBottom: '50px' }}>Campus News</h2>
+    </div>
 
-            {selectedNews && (
-              <div
-                className="news-modal-overlay"
-                onClick={() => setSelectedNews(null)}
-              >
-                <div
-                  className="news-modal-content"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    className="close-modal"
-                    onClick={() => setSelectedNews(null)}
-                  >
-                    ×
-                  </button>
-                  <img
-                    src={selectedNews.imageUrl}
-                    alt="News"
-                    className="modal-banner"
-                  />
-                  <h2>{selectedNews.headline}</h2>
-                  <div className="modal-body">
-                    <p>{selectedNews.content}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
+    <div className="news-grid-container">
+      {newsData.map((item) => {
+        // Logic: If content is short, mark it as 'compact' for the grid
+        const isShort = item.content.length < 150; 
+        
+        return (
+          <div
+            key={item._id}
+            className={`news-card-refined ${isShort ? 'compact-news' : 'full-news'}`}
+            onClick={() => setSelectedNews(item)}
+          >
+            <div className="news-img-wrapper-refined">
+              <img src={item.imageUrl} alt={item.headline} />
+              <div className="news-date-tag">News</div>
+            </div>
+            <div className="news-info-refined">
+              <h4 className="news-headline-refined">{item.headline}</h4>
+              <p className="news-excerpt-refined">
+                {item.content.substring(0, 120)}...
+              </p>
+              <span className="read-more-refined">
+                Read Full Story <span>→</span>
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    {/* Modal logic remains identical but uses updated "refined" classes for UI */}
+    {selectedNews && (
+      <div className="news-modal-overlay" onClick={() => setSelectedNews(null)}>
+        <div className="news-modal-content refined" onClick={(e) => e.stopPropagation()}>
+          <button className="close-modal" onClick={() => setSelectedNews(null)}>×</button>
+          <img src={selectedNews.imageUrl} alt="News" className="modal-banner" />
+          <h2>{selectedNews.headline}</h2>
+          <div className="modal-body"><p>{selectedNews.content}</p></div>
+        </div>
+      </div>
+    )}
+  </section>
+</section>
 
           <footer className="landing-footer">
             © 2026 MBM University Alumni Association |
