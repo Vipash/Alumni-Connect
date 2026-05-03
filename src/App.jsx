@@ -742,26 +742,29 @@ const downloadMagazine = () => {
       >
         <section className={`portal-info-section ${hasPopped ? 'content-pop' : ''}`}>
 
-{/* --- STRIP 1: CAMPUS GALLERY (Refined spacing) --- */}
+{/* --- STRIP 1: CAMPUS GALLERY (Fixed Left Anchor) --- */}
 <section className="campus-hero-full-width compact-strip">
   {galleryItems.length > 0 ? (
-    <div className="campus-hero-stack-container gallery-layout-adjust">
-      {/* Visual Area (pushed further left, fixed width via CSS) */}
-      <div className="stack-visual-wrapper gallery-left-skew">
+    <div className="campus-hero-stack-container gallery-fixed-layout">
+      
+      {/* 1. FIXED VISUAL ANCHOR: prevents sideways shifting */}
+      <div className="gallery-visual-anchor">
         <div className="stack-visual-area compact-height">
           {galleryItems.map((item, index) => {
             let position = 'stack-hidden';
-            if (index === currentGalleryIndex) position = 'stack-active';
-            else if (
+            if (index === currentGalleryIndex) {
+              position = 'stack-active';
+            } else if (
               index ===
               (currentGalleryIndex - 1 + galleryItems.length) %
                 galleryItems.length
-            )
+            ) {
               position = 'stack-prev';
-            else if (
+            } else if (
               index === (currentGalleryIndex + 1) % galleryItems.length
-            )
+            ) {
               position = 'stack-next';
+            }
 
             return (
               <div key={index} className={`stack-card ${position}`}>
@@ -771,6 +774,7 @@ const downloadMagazine = () => {
           })}
         </div>
 
+        {/* 2. NAV CLUSTER: stays attached to the stack, not the text */}
         <div className="stack-nav-cluster">
           <button onClick={handlePrev} className="stack-icon-btn">
             ❮
@@ -798,8 +802,8 @@ const downloadMagazine = () => {
         </div>
       </div>
 
-      {/* Expanded text area (70%ish, left aligned) */}
-      <div className="stack-text-side gallery-text-expanded">
+      {/* 3. EXPANDED TEXT AREA: independent, fills remaining space */}
+      <div className="gallery-text-container">
         <div className="text-content-wrapper">
           <h3 className="section-subtitle">
             {galleryItems[currentGalleryIndex]?.title || 'Highlights'}
