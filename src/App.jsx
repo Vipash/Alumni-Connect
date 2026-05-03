@@ -742,12 +742,12 @@ const downloadMagazine = () => {
       >
         <section className={`portal-info-section ${hasPopped ? 'content-pop' : ''}`}>
 
-{/* --- STRIP 1: CAMPUS GALLERY (Updated Alignment) --- */}
-<section className="campus-hero-full-width compact">
+{/* --- STRIP 1: CAMPUS GALLERY (Refined spacing) --- */}
+<section className="campus-hero-full-width compact-strip">
   {galleryItems.length > 0 ? (
-    <div className="campus-hero-stack-container gallery-left-aligned">
-      {/* Visual Area (kept on the left, constrained width) */}
-      <div className="stack-visual-wrapper" style={{ flex: '0 0 40%' }}>
+    <div className="campus-hero-stack-container gallery-layout-adjust">
+      {/* Visual Area (pushed further left, fixed width via CSS) */}
+      <div className="stack-visual-wrapper gallery-left-skew">
         <div className="stack-visual-area compact-height">
           {galleryItems.map((item, index) => {
             let position = 'stack-hidden';
@@ -798,19 +798,13 @@ const downloadMagazine = () => {
         </div>
       </div>
 
-      {/* Text Area: takes remaining width, left-aligned */}
-      <div
-        className="stack-text-side"
-        style={{ flex: '1', textAlign: 'left', paddingLeft: '5%' }}
-      >
-        <div
-          className="text-content-wrapper"
-          style={{ maxWidth: '800px' }}
-        >
+      {/* Expanded text area (70%ish, left aligned) */}
+      <div className="stack-text-side gallery-text-expanded">
+        <div className="text-content-wrapper">
           <h3 className="section-subtitle">
             {galleryItems[currentGalleryIndex]?.title || 'Highlights'}
           </h3>
-          <p className="hero-text-display">
+          <p className="hero-text-display large-text-area">
             {galleryItems[currentGalleryIndex]?.desc ||
               galleryItems[currentGalleryIndex]?.text ||
               'Loading Details...'}
@@ -856,10 +850,10 @@ const downloadMagazine = () => {
   )}
 </section>
 
-{/* --- STRIP 2: ALUMNI MAGAZINE (Static Stack Layout) --- */}
+{/* --- STRIP 2: ALUMNI MAGAZINE (Side Navigation + Compact Strip) --- */}
 <section
   className="campus-hero-full-width magazine-strip"
-  style={{ backgroundColor: '#3d2069', padding: '80px 5%' }}
+  /* padding compacted via CSS (.magazine-strip) */
 >
   <div className="campus-hero-stack-container reverse-layout">
     {/* Text Area */}
@@ -915,7 +909,7 @@ const downloadMagazine = () => {
       </div>
     </div>
 
-    {/* Visual Area: Animated Page Stack */}
+    {/* Visual Area: Animated Page Stack with side buttons */}
     <div className="stack-visual-wrapper magazine-preview-wrapper">
       <div className="magazine-visual-stack">
         {[
@@ -941,14 +935,11 @@ const downloadMagazine = () => {
             </div>
           );
         })}
-      </div>
 
-      {/* FIXED NAVIGATION CONTAINER: outside the stack for visibility */}
-      <div className="mag-stack-nav-container">
+        {/* Side navigation buttons inside stack for “ears” effect */}
         <button
-          className="stack-icon-btn"
+          className="mag-side-btn prev"
           onClick={(e) => {
-            e.preventDefault();
             e.stopPropagation();
             setCurrentMagPage((prev) => (prev === 0 ? 2 : prev - 1));
           }}
@@ -956,13 +947,10 @@ const downloadMagazine = () => {
           ❮
         </button>
         <button
-          className="stack-icon-btn"
+          className="mag-side-btn next"
           onClick={(e) => {
-            e.preventDefault();
             e.stopPropagation();
-            setCurrentMagPage((prev) =>
-              prev === 2 ? 0 : prev + 1
-            );
+            setCurrentMagPage((prev) => (prev === 2 ? 0 : prev + 1));
           }}
         >
           ❯
@@ -997,23 +985,38 @@ const downloadMagazine = () => {
     </div>
   )}
 </section>
-          {/* --- STRIP 3: CAMPUS NEWS (New Polished Strip) --- */}
-<section className="news-strip-wrapper" style={{ backgroundColor: '#2d1a4d', padding: '80px 0' }}>
+
+{/* --- STRIP 3: CAMPUS NEWS (New Polished Strip) --- */}
+<section
+  className="news-strip-wrapper"
+  style={{ backgroundColor: '#1a1c4d', padding: '80px 0' }}
+>
   <section className="campus-news-section polished">
     <div className="section-header-centered">
-      <h3 className="section-subtitle" style={{ color: '#d4af37', textAlign: 'center' }}>LATEST UPDATES</h3>
-      <h2 className="section-title" style={{ color: '#fff', textAlign: 'center', marginBottom: '50px' }}>Campus News</h2>
+      <h3
+        className="section-subtitle"
+        style={{ color: '#d4af37', textAlign: 'center' }}
+      >
+        LATEST UPDATES
+      </h3>
+      <h2
+        className="section-title"
+        style={{ color: '#fff', textAlign: 'center', marginBottom: '50px' }}
+      >
+        Campus News
+      </h2>
     </div>
 
     <div className="news-grid-container">
       {newsData.map((item) => {
-        // Logic: If content is short, mark it as 'compact' for the grid
-        const isShort = item.content.length < 150; 
-        
+        const isShort = item.content.length < 150;
+
         return (
           <div
             key={item._id}
-            className={`news-card-refined ${isShort ? 'compact-news' : 'full-news'}`}
+            className={`news-card-refined ${
+              isShort ? 'compact-news' : 'full-news'
+            }`}
             onClick={() => setSelectedNews(item)}
           >
             <div className="news-img-wrapper-refined">
@@ -1021,7 +1024,9 @@ const downloadMagazine = () => {
               <div className="news-date-tag">News</div>
             </div>
             <div className="news-info-refined">
-              <h4 className="news-headline-refined">{item.headline}</h4>
+              <h4 className="news-headline-refined">
+                {item.headline}
+              </h4>
               <p className="news-excerpt-refined">
                 {item.content.substring(0, 120)}...
               </p>
@@ -1034,14 +1039,31 @@ const downloadMagazine = () => {
       })}
     </div>
 
-    {/* Modal logic remains identical but uses updated "refined" classes for UI */}
+    {/* Modal logic unchanged, just uses refined classes */}
     {selectedNews && (
-      <div className="news-modal-overlay" onClick={() => setSelectedNews(null)}>
-        <div className="news-modal-content refined" onClick={(e) => e.stopPropagation()}>
-          <button className="close-modal" onClick={() => setSelectedNews(null)}>×</button>
-          <img src={selectedNews.imageUrl} alt="News" className="modal-banner" />
+      <div
+        className="news-modal-overlay"
+        onClick={() => setSelectedNews(null)}
+      >
+        <div
+          className="news-modal-content refined"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="close-modal"
+            onClick={() => setSelectedNews(null)}
+          >
+            ×
+          </button>
+          <img
+            src={selectedNews.imageUrl}
+            alt="News"
+            className="modal-banner"
+          />
           <h2>{selectedNews.headline}</h2>
-          <div className="modal-body"><p>{selectedNews.content}</p></div>
+          <div className="modal-body">
+            <p>{selectedNews.content}</p>
+          </div>
         </div>
       </div>
     )}
