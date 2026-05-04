@@ -1260,6 +1260,119 @@ input:focus,
   margin-left: 8px;
 }
 
+/* --- Refined Footer Styling --- */
+.landing-footer-refined {
+  background-color: #1a0f2e; /* Darker than the strips for contrast */
+  color: #e0e0e0;
+  padding: 60px 5% 20px 5%;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 60px;
+}
+
+.footer-content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 60px;
+  padding-bottom: 40px;
+}
+
+.footer-column h4 {
+  color: #fff;
+  margin: 15px 0;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+.footer-column h5 {
+  color: #d4af37; /* MBM Gold */
+  margin-bottom: 20px;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.footer-column p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #aaa;
+}
+
+.footer-mini-logo {
+  height: 50px;
+  filter: brightness(0) invert(1); /* Makes logo white if needed */
+  opacity: 0.8;
+}
+
+/* Links */
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 12px;
+}
+
+.footer-column ul li a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.footer-column ul li a:hover {
+  color: #d4af37;
+}
+
+/* Support Button */
+.footer-support-btn {
+  background: transparent;
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.footer-support-btn:hover {
+  background: #d4af37;
+  color: #1a0f2e;
+}
+
+.footer-socials {
+  margin-top: 20px;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Bottom Bar */
+.footer-bottom-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .footer-content-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  
+  .footer-column.brand-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 /* Typography */
 h1,
 h2 {

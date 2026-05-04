@@ -1,0 +1,150 @@
+.manual-outer-wrapper {
+  background: #f8f9fa; /* Light grey to contrast with the dark landing page */
+  min-height: 100vh;
+  padding: 40px;
+  color: #2d3436;
+}
+
+.manual-container-refined {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+/* Sidebar */
+.manual-sidebar {
+  width: 280px;
+  background: #2d1a4d; /* Matches News Strip Color */
+  color: white;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 50px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.sidebar-brand img { height: 35px; }
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sidebar-nav a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255,255,255,0.1);
+  color: #d4af37;
+}
+
+.back-to-portal {
+  margin-top: auto;
+  background: #d4af37;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Main Content */
+.manual-content-main {
+  flex: 1;
+  padding: 60px;
+  height: 85vh;
+  overflow-y: auto;
+}
+
+.manual-header-refined h1 {
+  font-size: 2.5rem;
+  color: #1a0f2e;
+  margin-bottom: 10px;
+}
+
+.version-tag {
+  color: #888;
+  font-weight: 500;
+  border-bottom: 2px solid #f1f1f1;
+  padding-bottom: 20px;
+  margin-bottom: 40px;
+}
+
+.manual-section-refined {
+  margin-bottom: 60px;
+}
+
+.section-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.manual-section-refined h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #3d2069;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.info-card {
+  background: #fdfbf7;
+  padding: 20px;
+  border-left: 4px solid #d4af37;
+  border-radius: 4px;
+}
+
+.workflow-steps {
+  margin-top: 25px;
+}
+
+.step {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.step-num {
+  background: #3d2069;
+  color: white;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.privacy-quote {
+  border-left: 4px solid #eee;
+  padding-left: 20px;
+  font-style: italic;
+  color: #666;
+  margin: 20px 0;
+}

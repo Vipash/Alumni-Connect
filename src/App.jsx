@@ -7,6 +7,7 @@ import './index.css';
 import './App.css';
 import './Portal.css';
 import './FeatureStrip.css';
+import './Manual.css';
 import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';
@@ -1074,19 +1075,50 @@ const downloadMagazine = () => {
   </section>
 </section>
 
-          <footer className="landing-footer">
-            © 2026 MBM University Alumni Association |
-            <span
-              onClick={() => setIsSupportOpen(true)}
-              style={{
-                cursor: 'pointer',
-                marginLeft: '10px',
-                color: '#3498db',
-              }}
-            >
-              Support & Feedback
-            </span>
-          </footer>
+          {/* --- STANDARDIZED FOOTER --- */}
+<footer className="landing-footer-refined">
+  <div className="footer-content-container">
+    
+    {/* Column 1: Brand Identity */}
+    <div className="footer-column brand-col">
+      <img src="/MBM_Logo.png" alt="MBM Logo" className="footer-mini-logo" />
+      <h4>MBM ALUMNI CONNECT</h4>
+      <p>Bridging Generations of Excellence since 1951. Stay connected with your alma mater and fellow alumni.</p>
+    </div>
+
+    {/* Column 2: Quick Navigation */}
+    <div className="footer-column link-col">
+      <h5>Quick Links</h5>
+      <ul>
+        <li><a href="#gallery">Campus Gallery</a></li>
+        <li><a href="#magazine">E-Magazine</a></li>
+        <li><a href="#news">Latest News</a></li>
+        <li><a href="#events">Upcoming Events</a></li>
+      </ul>
+    </div>
+
+    {/* Column 3: Support & Contact */}
+    <div className="footer-column contact-col">
+      <h5>Get In Touch</h5>
+      <p>Questions about the portal?</p>
+      <button 
+        className="footer-support-btn"
+        onClick={() => setIsSupportOpen(true)}
+      >
+        Support & Feedback
+      </button>
+      <div className="footer-socials">
+        {/* Placeholder for social icons */}
+        <span>LinkedIn</span> • <span>Facebook</span> • <span>Twitter</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div className="footer-bottom-bar">
+    <p>© 2026 MBM University Alumni Association | All Rights Reserved</p>
+  </div>
+</footer>
         </section>
       </div>
     </>
