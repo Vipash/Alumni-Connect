@@ -218,38 +218,41 @@
   color: #555;
 }
 
-/* --- VIEW MODE (mirroring Edit Profile form) --- */
-.profile-view-mode {
-  padding: 40px;
+/* --- WIDE VIEW MODE (new) --- */
+.profile-view-wide {
+  max-width: 1200px;
+  width: 95%;
+  margin: 0 auto;
+  padding: 50px;
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
+/* Header Spacing */
 .profile-view-header {
   display: flex;
+  gap: 40px;
   align-items: center;
-  gap: 30px;
-  margin-bottom: 40px;
-  border-bottom: 2px solid #f1f1f1;
-  padding-bottom: 30px;
+  margin-bottom: 50px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 40px;
 }
 
-.avatar-cluster {
+.avatar-side {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .status-pill {
-  margin-top: -15px;
-  padding: 4px 12px;
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 5px 15px;
   border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  border: 2px solid #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 3px solid #ffffff;
 }
 
 .status-pill.verified {
@@ -262,74 +265,108 @@
   color: #1a0f2e;
 }
 
-/* Grid sections inside view mode */
-.grid-section {
-  margin-bottom: 40px;
+/* Grid System */
+.profile-view-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two column primary layout */
+  gap: 60px;
 }
 
-.section-header {
+.span-full {
+  grid-column: 1 / -1; /* Bio/Address section full width */
+  margin-top: 20px;
+}
+
+.column-label {
   color: #3d2069;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-  border-left: 4px solid #d4af37;
-  padding-left: 15px;
+  letter-spacing: 1.5px;
+  margin-bottom: 25px;
+  display: block;
+  border-bottom: 2px solid #d4af37;
+  width: fit-content;
+  padding-bottom: 5px;
 }
 
-/* Value Boxes – read-only field look */
-.value-box {
-  background: #f8f9fa;
-  padding: 12px 15px;
+/* Data Display Boxes */
+.data-box-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.data-row-flex {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.data-field label {
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.static-value {
+  background: #fdfbf7; /* Very light gold tint */
+  padding: 14px 18px;
   border-radius: 8px;
-  font-size: 0.95rem;
   color: #333;
-  min-height: 45px;
+  font-weight: 500;
+  border: 1px solid #f1ece1;
+  min-height: 50px;
   display: flex;
   align-items: center;
-  border: 1px solid #edf2f7;
 }
 
-.bio-box {
-  align-items: flex-start;
+.bio-display {
   line-height: 1.6;
-  min-height: 80px;
+  min-height: 100px;
+  align-items: flex-start;
 }
 
-/* Tags in view mode */
-.tag-flex {
+.address-display {
+  font-size: 0.9rem;
+  min-height: 70px;
+}
+
+/* Hobbies Tags */
+.tag-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px 0;
+  gap: 10px;
+  padding: 5px 0;
 }
 
-.mini-tag {
-  padding: 5px 12px;
-  border-radius: 15px;
+.v-tag {
+  padding: 6px 16px;
+  border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
 }
 
-.mini-tag.gold {
+.v-tag.gold {
   background: #fff8e1;
   color: #b8860b;
   border: 1px solid #ffe082;
 }
 
-.mini-tag.violet {
+.v-tag.violet {
   background: #f3f0ff;
   color: #5f3dc4;
   border: 1px solid #dcd3ff;
 }
 
-/* Links in view mode */
-.link-text {
+/* Wide view links */
+.action-link {
   color: #3498db;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.link-text:hover {
+.action-link:hover {
   text-decoration: underline;
 }

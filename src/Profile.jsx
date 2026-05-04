@@ -146,120 +146,128 @@ function Profile({ user, setUser, setSidebarContent }) {
         onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} 
       />
     ) : (
-      <div className="profile-card profile-view-mode">
-        {/* TOP HEADER: Following the Edit Profile pattern */}
-        <div className="profile-view-header">
-          <div className="avatar-cluster">
-            <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="User" />
-            <div className={`status-pill ${user.isApproved ? 'verified' : 'pending'}`}>
-              {user.isApproved ? "Verified" : "Pending Audit"}
+  <div className="profile-card profile-view-wide">
+    {/* 1. TOP IDENTITY STRIP */}
+    <div className="profile-view-header">
+      <div className="avatar-side">
+        <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="User" />
+        <div className={`status-pill ${user.isApproved ? 'verified' : 'pending'}`}>
+          {user.isApproved ? "Verified Member" : "Pending Verification"}
+        </div>
+      </div>
+      <div className="identity-side">
+        <h1>{user.displayName || user.name}</h1>
+        <div className="badge-row">
+          <span className="info-badge role">{user.role?.toUpperCase()}</span>
+          <span className="info-badge branch">{user.branch}</span>
+          <span className="info-badge year">Batch of {user.passoutYear}</span>
+        </div>
+      </div>
+    </div>
+
+    <div className="profile-view-grid">
+      {/* 2. CORE INFORMATION (Left Column) */}
+      <div className="view-column">
+        <h4 className="column-label">Identity & Contact</h4>
+        <div className="data-box-grid">
+          <div className="data-field">
+            <label>Father's Name</label>
+            <div className="static-value">{user.fatherName || '—'}</div>
+          </div>
+          <div className="data-field">
+            <label>Date of Birth</label>
+            <div className="static-value">
+              {user.dob ? new Date(user.dob).toLocaleDateString() : '—'}
             </div>
           </div>
-          <div className="header-identity">
-            <h1>{user.displayName || user.name}</h1>
-            <p className="user-role-tag">{user.role?.toUpperCase()} • {user.branch} • {user.passoutYear}</p>
+          <div className="data-field">
+            <label>Mobile</label>
+            <div className="static-value">{user.mobile || '—'}</div>
+          </div>
+          <div className="data-field">
+            <label>Email</label>
+            <div className="static-value email-val">{user.email}</div>
           </div>
         </div>
+      </div>
 
-        <div className="view-content-grid">
-          {/* SECTION: GENERAL INFORMATION */}
-          <div className="grid-section">
-            <h4 className="section-header">General Information</h4>
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Father's Name</label>
-                <div className="value-box">{user.fatherName || 'N/A'}</div>
-              </div>
-              <div className="form-group">
-                <label>Date of Birth</label>
-                <div className="value-box">
-                  {user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'}
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Mobile Number</label>
-                <div className="value-box">{user.mobile || 'N/A'}</div>
-              </div>
-              <div className="form-group">
-                <label>Email Address</label>
-                <div className="value-box">{user.email}</div>
-              </div>
-              <div className="form-group full-width">
-                <label>Professional Bio</label>
-                <div className="value-box bio-box">{user.bio || "No professional bio added yet."}</div>
-              </div>
+      {/* 3. ACADEMICS & INTERESTS (Middle Column) */}
+      <div className="view-column">
+        <h4 className="column-label">Academic & Interests</h4>
+        <div className="data-box-grid">
+          <div className="data-field half">
+            <label>10th Year</label>
+            <div className="static-value">{user.tenthYear || '—'}</div>
+          </div>
+          <div className="data-field half">
+            <label>12th Year</label>
+            <div className="static-value">{user.twelfthYear || '—'}</div>
+          </div>
+          <div className="data-field">
+            <label>Technical Hobbies</label>
+            <div className="tag-group">
+              {user.hobbiesTechnical?.length > 0 
+                ? user.hobbiesTechnical.map((h, i) => <span key={i} className="v-tag gold">{h}</span>)
+                : <span className="empty-text">No technical tags added</span>}
             </div>
           </div>
-
-          {/* SECTION: ACADEMIC & HOBBIES */}
-          <div className="grid-section">
-            <h4 className="section-header">Academics & Interests</h4>
-            <div className="form-grid">
-              <div className="form-group">
-                <label>10th Pass-out Year</label>
-                <div className="value-box">{user.tenthYear || 'N/A'}</div>
-              </div>
-              <div className="form-group">
-                <label>12th Pass-out Year</label>
-                <div className="value-box">{user.twelfthYear || 'N/A'}</div>
-              </div>
-              <div className="form-group">
-                <label>Technical Hobbies</label>
-                <div className="tag-flex">
-                  {user.hobbiesTechnical?.length > 0 
-                    ? user.hobbiesTechnical.map((h, i) => <span key={i} className="mini-tag gold">{h}</span>)
-                    : <span className="text-muted">None listed</span>}
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Personal Hobbies</label>
-                <div className="tag-flex">
-                   {user.hobbiesPersonal?.length > 0 
-                    ? user.hobbiesPersonal.map((h, i) => <span key={i} className="mini-tag violet">{h}</span>)
-                    : <span className="text-muted">None listed</span>}
-                </div>
-              </div>
+          <div className="data-field">
+            <label>Personal Hobbies</label>
+            <div className="tag-group">
+              {user.hobbiesPersonal?.length > 0 
+                ? user.hobbiesPersonal.map((h, i) => <span key={i} className="v-tag violet">{h}</span>)
+                : <span className="empty-text">No personal tags added</span>}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* SECTION: ADDRESSES & DOCUMENTS */}
-          <div className="grid-section">
-            <h4 className="section-header">Addresses & Professional Links</h4>
-            <div className="form-grid">
-              <div className="form-group full-width">
-                <label>Current Address</label>
-                <div className="value-box">{user.currentAddress || 'N/A'}</div>
+      {/* 4. BIO & ADDRESSES (Full Width / Right Span) */}
+      <div className="view-column span-full">
+        <h4 className="column-label">Bio & Residential Registry</h4>
+        <div className="data-box-grid">
+          <div className="data-field full">
+            <label>Professional Bio</label>
+            <div className="static-value bio-display">{user.bio || "No professional statement provided."}</div>
+          </div>
+          <div className="data-row-flex">
+            <div className="data-field">
+              <label>Current Address</label>
+              <div className="static-value address-display">{user.currentAddress || '—'}</div>
+            </div>
+            <div className="data-field">
+              <label>Permanent Address</label>
+              <div className="static-value address-display">{user.permanentAddress || '—'}</div>
+            </div>
+          </div>
+          <div className="data-row-flex">
+            <div className="data-field">
+              <label>LinkedIn</label>
+              <div className="static-value">
+                {user.linkedin ? (
+                  <a href={ensureAbsoluteUrl(user.linkedin)} target="_blank" rel="noreferrer" className="action-link">
+                    External Profile ↗
+                  </a>
+                ) : 'Not Linked'}
               </div>
-              <div className="form-group full-width">
-                <label>Permanent Address</label>
-                <div className="value-box">{user.permanentAddress || 'N/A'}</div>
-              </div>
-              <div className="form-group">
-                <label>LinkedIn</label>
-                <div className="value-box">
-                  {user.linkedin ? (
-                    <a href={ensureAbsoluteUrl(user.linkedin)} target="_blank" rel="noreferrer" className="link-text">
-                      View Profile ↗
-                    </a>
-                  ) : 'N/A'}
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Resume</label>
-                <div className="value-box">
-                  {user.resumeUrl ? (
-                    <a href={user.resumeUrl} target="_blank" rel="noreferrer" className="link-text">
-                      View PDF ↗
-                    </a>
-                  ) : 'N/A'}
-                </div>
+            </div>
+            <div className="data-field">
+              <label>Resume</label>
+              <div className="static-value">
+                {user.resumeUrl ? (
+                  <a href={user.resumeUrl} target="_blank" rel="noreferrer" className="action-link">
+                    Download PDF ↗
+                  </a>
+                ) : 'Not Uploaded'}
               </div>
             </div>
           </div>
         </div>
       </div>
-    )}
+    </div>
   </div>
+)}
+</div>
 );
 }
 
