@@ -146,120 +146,84 @@ function Profile({ user, setUser, setSidebarContent }) {
         onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} 
       />
     ) : (
-      <div className="modern-profile-card">
-        {/* 1. Profile Hero Section */}
-        <div className="profile-hero-banner">
-          <div className="profile-avatar-wrapper">
-            <img 
-              src={user.profilePhoto || "/default-avatar.png"} 
-              className="main-avatar" 
-              alt="Profile" 
-            />
-            <div className={`status-indicator ${user.isApproved ? 'active' : 'pending'}`}></div>
-          </div>
-          <div className="hero-identity">
-            <h1>{user.displayName || user.name}</h1>
-            <div className="identity-tags">
-              <span className="role-badge">{user.role?.toUpperCase()}</span>
-              <span className="branch-badge">{user.branch} • Class of {user.passoutYear}</span>
+      <div className="profile-clean-layout">
+        
+        {/* TOP SECTION: Identity & Status */}
+        <div className="profile-top-bar">
+          <div className="profile-identity-main">
+            <img src={user.profilePhoto || "/default-avatar.png"} alt="User" className="avatar-simple" />
+            <div className="identity-details">
+              <h1>{user.displayName || user.name}</h1>
+              <span className="role-tag">{user.role?.toUpperCase()}</span>
             </div>
+          </div>
+          <div className="verification-status">
+            <span className={user.isApproved ? "badge-verified" : "badge-pending"}>
+              {user.isApproved ? "✓ Verified Account" : "⏳ Pending Audit"}
+            </span>
           </div>
         </div>
 
-        <div className="profile-grid-layout">
-          {/* 2. Left Column: Summary & Links */}
-          <div className="profile-aside">
-            <div className="info-card-mini">
-              <h4>Contact Assets</h4>
-              <div className="asset-links">
-                {user.resumeUrl ? (
-                  <a href={user.resumeUrl} target="_blank" rel="noreferrer" className="asset-btn resume">
-                    <span className="icon">📄</span> Curriculum Vitae
-                  </a>
-                ) : (
-                  <div className="asset-btn disabled">No Resume Provided</div>
-                )}
-                {user.linkedin && (
-                  <a href={ensureAbsoluteUrl(user.linkedin)} target="_blank" rel="noreferrer" className="asset-btn linkedin">
-                    <span className="icon">🔗</span> LinkedIn Profile
-                  </a>
-                )}
+        {/* SECTION: Professional Bio */}
+        <section className="profile-content-block">
+          <h3>Professional Bio</h3>
+          <p className="light-text">{user.bio || "No professional bio added yet."}</p>
+        </section>
+
+        {/* SECTION: Academic & Contact Grid */}
+        <section className="profile-content-block">
+          <h3>Academic & Contact Information</h3>
+          <div className="info-flex-grid">
+            <div className="info-cell"><label>Branch</label><p>{user.branch}</p></div>
+            <div className="info-cell"><label>Batch</label><p>Class of {user.passoutYear}</p></div>
+            <div className="info-cell"><label>Email</label><p>{user.email}</p></div>
+            <div className="info-cell"><label>Mobile</label><p>{user.mobile || 'N/A'}</p></div>
+            <div className="info-cell"><label>10th Year</label><p>{user.tenthYear}</p></div>
+            <div className="info-cell"><label>12th Year</label><p>{user.twelfthYear}</p></div>
+          </div>
+        </section>
+
+        {/* SECTION: Hobbies (Restored) */}
+        <section className="profile-content-block">
+          <h3>Interests & Hobbies</h3>
+          <div className="hobbies-split">
+            <div className="hobby-group">
+              <label>Technical Interests</label>
+              <div className="tag-container">
+                {user.hobbiesTechnical?.length > 0 
+                  ? user.hobbiesTechnical.map((h, i) => <span key={i} className="tag-gold">{h}</span>)
+                  : <span className="text-muted">Not specified</span>}
               </div>
             </div>
-
-            <div className="info-card-mini">
-              <h4>Quick Stats</h4>
-              <div className="stat-row">
-                <span>Member Status</span>
-                <b className={user.isApproved ? "text-success" : "text-warning"}>
-                  {user.isApproved ? "Verified" : "Pending Audit"}
-                </b>
-              </div>
-              <div className="stat-row">
-                <span>Account Type</span>
-                <b>Official Member</b>
+            <div className="hobby-group">
+              <label>Personal Interests</label>
+              <div className="tag-container">
+                {user.hobbiesPersonal?.length > 0 
+                  ? user.hobbiesPersonal.map((h, i) => <span key={i} className="tag-violet">{h}</span>)
+                  : <span className="text-muted">Not specified</span>}
               </div>
             </div>
           </div>
+        </section>
 
-          {/* 3. Right Column: Detailed Info Sections */}
-          <div className="profile-main-body">
-            <section className="detail-section">
-              <h3 className="section-heading">Professional Statement</h3>
-              <p className="bio-paragraph">{user.bio || "This user prefers to keep their professional mystery. No bio added yet."}</p>
-            </section>
-
-            <section className="detail-section">
-              <h3 className="section-heading">Personal & Academic Portfolio</h3>
-              <div className="data-table">
-                <div className="data-row">
-                  <div className="data-cell">
-                    <label>Email Address</label>
-                    <span>{user.email}</span>
-                  </div>
-                  <div className="data-cell">
-                    <label>Primary Phone</label>
-                    <span>{user.mobile || 'Not Disclosed'}</span>
-                  </div>
-                </div>
-                <div className="data-row">
-                  <div className="data-cell">
-                    <label>Guardian Name</label>
-                    <span>{user.fatherName}</span>
-                  </div>
-                  <div className="data-cell">
-                    <label>Birth Date</label>
-                    <span>{user.dob ? new Date(user.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}</span>
-                  </div>
-                </div>
-                <div className="data-row">
-                  <div className="data-cell">
-                    <label>Secondary Education (10th)</label>
-                    <span>Class of {user.tenthYear}</span>
-                  </div>
-                  <div className="data-cell">
-                    <label>Higher Secondary (12th)</label>
-                    <span>Class of {user.twelfthYear}</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="detail-section">
-              <h3 className="section-heading">Residential Registry</h3>
-              <div className="address-grid">
-                <div className="address-box">
-                  <label>Current Mailing Address</label>
-                  <p>{user.currentAddress || 'No address on file.'}</p>
-                </div>
-                <div className="address-box">
-                  <label>Permanent Residence</label>
-                  <p>{user.permanentAddress || 'Same as current.'}</p>
-                </div>
-              </div>
-            </section>
+        {/* SECTION: Addresses & Links */}
+        <section className="profile-content-block">
+          <div className="info-flex-grid">
+            <div className="info-cell full">
+              <label>Current Address</label>
+              <p className="light-text">{user.currentAddress || 'N/A'}</p>
+            </div>
+            <div className="info-cell">
+              <label>LinkedIn</label>
+              <p>{user.linkedin ? <a href={ensureAbsoluteUrl(user.linkedin)} target="_blank" rel="noreferrer" className="link-action">View Profile</a> : 'N/A'}</p>
+            </div>
+            <div className="info-cell">
+              <label>Resume</label>
+              <p>{user.resumeUrl ? <a href={user.resumeUrl} target="_blank" rel="noreferrer" className="link-action">Open Document</a> : 'N/A'}</p>
+            </div>
           </div>
-        </div>
+        </section>
+
       </div>
     )}
   </div>

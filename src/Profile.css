@@ -1,18 +1,20 @@
+/* --- Profile Layout Wrapper --- */
 .profile-dashboard-wrapper {
   padding: 20px;
   max-width: 1100px;
   margin: 0 auto;
 }
 
+/* --- Main Profile Card --- */
 .modern-profile-card {
-  background: white;
+  background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   border: 1px solid #eee;
 }
 
-/* Hero Banner */
+/* --- Hero Banner --- */
 .profile-hero-banner {
   background: linear-gradient(135deg, #2d1a4d 0%, #3d2069 100%);
   padding: 60px 40px 40px 40px;
@@ -32,8 +34,8 @@
   height: 140px;
   border-radius: 25px;
   object-fit: cover;
-  border: 5px solid white;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  border: 5px solid #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   background: #f8f9fa;
 }
 
@@ -44,13 +46,19 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 3px solid white;
+  border: 3px solid #ffffff;
 }
-.status-indicator.active { background: #2ecc71; }
-.status-indicator.pending { background: #f1c40f; }
+
+.status-indicator.active {
+  background: #2ecc71;
+}
+
+.status-indicator.pending {
+  background: #f1c40f;
+}
 
 .hero-identity h1 {
-  color: white;
+  color: #ffffff;
   margin: 0;
   font-size: 2.2rem;
 }
@@ -71,19 +79,19 @@
 }
 
 .branch-badge {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.95rem;
 }
 
-/* Grid Layout */
+/* --- Grid Layout (Sidebar + Main) --- */
 .profile-grid-layout {
   display: grid;
   grid-template-columns: 300px 1fr;
   gap: 40px;
-  padding: 80px 40px 40px 40px; /* Top padding accounts for avatar overlap */
+  padding: 80px 40px 40px 40px; /* top padding for avatar overlap */
 }
 
-/* Sidebar Info */
+/* --- Sidebar Info --- */
 .info-card-mini {
   margin-bottom: 30px;
 }
@@ -112,9 +120,18 @@
   color: #2d1a4d;
 }
 
-.asset-btn:hover { background: #eee; transform: translateX(5px); }
-.asset-btn.resume { border-left: 4px solid #e74c3c; }
-.asset-btn.linkedin { border-left: 4px solid #0077b5; }
+.asset-btn:hover {
+  background: #eeeeee;
+  transform: translateX(5px);
+}
+
+.asset-btn.resume {
+  border-left: 4px solid #e74c3c;
+}
+
+.asset-btn.linkedin {
+  border-left: 4px solid #0077b5;
+}
 
 .stat-row {
   display: flex;
@@ -123,7 +140,7 @@
   font-size: 0.9rem;
 }
 
-/* Main Content Area */
+/* --- Main Content Area --- */
 .section-heading {
   font-size: 1.1rem;
   color: #2d1a4d;
@@ -147,6 +164,7 @@
   margin-bottom: 40px;
 }
 
+/* Data table-style blocks */
 .data-table {
   display: flex;
   flex-direction: column;
@@ -174,6 +192,7 @@
   font-weight: 500;
 }
 
+/* Address layout */
 .address-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -187,5 +206,14 @@
   border: 1px dashed #d4af37;
 }
 
-.address-box label { color: #d4af37; font-size: 0.75rem; font-weight: 700; }
-.address-box p { margin: 5px 0 0 0; font-size: 0.9rem; color: #555; }
+.address-box label {
+  color: #d4af37;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.address-box p {
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+  color: #555;
+}
