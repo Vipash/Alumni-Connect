@@ -134,130 +134,135 @@ function Profile({ user, setUser, setSidebarContent }) {
   if (!user) return <div className="profile-container">Loading...</div>;
 
   return (
-    <div className="profile-content-container">
-      {/* Note: The Action Header is removed from here because it's now in the sidebar */}
-
-      {isOnboarding ? (
-        <div className="onboarding-wrapper">
-          <div className="onboarding-header"><h2>Finish Your Profile</h2></div>
-          <form ref={formRef} onSubmit={handleOnboardingSubmit} className="onboarding-form">
-            <div className="form-grid">
-               <div className="form-group">
-                <label>Father's Name</label>
-                <input required value={onboardData.fatherName} onChange={e => setOnboardData({ ...onboardData, fatherName: e.target.value })} />
-              </div>
-              <div className="form-group">
-                <label>Date of Birth</label>
-                <input type="date" required value={onboardData.dob} onChange={e => setOnboardData({ ...onboardData, dob: e.target.value })} />
-              </div>
-              <div className="form-group">
-                <label>10th Pass-out Year</label>
-                <input type="number" required value={onboardData.tenthYear} onChange={e => setOnboardData({ ...onboardData, tenthYear: e.target.value })} />
-              </div>
-              <div className="form-group">
-                <label>12th Pass-out Year</label>
-                <input type="number" required value={onboardData.twelfthYear} onChange={e => setOnboardData({ ...onboardData, twelfthYear: e.target.value })} />
-              </div>
-              <div className="form-group full-width">
-                <label>Current Address</label>
-                <textarea required value={onboardData.currentAddress} onChange={e => setOnboardData({ ...onboardData, currentAddress: e.target.value })} />
-              </div>
-              <div className="form-group full-width">
-                <label>Permanent Address</label>
-                <textarea required value={onboardData.permanentAddress} onChange={e => setOnboardData({ ...onboardData, permanentAddress: e.target.value })} />
-              </div>
-            </div>
-          </form>
-        </div>
-      ) : isEditing ? (
-        <EditProfile
-          user={user}
-          ref={formRef} // CORRECT: use the 'ref' prop
-          onCancel={() => setIsEditing(false)}
-          onUpdate={(updated) => { setUser(updated); setIsEditing(false); }}
-        />
-      ) : (
-  <div className="profile-card">
-    <div className="profile-header">
-      <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="Profile" />
-      <div className="header-text">
-        <h1>{user.displayName || user.name}</h1>
-        <p className="user-role-tag">{user.role?.toUpperCase()}</p>
-      </div>
-    </div>
-
-    <div className="profile-body"> {/* Keep this one */}
-      <section className="profile-row-group">
-        <h4 className="row-title">Documents & Links</h4>
-        <div className="grid-info">
-          <div className="info-item">
-            <label>Resume</label>
-            {user.resumeUrl ? (
-              <div className="resume-actions" style={{ display: 'flex', gap: '10px' }}>
-                <a href={user.resumeUrl} target="_blank" rel="noopener noreferrer" className="link-text">
-                  View Resume
-                </a>
-                <a href={user.resumeUrl} download className="link-text">Download</a>
-              </div>
-            ) : (
-              <span className="text-muted">No resume uploaded</span>
-            )}
+  <div className="profile-dashboard-wrapper">
+    {isOnboarding ? (
+       {/* ... keep onboarding form as is ... */}
+    ) : isEditing ? (
+      <EditProfile 
+        user={user} 
+        ref={formRef} 
+        onCancel={() => setIsEditing(false)} 
+        onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} 
+      />
+    ) : (
+      <div className="modern-profile-card">
+        {/* 1. Profile Hero Section */}
+        <div className="profile-hero-banner">
+          <div className="profile-avatar-wrapper">
+            <img 
+              src={user.profilePhoto || "/default-avatar.png"} 
+              className="main-avatar" 
+              alt="Profile" 
+            />
+            <div className={`status-indicator ${user.isApproved ? 'active' : 'pending'}`}></div>
           </div>
-          {user.linkedin && (
-            <div className="info-item">
-              <label>LinkedIn</label>
-              <a 
-                href={ensureAbsoluteUrl(user.linkedin)} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="link-text"
-              >
-                View Profile
-              </a>
+          <div className="hero-identity">
+            <h1>{user.displayName || user.name}</h1>
+            <div className="identity-tags">
+              <span className="role-badge">{user.role?.toUpperCase()}</span>
+              <span className="branch-badge">{user.branch} • Class of {user.passoutYear}</span>
             </div>
-          )}
+          </div>
         </div>
-      </section>
 
-      {/* REMOVED: the extra <div className="profile-body"> that was here */}
-      
-      <section className="profile-row-group">
-        <h4 className="row-title">Professional Bio</h4>
-        <p className="bio-text">{user.bio || "No bio added yet."}</p>
-      </section>
+        <div className="profile-grid-layout">
+          {/* 2. Left Column: Summary & Links */}
+          <div className="profile-aside">
+            <div className="info-card-mini">
+              <h4>Contact Assets</h4>
+              <div className="asset-links">
+                {user.resumeUrl ? (
+                  <a href={user.resumeUrl} target="_blank" rel="noreferrer" className="asset-btn resume">
+                    <span className="icon">📄</span> Curriculum Vitae
+                  </a>
+                ) : (
+                  <div className="asset-btn disabled">No Resume Provided</div>
+                )}
+                {user.linkedin && (
+                  <a href={ensureAbsoluteUrl(user.linkedin)} target="_blank" rel="noreferrer" className="asset-btn linkedin">
+                    <span className="icon">🔗</span> LinkedIn Profile
+                  </a>
+                )}
+              </div>
+            </div>
 
-      <section className="profile-row-group">
-        <h4 className="row-title">Basic Information</h4>
-        <div className="grid-info">
-          <div className="info-item"><label>Email</label><span>{user.email}</span></div>
-          <div className="info-item"><label>Mobile</label><span>{user.mobile || 'N/A'}</span></div>
-          <div className="info-item"><label>Branch</label><span>{user.branch}</span></div>
-          <div className="info-item"><label>Batch</label><span>{user.passoutYear}</span></div>
-          <div className="info-item"><label>Father's Name</label><span>{user.fatherName}</span></div>
-          <div className="info-item"><label>DOB</label><span>{user.dob ? new Date(user.dob).toLocaleDateString() : 'N/A'}</span></div>
+            <div className="info-card-mini">
+              <h4>Quick Stats</h4>
+              <div className="stat-row">
+                <span>Member Status</span>
+                <b className={user.isApproved ? "text-success" : "text-warning"}>
+                  {user.isApproved ? "Verified" : "Pending Audit"}
+                </b>
+              </div>
+              <div className="stat-row">
+                <span>Account Type</span>
+                <b>Official Member</b>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Right Column: Detailed Info Sections */}
+          <div className="profile-main-body">
+            <section className="detail-section">
+              <h3 className="section-heading">Professional Statement</h3>
+              <p className="bio-paragraph">{user.bio || "This user prefers to keep their professional mystery. No bio added yet."}</p>
+            </section>
+
+            <section className="detail-section">
+              <h3 className="section-heading">Personal & Academic Portfolio</h3>
+              <div className="data-table">
+                <div className="data-row">
+                  <div className="data-cell">
+                    <label>Email Address</label>
+                    <span>{user.email}</span>
+                  </div>
+                  <div className="data-cell">
+                    <label>Primary Phone</label>
+                    <span>{user.mobile || 'Not Disclosed'}</span>
+                  </div>
+                </div>
+                <div className="data-row">
+                  <div className="data-cell">
+                    <label>Guardian Name</label>
+                    <span>{user.fatherName}</span>
+                  </div>
+                  <div className="data-cell">
+                    <label>Birth Date</label>
+                    <span>{user.dob ? new Date(user.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}</span>
+                  </div>
+                </div>
+                <div className="data-row">
+                  <div className="data-cell">
+                    <label>Secondary Education (10th)</label>
+                    <span>Class of {user.tenthYear}</span>
+                  </div>
+                  <div className="data-cell">
+                    <label>Higher Secondary (12th)</label>
+                    <span>Class of {user.twelfthYear}</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="detail-section">
+              <h3 className="section-heading">Residential Registry</h3>
+              <div className="address-grid">
+                <div className="address-box">
+                  <label>Current Mailing Address</label>
+                  <p>{user.currentAddress || 'No address on file.'}</p>
+                </div>
+                <div className="address-box">
+                  <label>Permanent Residence</label>
+                  <p>{user.permanentAddress || 'Same as current.'}</p>
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
-      </section>
-
-      <section className="profile-row-group">
-        <h4 className="row-title">Academic History</h4>
-        <div className="grid-info">
-          <div className="info-item"><label>10th Year</label><span>{user.tenthYear}</span></div>
-          <div className="info-item"><label>12th Year</label><span>{user.twelfthYear}</span></div>
-        </div>
-      </section>
-
-      <section className="profile-row-group">
-        <h4 className="row-title">Addresses</h4>
-        <div className="grid-info">
-          <div className="info-item"><label>Current</label><span>{user.currentAddress || 'N/A'}</span></div>
-          <div className="info-item"><label>Permanent</label><span>{user.permanentAddress || 'N/A'}</span></div>
-        </div>
-      </section>
-    </div> {/* Close the profile-body here */}
+      </div>
+    )}
   </div>
-)}
-    </div>
-  );
+);
 }
 
 export default Profile;
