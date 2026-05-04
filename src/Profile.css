@@ -217,3 +217,119 @@
   font-size: 0.9rem;
   color: #555;
 }
+
+/* --- VIEW MODE (mirroring Edit Profile form) --- */
+.profile-view-mode {
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+.profile-view-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  border-bottom: 2px solid #f1f1f1;
+  padding-bottom: 30px;
+}
+
+.avatar-cluster {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.status-pill {
+  margin-top: -15px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.status-pill.verified {
+  background: #27ae60;
+  color: #ffffff;
+}
+
+.status-pill.pending {
+  background: #f1c40f;
+  color: #1a0f2e;
+}
+
+/* Grid sections inside view mode */
+.grid-section {
+  margin-bottom: 40px;
+}
+
+.section-header {
+  color: #3d2069;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  border-left: 4px solid #d4af37;
+  padding-left: 15px;
+}
+
+/* Value Boxes – read-only field look */
+.value-box {
+  background: #f8f9fa;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #333;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #edf2f7;
+}
+
+.bio-box {
+  align-items: flex-start;
+  line-height: 1.6;
+  min-height: 80px;
+}
+
+/* Tags in view mode */
+.tag-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.mini-tag {
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mini-tag.gold {
+  background: #fff8e1;
+  color: #b8860b;
+  border: 1px solid #ffe082;
+}
+
+.mini-tag.violet {
+  background: #f3f0ff;
+  color: #5f3dc4;
+  border: 1px solid #dcd3ff;
+}
+
+/* Links in view mode */
+.link-text {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}
