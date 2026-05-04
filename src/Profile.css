@@ -14,7 +14,7 @@
   border: 1px solid #eee;
 }
 
-/* --- Hero Banner --- */
+/* --- Legacy Hero Banner (if still used anywhere) --- */
 .profile-hero-banner {
   background: linear-gradient(135deg, #2d1a4d 0%, #3d2069 100%);
   padding: 60px 40px 40px 40px;
@@ -83,7 +83,7 @@
   font-size: 0.95rem;
 }
 
-/* --- Grid Layout (Sidebar + Main) --- */
+/* --- Legacy Grid Layout (Sidebar + Main) --- */
 .profile-grid-layout {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -140,7 +140,7 @@
   font-size: 0.9rem;
 }
 
-/* --- Main Content Area --- */
+/* --- Main Content Area (legacy) --- */
 .section-heading {
   font-size: 1.1rem;
   color: #2d1a4d;
@@ -218,6 +218,23 @@
   color: #555;
 }
 
+/* --- FULL PARTITION VIEW CONTAINER --- */
+.profile-partition-wrapper {
+  width: 100%;
+  min-height: calc(100vh - 80px); /* Adjust based on your Navbar height */
+  background: #fdfdfd;
+  display: flex;
+}
+
+.profile-full-view {
+  width: 100%;
+  border-radius: 0; /* Remove rounded corners for full partition look */
+  border: none;
+  box-shadow: none;
+  padding: 60px; /* Generous breathing room */
+  background: #ffffff;
+}
+
 /* --- WIDE VIEW MODE (new) --- */
 .profile-view-wide {
   max-width: 1200px;
@@ -228,20 +245,27 @@
   border-radius: 16px;
 }
 
-/* Header Spacing */
+/* Header Spacing (shared for wide/full view) */
 .profile-view-header {
   display: flex;
-  gap: 40px;
+  gap: 50px;
   align-items: center;
+  padding-bottom: 50px;
+  border-bottom: 2px solid #f8f9fa;
   margin-bottom: 50px;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 40px;
 }
 
 .avatar-side {
   position: relative;
 }
 
+.avatar-side .profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+}
+
+/* Status pill */
 .status-pill {
   position: absolute;
   bottom: -10px;
@@ -265,28 +289,29 @@
   color: #1a0f2e;
 }
 
-/* Grid System */
+/* Grid System - Wide Layout */
 .profile-view-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Two column primary layout */
-  gap: 60px;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 80px;
+  row-gap: 40px;
 }
 
 .span-full {
-  grid-column: 1 / -1; /* Bio/Address section full width */
+  grid-column: 1 / -1;
   margin-top: 20px;
 }
 
 .column-label {
   color: #3d2069;
   font-size: 0.85rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   margin-bottom: 25px;
   display: block;
-  border-bottom: 2px solid #d4af37;
-  width: fit-content;
-  padding-bottom: 5px;
+  border-left: 5px solid #d4af37;
+  padding-left: 15px;
 }
 
 /* Data Display Boxes */
@@ -299,7 +324,8 @@
 .data-row-flex {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 30px;
+  margin-bottom: 20px;
 }
 
 .data-field label {
@@ -311,53 +337,60 @@
 }
 
 .static-value {
-  background: #fdfbf7; /* Very light gold tint */
-  padding: 14px 18px;
-  border-radius: 8px;
-  color: #333;
+  background: #f9f9fb;
+  padding: 16px 20px;
+  border-radius: 6px;
+  color: #2c3e50;
   font-weight: 500;
-  border: 1px solid #f1ece1;
+  border: 1px solid #edf2f7;
   min-height: 50px;
   display: flex;
   align-items: center;
 }
 
 .bio-display {
-  line-height: 1.6;
-  min-height: 100px;
+  line-height: 1.8;
+  min-height: 120px;
   align-items: flex-start;
 }
 
 .address-display {
   font-size: 0.9rem;
-  min-height: 70px;
+  min-height: 80px;
 }
 
-/* Hobbies Tags */
-.tag-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 5px 0;
+/* Badges & Tags */
+.info-badge {
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: 10px;
+  background: #f1f1f1;
+}
+
+.info-badge.role {
+  background: #d4af37;
+  color: #ffffff;
 }
 
 .v-tag {
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 0.85rem;
   font-weight: 600;
+  display: inline-block;
+  margin-right: 8px;
 }
 
 .v-tag.gold {
   background: #fff8e1;
   color: #b8860b;
-  border: 1px solid #ffe082;
 }
 
 .v-tag.violet {
   background: #f3f0ff;
   color: #5f3dc4;
-  border: 1px solid #dcd3ff;
 }
 
 /* Wide view links */

@@ -139,135 +139,214 @@ function Profile({ user, setUser, setSidebarContent }) {
     {isOnboarding ? (
        {/* ... keep onboarding form as is ... */}
     ) : isEditing ? (
-      <EditProfile 
-        user={user} 
-        ref={formRef} 
-        onCancel={() => setIsEditing(false)} 
-        onUpdate={(updated) => { setUser(updated); setIsEditing(false); }} 
+      <EditProfile
+        user={user}
+        ref={formRef}
+        onCancel={() => setIsEditing(false)}
+        onUpdate={(updated) => {
+          setUser(updated);
+          setIsEditing(false);
+        }}
       />
     ) : (
-  <div className="profile-card profile-view-wide">
-    {/* 1. TOP IDENTITY STRIP */}
-    <div className="profile-view-header">
-      <div className="avatar-side">
-        <img src={user.profilePhoto || "/default-avatar.png"} className="profile-avatar" alt="User" />
-        <div className={`status-pill ${user.isApproved ? 'verified' : 'pending'}`}>
-          {user.isApproved ? "Verified Member" : "Pending Verification"}
-        </div>
-      </div>
-      <div className="identity-side">
-        <h1>{user.displayName || user.name}</h1>
-        <div className="badge-row">
-          <span className="info-badge role">{user.role?.toUpperCase()}</span>
-          <span className="info-badge branch">{user.branch}</span>
-          <span className="info-badge year">Batch of {user.passoutYear}</span>
-        </div>
-      </div>
-    </div>
-
-    <div className="profile-view-grid">
-      {/* 2. CORE INFORMATION (Left Column) */}
-      <div className="view-column">
-        <h4 className="column-label">Identity & Contact</h4>
-        <div className="data-box-grid">
-          <div className="data-field">
-            <label>Father's Name</label>
-            <div className="static-value">{user.fatherName || '—'}</div>
-          </div>
-          <div className="data-field">
-            <label>Date of Birth</label>
-            <div className="static-value">
-              {user.dob ? new Date(user.dob).toLocaleDateString() : '—'}
-            </div>
-          </div>
-          <div className="data-field">
-            <label>Mobile</label>
-            <div className="static-value">{user.mobile || '—'}</div>
-          </div>
-          <div className="data-field">
-            <label>Email</label>
-            <div className="static-value email-val">{user.email}</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. ACADEMICS & INTERESTS (Middle Column) */}
-      <div className="view-column">
-        <h4 className="column-label">Academic & Interests</h4>
-        <div className="data-box-grid">
-          <div className="data-field half">
-            <label>10th Year</label>
-            <div className="static-value">{user.tenthYear || '—'}</div>
-          </div>
-          <div className="data-field half">
-            <label>12th Year</label>
-            <div className="static-value">{user.twelfthYear || '—'}</div>
-          </div>
-          <div className="data-field">
-            <label>Technical Hobbies</label>
-            <div className="tag-group">
-              {user.hobbiesTechnical?.length > 0 
-                ? user.hobbiesTechnical.map((h, i) => <span key={i} className="v-tag gold">{h}</span>)
-                : <span className="empty-text">No technical tags added</span>}
-            </div>
-          </div>
-          <div className="data-field">
-            <label>Personal Hobbies</label>
-            <div className="tag-group">
-              {user.hobbiesPersonal?.length > 0 
-                ? user.hobbiesPersonal.map((h, i) => <span key={i} className="v-tag violet">{h}</span>)
-                : <span className="empty-text">No personal tags added</span>}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. BIO & ADDRESSES (Full Width / Right Span) */}
-      <div className="view-column span-full">
-        <h4 className="column-label">Bio & Residential Registry</h4>
-        <div className="data-box-grid">
-          <div className="data-field full">
-            <label>Professional Bio</label>
-            <div className="static-value bio-display">{user.bio || "No professional statement provided."}</div>
-          </div>
-          <div className="data-row-flex">
-            <div className="data-field">
-              <label>Current Address</label>
-              <div className="static-value address-display">{user.currentAddress || '—'}</div>
-            </div>
-            <div className="data-field">
-              <label>Permanent Address</label>
-              <div className="static-value address-display">{user.permanentAddress || '—'}</div>
-            </div>
-          </div>
-          <div className="data-row-flex">
-            <div className="data-field">
-              <label>LinkedIn</label>
-              <div className="static-value">
-                {user.linkedin ? (
-                  <a href={ensureAbsoluteUrl(user.linkedin)} target="_blank" rel="noreferrer" className="action-link">
-                    External Profile ↗
-                  </a>
-                ) : 'Not Linked'}
+      <div className="profile-partition-wrapper">
+        <div className="profile-card profile-view-wide">
+          {/* 1. HEADER SECTION (Expanded) */}
+          <div className="profile-view-header">
+            <div className="avatar-side">
+              <img
+                src={user.profilePhoto || "/default-avatar.png"}
+                className="profile-avatar"
+                alt="User"
+              />
+              <div
+                className={`status-pill ${
+                  user.isApproved ? "verified" : "pending"
+                }`}
+              >
+                {user.isApproved ? "Verified Member" : "Pending Verification"}
               </div>
             </div>
-            <div className="data-field">
-              <label>Resume</label>
-              <div className="static-value">
-                {user.resumeUrl ? (
-                  <a href={user.resumeUrl} target="_blank" rel="noreferrer" className="action-link">
-                    Download PDF ↗
-                  </a>
-                ) : 'Not Uploaded'}
+
+            <div className="identity-side">
+              <h1>{user.displayName || user.name}</h1>
+              <div className="badge-row">
+                <span className="info-badge role">
+                  {user.role?.toUpperCase()}
+                </span>
+                <span className="info-badge branch">{user.branch}</span>
+                <span className="info-badge year">
+                  Batch of {user.passoutYear}
+                </span>
               </div>
             </div>
           </div>
+
+          <div className="profile-view-grid">
+            {/* 2. IDENTITY & CONTACT (Left Column) */}
+            <div className="view-column">
+              <h4 className="column-label">Identity & Contact</h4>
+              <div className="data-box-grid">
+                <div className="data-row-flex">
+                  <div className="data-field">
+                    <label>Father&apos;s Name</label>
+                    <div className="static-value">
+                      {user.fatherName || "—"}
+                    </div>
+                  </div>
+                  <div className="data-field">
+                    <label>Date of Birth</label>
+                    <div className="static-value">
+                      {user.dob
+                        ? new Date(user.dob).toLocaleDateString()
+                        : "—"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="data-row-flex">
+                  <div className="data-field">
+                    <label>Mobile</label>
+                    <div className="static-value">{user.mobile || "—"}</div>
+                  </div>
+                  <div className="data-field">
+                    <label>Email</label>
+                    <div className="static-value email-val">
+                      {user.email}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. ACADEMICS & INTERESTS (Right Column) */}
+            <div className="view-column">
+              <h4 className="column-label">Academic & Interests</h4>
+              <div className="data-box-grid">
+                <div className="data-row-flex">
+                  <div className="data-field">
+                    <label>10th Year</label>
+                    <div className="static-value">
+                      {user.tenthYear || "—"}
+                    </div>
+                  </div>
+                  <div className="data-field">
+                    <label>12th Year</label>
+                    <div className="static-value">
+                      {user.twelfthYear || "—"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="data-field">
+                  <label>Technical Hobbies</label>
+                  <div className="tag-group">
+                    {user.hobbiesTechnical?.length > 0 ? (
+                      user.hobbiesTechnical.map((h, i) => (
+                        <span key={i} className="v-tag gold">
+                          {h}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="empty-text">
+                        No technical tags added
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="data-field">
+                  <label>Personal Hobbies</label>
+                  <div className="tag-group">
+                    {user.hobbiesPersonal?.length > 0 ? (
+                      user.hobbiesPersonal.map((h, i) => (
+                        <span key={i} className="v-tag violet">
+                          {h}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="empty-text">
+                        No personal tags added
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. BIO & ADDRESSES (Full Width) */}
+            <div className="view-column span-full">
+              <h4 className="column-label">Professional Statement</h4>
+              <div className="data-field full">
+                <div className="static-value bio-display">
+                  {user.bio || "No professional statement provided."}
+                </div>
+              </div>
+            </div>
+
+            <div className="view-column span-full">
+              <h4 className="column-label">
+                Residential & Professional Registry
+              </h4>
+
+              <div className="data-row-flex">
+                <div className="data-field">
+                  <label>Current Address</label>
+                  <div className="static-value address-display">
+                    {user.currentAddress || "—"}
+                  </div>
+                </div>
+                <div className="data-field">
+                  <label>Permanent Address</label>
+                  <div className="static-value address-display">
+                    {user.permanentAddress || "—"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="data-row-flex">
+                <div className="data-field">
+                  <label>LinkedIn</label>
+                  <div className="static-value">
+                    {user.linkedin ? (
+                      <a
+                        href={ensureAbsoluteUrl(user.linkedin)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="action-link"
+                      >
+                        External Profile ↗
+                      </a>
+                    ) : (
+                      "Not Linked"
+                    )}
+                  </div>
+                </div>
+
+                <div className="data-field">
+                  <label>Resume</label>
+                  <div className="static-value">
+                    {user.resumeUrl ? (
+                      <a
+                        href={user.resumeUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="action-link"
+                      >
+                        Download PDF ↗
+                      </a>
+                    ) : (
+                      "Not Uploaded"
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    )}
   </div>
-)}
-</div>
 );
 }
 
