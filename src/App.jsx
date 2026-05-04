@@ -8,6 +8,7 @@ import './App.css';
 import './Portal.css';
 import './FeatureStrip.css';
 import './Manual.css';
+import './AboutUs.css';
 import AdminDashboard from './AdminDashboard';
 import Profile from './Profile';
 import MapSearchSection from './MapSearchSection';

@@ -1,0 +1,91 @@
+.about-page-wrapper {
+  background-color: #f4f4f4;
+  color: #333;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Hero Section */
+.about-hero-strip {
+  background: linear-gradient(rgba(26, 15, 46, 0.9), rgba(26, 15, 46, 0.9)), url('/campus-bg.jpg');
+  background-size: cover;
+  padding: 80px 5%;
+  text-align: center;
+  color: white;
+}
+
+.about-main-logo { height: 100px; margin-bottom: 20px; }
+.legacy-tag { color: #d4af37; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+
+/* Global Strip Styling */
+.about-strip {
+  padding: 80px 10%;
+  border-bottom: 1px solid #eee;
+}
+
+.content-container { max-width: 1100px; margin: 0 auto; }
+
+.section-title-gold { color: #2d1a4d; font-size: 2.5rem; margin-bottom: 40px; text-align: center; }
+.section-title-white { color: #fff; font-size: 2.5rem; margin-bottom: 40px; text-align: center; }
+
+/* Bento Grid */
+.milestones-bg { background-color: #2d1a4d; color: white; }
+.milestone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.m-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.m-card strong { display: block; font-size: 1.8rem; color: #d4af37; margin-bottom: 10px; }
+.m-card.highlight { background: rgba(212, 175, 55, 0.1); border: 2px solid #d4af37; }
+
+/* Vision/Mission */
+.vision-mission-row {
+  display: flex;
+  gap: 30px;
+  margin-top: 50px;
+}
+
+.vm-box {
+  flex: 1;
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.vm-box h3 { color: #d4af37; margin-bottom: 15px; }
+
+/* History Items */
+.history-item {
+  margin-bottom: 50px;
+  padding-left: 30px;
+  border-left: 3px solid #d4af37;
+}
+
+.history-item h3 { color: #2d1a4d; margin-bottom: 15px; }
+
+.back-btn-gold {
+  margin-top: 30px;
+  background: #d4af37;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.about-footer-simple {
+  padding: 40px;
+  text-align: center;
+  background: #1a0f2e;
+  color: #888;
+  font-size: 0.9rem;
+}
