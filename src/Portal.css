@@ -271,7 +271,8 @@
   padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Consistent spacing between sections */
+  gap: 10px;
+  min-height: 180px;
   transition: all 0.25s ease;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
@@ -333,7 +334,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 4px 0; /* breathing room above/below */
+  margin-top: 4px; /* Slight gap from the company name */
+  margin-bottom: 8px; /* Gap before the footer line */
 }
 
 /* Status Indicator Styling (now mid-bar sub-tags) */
@@ -383,13 +385,12 @@
 
 /* Footer: simple two-sided layout */
 .card-metadata {
-  margin-top: auto; /* push footer to bottom */
+  margin-top: auto; /* This pushes the mid-bar and info up */
   padding-top: 10px;
   border-top: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
 }
 
 .meta-left {
@@ -398,8 +399,7 @@
 
 .meta-right {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  justify-content: flex-end;
 }
 
 .view-more {

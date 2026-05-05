@@ -198,62 +198,59 @@ return () => {
           const contacted = hasContacted(n._id);
 
           return (
-            /* REPLACED CARD STARTS HERE */
-            <div
-              key={n._id}
-              className={`notice-card glance ${n.isFilled ? 'filled-status' : ''}`}
-              onClick={() => setSelectedNotice(n)}
-            >
-              {/* TOP ROW: Just Type and Deadline */}
-              <div className="card-status-bar">
-                <span className={`type-tag ${n.opportunityType.toLowerCase()}`}>
-                  {n.opportunityType}
-                </span>
-                <span className={`deadline-tag ${deadline.class}`}>
-                  {deadline.label}
-                </span>
-              </div>
+    <div
+      key={n._id}
+      className={`notice-card glance ${n.isFilled ? 'filled-status' : ''}`}
+      onClick={() => setSelectedNotice(n)}
+    >
+      {/* 1. TOP BAR: Type & Deadline */}
+      <div className="card-status-bar">
+        <span className={`type-tag ${n.opportunityType.toLowerCase()}`}>
+          {n.opportunityType}
+        </span>
+        <span className={`deadline-tag ${deadline.class}`}>
+          {deadline.label}
+        </span>
+      </div>
 
-              {/* MAIN CONTENT: Title and Company */}
-              <div className="card-main-info">
-                <h4 className="notice-title">{n.title}</h4>
-                <p className="notice-company">
-                  <span className="icon">🏢</span> {n.company}
-                </p>
-              </div>
+      {/* 2. MAIN INFO: Title and Company */}
+      <div className="card-main-info">
+        <h4 className="notice-title">{n.title}</h4>
+        <p className="notice-company">
+          <span className="icon">🏢</span> {n.company}
+        </p>
+      </div>
 
-              {/* STATUS MID-BAR: Dedicated space for secondary tags */}
-              {(contacted || n.isFilled) && (
-                <div className="card-status-mid">
-                  {contacted && (
-                    <span className="status-indicator contacted">
-                      ✓ Contacted
-                    </span>
-                  )}
-                  {n.isFilled && (
-                    <span className="status-indicator filled">
-                      Closed
-                    </span>
-                  )}
-                </div>
-              )}
+      {/* 3. STATUS MID-BAR: Now appearing below Company, above Footer */}
+      {(contacted || n.isFilled) && (
+        <div className="card-status-mid">
+          {contacted && (
+            <span className="status-indicator contacted">
+              ✓ Contacted
+            </span>
+          )}
+          {n.isFilled && (
+            <span className="status-indicator filled">
+              Closed
+            </span>
+          )}
+        </div>
+      )}
 
-              {/* FOOTER: Only Meta information */}
-              <div className="card-metadata">
-                <div className="meta-left">
-                  <span className="post-date">
-                    📅 {new Date(n.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="meta-right">
-                  <span className="view-more">View Details →</span>
-                </div>
-              </div>
-            </div>
-            /* REPLACED CARD ENDS HERE */
-          );
-        })}
-
+      {/* 4. FOOTER: Date and View Details ONLY */}
+      <div className="card-metadata">
+        <div className="meta-left">
+          <span className="post-date">
+            📅 {new Date(n.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+        <div className="meta-right">
+          <span className="view-more">View Details →</span>
+        </div>
+      </div>
+    </div>
+  );
+})}
         {filteredNotices.length === 0 && (
           <p
             style={{
