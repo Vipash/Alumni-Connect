@@ -178,60 +178,157 @@ return () => {
       </h3>
     </div>
 
-    {/* NEW: Scroll area wrapper */}
-     <div className="hub-content-body" style={{ width: '100%', height: 'auto', display: 'block', maxWidth: '100%', boxSizing: 'border-box' }}>
-        {activeSubTab === 'bulletin' && (
-          <>
-            {!selectedNotice ? (
-              <div className="notice-grid">
-                {filteredNotices.map(n => {
-                  const deadline = getDeadlineStatus(n.deadline);
-                  const contacted = hasContacted(n._id);
-                  return (
-                    <div key={n._id} className={`notice-card glance ${n.isFilled ? 'filled-status' : ''}`} onClick={() => setSelectedNotice(n)}>
-                      <div className="card-top-row">
-                        <div className="notice-badge">{n.opportunityType}</div>
-                        <div className={`deadline-badge ${deadline.class}`}>{deadline.label}</div>
-                      </div>
-                      <h4>{n.title}</h4>
-                      <p className="company-tag">🏢 {n.company}</p>
-                      <div className="card-footer-tags">
-                        <span className="posted-at">📅 {new Date(n.createdAt).toLocaleDateString()}</span>
-                        {contacted && <span className="contacted-tag">✓ Contacted</span>}
-                        {n.isFilled && <span className="filled-tag">Filled</span>}
-                      </div>
-                    </div>
-                  );
-                })}
-                {filteredNotices.length === 0 && <p style={{gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#888'}}>No matches found.</p>}
-              </div>
-            ) : (
-              <div className="notice-detail-view">
-                <button className="admin-btn" style={{width: 'auto', marginBottom: '15px'}} onClick={() => setSelectedNotice(null)}>← Back</button>
-                <div className="detail-content">
-                  <span className="badge-pill">{selectedNotice.opportunityType}</span>
-                  <h2>{selectedNotice.title}</h2>
-                  <div className="details-text">{selectedNotice.details}</div>
-                  <div className="alumni-mini-card">
-                    <p>Posted by: <strong>{selectedNotice.postedBy?.name}</strong></p>
-                    <button className="nav-btn" style={{width: 'auto', fontSize: '0.8rem'}} onClick={() => setViewProfile(selectedNotice.postedBy)}>View Profile</button>
+   {/* NEW: Scroll area wrapper */}
+<div
+  className="hub-content-body"
+  style={{
+    width: '100%',
+    height: 'auto',
+    display: 'block',
+    maxWidth: '100%',
+    boxSizing: 'border-box',
+  }}
+>
+  {activeSubTab === 'bulletin' && (
+    <>
+      {!selectedNotice ? (
+        <div className="notice-grid">
+          {filteredNotices.map((n) => {
+            const deadline = getDeadlineStatus(n.deadline);
+            const contacted = hasContacted(n._id);
+
+            return (
+              // REPLACED CARD STARTS HERE
+              <div
+                key={n._id}
+                className={`notice-card glance ${
+                  n.isFilled ? 'filled-status' : ''
+                }`}
+                onClick={() => setSelectedNotice(n)}
+              >
+                {/* TOP ROW: Opportunity Type & Deadline Status */}
+                <div className="card-status-bar">
+                  <span
+                    className={`type-tag ${n.opportunityType.toLowerCase()}`}
+                  >
+                    {n.opportunityType}
+                  </span>
+                  <span className={`deadline-tag ${deadline.class}`}>
+                    {deadline.label}
+                  </span>
+                </div>
+
+                {/* MAIN CONTENT: Title and Company */}
+                <div className="card-main-info">
+                  <h4 className="notice-title">{n.title}</h4>
+                  <p className="notice-company">
+                    <span className="icon">🏢</span> {n.company}
+                  </p>
+                </div>
+
+                {/* FOOTER: Meta info */}
+                <div className="card-metadata">
+                  <div className="meta-left">
+                    <span className="post-date">
+                      Posted: {new Date(n.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
-                  <div className="action-row" style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
-                    <button 
-                      className="submit-btn" 
-                      disabled={selectedNotice.isFilled || new Date(selectedNotice.deadline) < new Date()}
-                      style={{ backgroundColor: (selectedNotice.isFilled || new Date(selectedNotice.deadline) < new Date()) ? '#ccc' : '' }}
-                      onClick={() => handleConnect(selectedNotice)}
-                    >
-                      {selectedNotice.isFilled ? "Position Filled" : (new Date(selectedNotice.deadline) < new Date() ? "Expired" : "Connect Now")}
-                    </button>
+                  <div className="meta-right">
+                    {contacted && (
+                      <span className="status-indicator contacted">
+                        ✓ Contacted
+                      </span>
+                    )}
+                    {n.isFilled && (
+                      <span className="status-indicator filled">Closed</span>
+                    )}
+                    <span className="view-more">View Details →</span>
                   </div>
                 </div>
               </div>
-            )}
-          </>
-        )}
+              // REPLACED CARD ENDS HERE
+            );
+          })}
 
+          {filteredNotices.length === 0 && (
+            <p
+              style={{
+                gridColumn: '1 / -1',
+                textAlign: 'center',
+                padding: '40px',
+                color: '#888',
+              }}
+            >
+              No matches found.
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="notice-detail-view">
+          <button
+            className="admin-btn"
+            style={{ width: 'auto', marginBottom: '15px' }}
+            onClick={() => setSelectedNotice(null)}
+          >
+            ← Back
+          </button>
+
+          <div className="detail-content">
+            <span className="badge-pill">
+              {selectedNotice.opportunityType}
+            </span>
+            <h2>{selectedNotice.title}</h2>
+            <div className="details-text">{selectedNotice.details}</div>
+
+            <div className="alumni-mini-card">
+              <p>
+                Posted by:{' '}
+                <strong>{selectedNotice.postedBy?.name}</strong>
+              </p>
+              <button
+                className="nav-btn"
+                style={{ width: 'auto', fontSize: '0.8rem' }}
+                onClick={() => setViewProfile(selectedNotice.postedBy)}
+              >
+                View Profile
+              </button>
+            </div>
+
+            <div
+              className="action-row"
+              style={{
+                marginTop: '20px',
+                display: 'flex',
+                gap: '10px',
+              }}
+            >
+              <button
+                className="submit-btn"
+                disabled={
+                  selectedNotice.isFilled ||
+                  new Date(selectedNotice.deadline) < new Date()
+                }
+                style={{
+                  backgroundColor:
+                    selectedNotice.isFilled ||
+                    new Date(selectedNotice.deadline) < new Date()
+                      ? '#ccc'
+                      : '',
+                }}
+                onClick={() => handleConnect(selectedNotice)}
+              >
+                {selectedNotice.isFilled
+                  ? 'Position Filled'
+                  : new Date(selectedNotice.deadline) < new Date()
+                  ? 'Expired'
+                  : 'Connect Now'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )}
         {activeSubTab === 'history' && (
           <div className="history-section">
             <table className="admin-table">
