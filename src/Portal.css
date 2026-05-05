@@ -329,21 +329,38 @@
   color: #dc2626;
 }
 
-/* Mid-bar for contacted/filled tags */
-.card-status-mid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px; /* Slight gap from the company name */
-  margin-bottom: 8px; /* Gap before the footer line */
+/* Mid-bar for contacted/filled tags – scoped to the card */
+.notice-card.glance .card-status-mid {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  height: auto !important;           /* expand based on content */
+  min-height: 20px !important;
+  width: 100% !important;
+  position: relative !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  gap: 8px !important;
+  margin: 5px 0 !important;          /* space around mid-bar */
+  clear: both !important;
 }
 
-/* Status Indicator Styling (now mid-bar sub-tags) */
-.status-indicator {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 4px;
+/* Status Indicator Styling (reset any leaked positioning) */
+.notice-card.glance .status-indicator {
+  position: static !important;       /* kill absolute/fixed from elsewhere */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: none !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  top: auto !important;
+
+  font-size: 0.7rem !important;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
   white-space: nowrap;
 }
 
@@ -494,7 +511,6 @@
 .notice-form-modal label {display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--mbm-blue);}
 .notice-form-modal .input-group {display: grid; grid-template-columns: 1fr 1fr; gap: 15px;}
 /* --- DETAIL VIEW STYLING --- */
-.notice-card.glance {cursor: pointer; border-left-width: 8px;}
 .click-hint { font-size: 0.8rem; color: var(--mbm-blue); font-weight: bold; margin-top: 10px; }
 .posted-at { font-size: 0.75rem; color: #888; }
 .notice-detail-view {background: white; padding: 30px; border-radius: 15px; box-shadow: var(--shadow); animation: fadeIn 0.3s ease;}
