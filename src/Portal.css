@@ -271,7 +271,7 @@
   padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 12px; /* Consistent spacing between sections */
   transition: all 0.25s ease;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
@@ -283,20 +283,12 @@
   border-color: var(--mbm-blue);
 }
 
-/* Top Bar Layout */
+/* Top Bar Layout: type + deadline */
 .card-status-bar {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-/* Container for tags on the left (type + contacted/filled) */
-.status-left {
-  display: flex;
-  flex-wrap: wrap; /* Allows tags to stack if the card is very narrow */
-  gap: 6px;
   align-items: center;
+  width: 100%;
 }
 
 /* Header: type tag */
@@ -336,12 +328,19 @@
   color: #dc2626;
 }
 
-/* Status Indicator Styling (now in the top bar) */
+/* Mid-bar for contacted/filled tags */
+.card-status-mid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0; /* breathing room above/below */
+}
+
+/* Status Indicator Styling (now mid-bar sub-tags) */
 .status-indicator {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
   border-radius: 4px;
   white-space: nowrap;
 }
@@ -382,10 +381,10 @@
   margin-right: 4px;
 }
 
-/* Footer Cleanup: simple two-sided layout */
+/* Footer: simple two-sided layout */
 .card-metadata {
-  margin-top: auto;
-  padding-top: 12px;
+  margin-top: auto; /* push footer to bottom */
+  padding-top: 10px;
   border-top: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
@@ -416,6 +415,7 @@
   filter: grayscale(0.5);
   background: #f8fafc;
 }
+
 /* Buttons / other elements keep existing styles */
 .connect-btn {
   width: auto !important;

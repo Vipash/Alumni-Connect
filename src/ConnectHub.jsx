@@ -204,13 +204,27 @@ return () => {
               className={`notice-card glance ${n.isFilled ? 'filled-status' : ''}`}
               onClick={() => setSelectedNotice(n)}
             >
-              {/* TOP ROW: Grouped Status Tags & Deadline */}
+              {/* TOP ROW: Just Type and Deadline */}
               <div className="card-status-bar">
-                <div className="status-left">
-                  <span className={`type-tag ${n.opportunityType.toLowerCase()}`}>
-                    {n.opportunityType}
-                  </span>
-                  {/* Moved tags here to prevent footer overflow */}
+                <span className={`type-tag ${n.opportunityType.toLowerCase()}`}>
+                  {n.opportunityType}
+                </span>
+                <span className={`deadline-tag ${deadline.class}`}>
+                  {deadline.label}
+                </span>
+              </div>
+
+              {/* MAIN CONTENT: Title and Company */}
+              <div className="card-main-info">
+                <h4 className="notice-title">{n.title}</h4>
+                <p className="notice-company">
+                  <span className="icon">🏢</span> {n.company}
+                </p>
+              </div>
+
+              {/* STATUS MID-BAR: Dedicated space for secondary tags */}
+              {(contacted || n.isFilled) && (
+                <div className="card-status-mid">
                   {contacted && (
                     <span className="status-indicator contacted">
                       ✓ Contacted
@@ -222,23 +236,9 @@ return () => {
                     </span>
                   )}
                 </div>
+              )}
 
-                <div className="status-right">
-                  <span className={`deadline-tag ${deadline.class}`}>
-                    {deadline.label}
-                  </span>
-                </div>
-              </div>
-
-              {/* MAIN CONTENT: Title and Company */}
-              <div className="card-main-info">
-                <h4 className="notice-title">{n.title}</h4>
-                <p className="notice-company">
-                  <span className="icon">🏢</span> {n.company}
-                </p>
-              </div>
-
-              {/* CLEAN FOOTER: Simple and stable */}
+              {/* FOOTER: Only Meta information */}
               <div className="card-metadata">
                 <div className="meta-left">
                   <span className="post-date">
