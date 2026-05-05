@@ -357,36 +357,51 @@
   border-top: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end; /* Aligns items to the bottom if they wrap */
+  gap: 10px;
   font-size: 0.8rem;
 }
 
 .meta-left {
   color: #94a3b8;
+  flex-shrink: 0; /* Prevents the date from getting squished */
 }
 
 .meta-right {
   display: flex;
+  flex-wrap: wrap; /* CRITICAL: Allows tags to move to a second line instead of breaking the box */
+  justify-content: flex-end;
   align-items: center;
-  gap: 12px;
+  gap: 8px; /* Precise spacing between tags */
+  max-width: 70%; /* Prevents the tags from crowding the date too much */
 }
 
+/* Ensure indicators are precise boxes themselves */
 .status-indicator {
   font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap; /* Prevents the text inside the tag from splitting */
+  font-size: 0.7rem;
 }
 
-.status-indicator.contacted {
-  color: #059669;
+.status-indicator.contacted { 
+  background: #ecfdf5; 
+  color: #059669; 
+  border: 1px solid #d1fae5;
 }
 
-.status-indicator.filled {
-  color: #94a3b8;
-  text-decoration: line-through;
+.status-indicator.filled { 
+  background: #f1f5f9; 
+  color: #64748b; 
+  border: 1px solid #e2e8f0;
 }
 
 .view-more {
   color: var(--mbm-blue);
   font-weight: 700;
+  white-space: nowrap;
+  margin-left: 4px;
 }
 
 /* "Filled" State Overlay */
