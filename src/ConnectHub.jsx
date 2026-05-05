@@ -190,145 +190,149 @@ return () => {
   }}
 >
   {activeSubTab === 'bulletin' && (
-    <>
-      {!selectedNotice ? (
-        <div className="notice-grid">
-          {filteredNotices.map((n) => {
-            const deadline = getDeadlineStatus(n.deadline);
-            const contacted = hasContacted(n._id);
+  <>
+    {!selectedNotice ? (
+      <div className="notice-grid">
+        {filteredNotices.map((n) => {
+          const deadline = getDeadlineStatus(n.deadline);
+          const contacted = hasContacted(n._id);
 
-            return (
-              // REPLACED CARD STARTS HERE
-              <div
-                key={n._id}
-                className={`notice-card glance ${
-                  n.isFilled ? 'filled-status' : ''
-                }`}
-                onClick={() => setSelectedNotice(n)}
-              >
-                {/* TOP ROW: Opportunity Type & Deadline Status */}
-                <div className="card-status-bar">
-                  <span
-                    className={`type-tag ${n.opportunityType.toLowerCase()}`}
-                  >
+          return (
+            /* REPLACED CARD STARTS HERE */
+            <div
+              key={n._id}
+              className={`notice-card glance ${n.isFilled ? 'filled-status' : ''}`}
+              onClick={() => setSelectedNotice(n)}
+            >
+              {/* TOP ROW: Grouped Status Tags & Deadline */}
+              <div className="card-status-bar">
+                <div className="status-left">
+                  <span className={`type-tag ${n.opportunityType.toLowerCase()}`}>
                     {n.opportunityType}
                   </span>
+                  {/* Moved tags here to prevent footer overflow */}
+                  {contacted && (
+                    <span className="status-indicator contacted">
+                      ✓ Contacted
+                    </span>
+                  )}
+                  {n.isFilled && (
+                    <span className="status-indicator filled">
+                      Closed
+                    </span>
+                  )}
+                </div>
+
+                <div className="status-right">
                   <span className={`deadline-tag ${deadline.class}`}>
                     {deadline.label}
                   </span>
                 </div>
+              </div>
 
-                {/* MAIN CONTENT: Title and Company */}
-                <div className="card-main-info">
-                  <h4 className="notice-title">{n.title}</h4>
-                  <p className="notice-company">
-                    <span className="icon">🏢</span> {n.company}
-                  </p>
+              {/* MAIN CONTENT: Title and Company */}
+              <div className="card-main-info">
+                <h4 className="notice-title">{n.title}</h4>
+                <p className="notice-company">
+                  <span className="icon">🏢</span> {n.company}
+                </p>
+              </div>
+
+              {/* CLEAN FOOTER: Simple and stable */}
+              <div className="card-metadata">
+                <div className="meta-left">
+                  <span className="post-date">
+                    📅 {new Date(n.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
-
-                {/* FOOTER: Meta info */}
-                <div className="card-metadata">
-                  <div className="meta-left">
-                    <span className="post-date">
-                      Posted: {new Date(n.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="meta-right">
-                    {contacted && (
-                      <span className="status-indicator contacted">
-                        ✓ Contacted
-                      </span>
-                    )}
-                    {n.isFilled && (
-                      <span className="status-indicator filled">Closed</span>
-                    )}
-                    <span className="view-more">View Details →</span>
-                  </div>
+                <div className="meta-right">
+                  <span className="view-more">View Details →</span>
                 </div>
               </div>
-              // REPLACED CARD ENDS HERE
-            );
-          })}
-
-          {filteredNotices.length === 0 && (
-            <p
-              style={{
-                gridColumn: '1 / -1',
-                textAlign: 'center',
-                padding: '40px',
-                color: '#888',
-              }}
-            >
-              No matches found.
-            </p>
-          )}
-        </div>
-      ) : (
-        <div className="notice-detail-view">
-          <button
-            className="admin-btn"
-            style={{ width: 'auto', marginBottom: '15px' }}
-            onClick={() => setSelectedNotice(null)}
-          >
-            ← Back
-          </button>
-
-          <div className="detail-content">
-            <span className="badge-pill">
-              {selectedNotice.opportunityType}
-            </span>
-            <h2>{selectedNotice.title}</h2>
-            <div className="details-text">{selectedNotice.details}</div>
-
-            <div className="alumni-mini-card">
-              <p>
-                Posted by:{' '}
-                <strong>{selectedNotice.postedBy?.name}</strong>
-              </p>
-              <button
-                className="nav-btn"
-                style={{ width: 'auto', fontSize: '0.8rem' }}
-                onClick={() => setViewProfile(selectedNotice.postedBy)}
-              >
-                View Profile
-              </button>
             </div>
+            /* REPLACED CARD ENDS HERE */
+          );
+        })}
 
-            <div
-              className="action-row"
-              style={{
-                marginTop: '20px',
-                display: 'flex',
-                gap: '10px',
-              }}
+        {filteredNotices.length === 0 && (
+          <p
+            style={{
+              gridColumn: '1 / -1',
+              textAlign: 'center',
+              padding: '40px',
+              color: '#888',
+            }}
+          >
+            No matches found.
+          </p>
+        )}
+      </div>
+    ) : (
+      <div className="notice-detail-view">
+        <button
+          className="admin-btn"
+          style={{ width: 'auto', marginBottom: '15px' }}
+          onClick={() => setSelectedNotice(null)}
+        >
+          ← Back
+        </button>
+
+        <div className="detail-content">
+          <span className="badge-pill">
+            {selectedNotice.opportunityType}
+          </span>
+          <h2>{selectedNotice.title}</h2>
+          <div className="details-text">{selectedNotice.details}</div>
+
+          <div className="alumni-mini-card">
+            <p>
+              Posted by:{' '}
+              <strong>{selectedNotice.postedBy?.name}</strong>
+            </p>
+            <button
+              className="nav-btn"
+              style={{ width: 'auto', fontSize: '0.8rem' }}
+              onClick={() => setViewProfile(selectedNotice.postedBy)}
             >
-              <button
-                className="submit-btn"
-                disabled={
+              View Profile
+            </button>
+          </div>
+
+          <div
+            className="action-row"
+            style={{
+              marginTop: '20px',
+              display: 'flex',
+              gap: '10px',
+            }}
+          >
+            <button
+              className="submit-btn"
+              disabled={
+                selectedNotice.isFilled ||
+                new Date(selectedNotice.deadline) < new Date()
+              }
+              style={{
+                backgroundColor:
                   selectedNotice.isFilled ||
                   new Date(selectedNotice.deadline) < new Date()
-                }
-                style={{
-                  backgroundColor:
-                    selectedNotice.isFilled ||
-                    new Date(selectedNotice.deadline) < new Date()
-                      ? '#ccc'
-                      : '',
-                }}
-                onClick={() => handleConnect(selectedNotice)}
-              >
-                {selectedNotice.isFilled
-                  ? 'Position Filled'
-                  : new Date(selectedNotice.deadline) < new Date()
-                  ? 'Expired'
-                  : 'Connect Now'}
-              </button>
-            </div>
+                    ? '#ccc'
+                    : '',
+              }}
+              onClick={() => handleConnect(selectedNotice)}
+            >
+              {selectedNotice.isFilled
+                ? 'Position Filled'
+                : new Date(selectedNotice.deadline) < new Date()
+                ? 'Expired'
+                : 'Connect Now'}
+            </button>
           </div>
         </div>
-      )}
-    </>
-  )}
+      </div>
+    )}
+  </>
+)}
         {activeSubTab === 'history' && (
           <div className="history-section">
             <table className="admin-table">
