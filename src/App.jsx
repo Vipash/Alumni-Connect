@@ -725,7 +725,7 @@ const downloadMagazine = () => {
       className="floating-logo"
       style={{ margin: '0 auto 20px auto', display: 'block' }}
     />
-    <h1 className="hero-title" style={{ color: '#4c2882', margin: 0 }}>
+    <h1 className="hero-title" style={{ color: '#08056d', margin: 0 }}>
       MBM ALUMNI CONNECT
     </h1>
     <p className="hero-subtitle" style={{ color: '#333', fontWeight: '500' }}>

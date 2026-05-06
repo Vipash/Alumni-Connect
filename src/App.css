@@ -326,8 +326,8 @@ button:hover {
   align-items: center;
 
   background: linear-gradient(
-      rgba(28, 78, 244, 0.535),
-      rgba(72, 148, 255, 0.738)
+      rgba(6, 32, 119, 0.295),
+      rgba(6, 20, 112, 0.504)
     ),
     url('/university-background.png');
   background-size: cover !important;
