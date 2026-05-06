@@ -6,7 +6,7 @@
 
 /* Hero Section */
 .about-hero-strip {
-  background: linear-gradient(rgba(26, 15, 46, 0.9), rgba(26, 15, 46, 0.9)), url('/campus-bg.jpg');
+  background: linear-gradient(rgba(24, 0, 130, 0.9), rgba(24, 17, 129, 0.386)), url('/campus-bg.jpg');
   background-size: cover;
   padding: 80px 5%;
   text-align: center;
