@@ -1,5 +1,6 @@
 // AdminDashboard.jsx
 import { useState, useEffect } from 'react';
+import PortalOverview from './PortalOverview';
 
 function AdminDashboard({ admin, setView, onLogout }) {
   // 1. STATE
@@ -556,32 +557,6 @@ const deleteNewsItem = async (id) => {
     }
   }, [activeTab, announcementMode, subView]);
   useEffect(() => { if (activeTab === 'media') fetchExistingMedia(); }, [activeTab]);
-
-  // 5. SUBCOMPONENTS
-  const PortalOverview = () => (
-    <div className="admin-overview-container">
-      <div className="overview-header">
-        <h2>Portal Overview</h2>
-        <p>Live system status and user distribution.</p>
-      </div>
-      <div className="admin-stats-grid">
-        <div className="stat-card">
-          <h4>Alumni</h4>
-          <p>Verified: <strong>{stats?.alumni?.verified || 0}</strong></p>
-          <p className="pending-text">Pending: {stats?.alumni?.pending || 0}</p>
-        </div>
-        <div className="stat-card">
-          <h4>Students</h4>
-          <p>Verified: <strong>{stats?.students?.verified || 0}</strong></p>
-          <p className="pending-text">Pending: {stats?.students?.pending || 0}</p>
-        </div>
-        <div className="stat-card">
-          <h4>Security</h4>
-          <p>Status: <span style={{ color: 'green' }}>Healthy</span></p>
-        </div>
-      </div>
-    </div>
-  );
 
   const FeedbackView = () => (
     <div className="admin-support-container">
@@ -1191,7 +1166,7 @@ const deleteNewsItem = async (id) => {
 
         {/* Main table area */}
         <div className="tab-render-area">
-          {activeTab === 'overview' && <PortalOverview />}
+          {activeTab === 'overview' && <PortalOverview stats={stats} />}
           {activeTab === 'manage-admins' && <ManageAdmins />}
           {activeTab === 'feedback' && <FeedbackView />}
 
