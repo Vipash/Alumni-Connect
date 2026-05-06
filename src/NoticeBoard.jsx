@@ -8,8 +8,8 @@ function NoticeBoard({ user, searchQuery }) {
   const query = searchQuery?.toLowerCase() || "";
   const filteredNotices = notices
     .filter(n => filter === 'All' || n.opportunityType === filter)
-    .filter(n => 
-      n.title?.toLowerCase().includes(query) || 
+    .filter(n =>
+      n.title?.toLowerCase().includes(query) ||
       n.company?.toLowerCase().includes(query) ||
       n.details?.toLowerCase().includes(query)
     );
@@ -29,43 +29,42 @@ function NoticeBoard({ user, searchQuery }) {
   }, []);
 
   // 2. Handle the "Connect" action
-  /* --- Inside NoticeBoard.jsx --- */
-const handleConnect = async (notice) => {
-    // Safety check
+  const handleConnect = async (notice) => {
     if (!notice.postedBy) {
       alert("Contact information no longer available.");
       return;
     }
 
     const message = `Hi ${notice.postedBy.name}, I'm ${user.name} from MBM. I saw your post regarding ${notice.title} at ${notice.company} and would love to connect.`;
-  
-  // 1. Log to Database
-  try {
-    await fetch('/api/connections/log', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        studentId: user._id,
-        alumniId: notice.postedBy._id,
-        noticeId: notice._id,
-        contactMethod: notice.contactMethod
-      })
-    });
-  } catch (err) { console.error("Log error", err); }
 
-  // 2. Open WhatsApp/Email
-  let url = "";
+    // 1. Log to Database
+    try {
+      await fetch('/api/connections/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: user._id,
+          alumniId: notice.postedBy._id,
+          noticeId: notice._id,
+          contactMethod: notice.contactMethod,
+        }),
+      });
+    } catch (err) {
+      console.error("Log error", err);
+    }
+
+    // 2. Open WhatsApp/Email/LinkedIn
+    let url = "";
     if (notice.contactMethod === 'WhatsApp') {
-       url = `https://wa.me/${notice.postedBy.mobile}?text=${encodeURIComponent(message)}`;
+      url = `https://wa.me/${notice.postedBy.mobile}?text=${encodeURIComponent(message)}`;
     } else if (notice.contactMethod === 'Email') {
-       url = `mailto:${notice.postedBy.email}?subject=Inquiry: ${notice.title}&body=${encodeURIComponent(message)}`;
+      url = `mailto:${notice.postedBy.email}?subject=Inquiry: ${notice.title}&body=${encodeURIComponent(message)}`;
     } else {
-       // Fallback for LinkedIn or others
-       url = notice.postedBy.linkedin || "#";
+      url = notice.postedBy.linkedin || "#";
     }
     window.open(url, '_blank');
   };
-  
+
   // 3. Handle Form Submission
   const handleSubmitNotice = async (e) => {
     e.preventDefault();
@@ -78,19 +77,19 @@ const handleConnect = async (notice) => {
       deadline: formData.get('deadline'),
       contactMethod: formData.get('contactMethod'),
       details: formData.get('details'),
-      postedBy: user._id // Link to current user
+      postedBy: user._id, // Link to current user
     };
 
     try {
       const res = await fetch('/api/notices/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(noticeData)
+        body: JSON.stringify(noticeData),
       });
 
       if (res.ok) {
         const newNotice = await res.json();
-        setNotices([newNotice, ...notices]); // Add to list immediately
+        setNotices([newNotice, ...notices]);
         setShowForm(false);
       } else {
         alert("Failed to post notice.");
@@ -101,24 +100,24 @@ const handleConnect = async (notice) => {
   };
 
   const handleDelete = async (noticeId) => {
-  if (!window.confirm("Are you sure you want to remove this opportunity?")) return;
+    if (!window.confirm("Are you sure you want to remove this opportunity?")) return;
 
-  try {
-    const res = await fetch(`/api/notices/${noticeId}`, {
-      method: 'DELETE',
-    });
+    try {
+      const res = await fetch(`/api/notices/${noticeId}`, {
+        method: 'DELETE',
+      });
 
-    if (res.ok) {
-      // Update UI by filtering out the deleted notice
-      setNotices(notices.filter(n => n._id !== noticeId));
-    } else {
-      alert("Failed to delete notice.");
+      if (res.ok) {
+        setNotices(notices.filter(n => n._id !== noticeId));
+      } else {
+        alert("Failed to delete notice.");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
     }
-  } catch (err) {
-    console.error("Delete error:", err);
-  }
-};
+  };
 
+  // ---------- UPDATED RETURN ----------
   return (
     <div className="notice-board-container">
       <div className="board-header">
@@ -126,15 +125,17 @@ const handleConnect = async (notice) => {
           <h2>Opportunity Bulletin 📋</h2>
           <div className="filter-tabs">
             {['All', 'Internship', 'Full-time', 'Project', 'Referral'].map(tab => (
-              <button 
-                key={tab} 
-                className={filter === tab ? 'active' : ''} 
+              <button
+                key={tab}
+                className={filter === tab ? 'active' : ''}
                 onClick={() => setFilter(tab)}
-              >{tab}</button>
+              >
+                {tab}
+              </button>
             ))}
           </div>
         </div>
-        
+
         {/* ALUMNI ONLY BUTTON */}
         {user.role === 'alumni' && (
           <button className="add-notice-btn" onClick={() => setShowForm(true)}>
@@ -143,7 +144,7 @@ const handleConnect = async (notice) => {
         )}
       </div>
 
-      {/* MODAL FORM */}
+      {/* MODAL FORM (unchanged) */}
       {showForm && (
         <div className="modal-overlay">
           <form className="modal-box notice-form" onSubmit={handleSubmitNotice}>
@@ -176,46 +177,82 @@ const handleConnect = async (notice) => {
               <option value="LinkedIn">LinkedIn</option>
             </select>
 
-            <textarea name="details" placeholder="Brief description & requirements..." rows="4" required />
+            <textarea
+              name="details"
+              placeholder="Brief description & requirements..."
+              rows="4"
+              required
+            />
 
             <div className="button-row">
-              <button type="submit" className="submit-btn">Post to Board</button>
-              <button type="button" className="admin-btn" onClick={() => setShowForm(false)}>Cancel</button>
+              <button type="submit" className="submit-btn">
+                Post to Board
+              </button>
+              <button
+                type="button"
+                className="admin-btn"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* FEED GRID */}
+      {/* FEED GRID – standardized cards using filteredNotices */}
       <div className="notice-grid">
-        {notices
-          .filter(n => filter === 'All' || n.opportunityType === filter)
-          .map(notice => (
-            <div key={notice._id} className="notice-card">
-              <div className="notice-badge">{notice.opportunityType}</div>
-              <h4>{notice.title}</h4>
-              <p className="company-tag">🏢 {notice.company} • {notice.location}</p>
-              
-              <div className="notice-details">
-                <p><strong>Details:</strong> {notice.details}</p>
-                <p className="deadline-text">⏳ Deadline: {new Date(notice.deadline).toLocaleDateString()}</p>
-              </div>
+        {filteredNotices.map(notice => (
+          <div key={notice._id} className="notice-card standardized">
+            <div className="notice-badge">{notice.opportunityType}</div>
+            <h4>{notice.title}</h4>
+            <p className="company-tag">
+              🏢 {notice.company} • {notice.location}
+            </p>
 
-              <div className="notice-footer">
-                <span className="posted-by">By: {notice.postedBy?.name || "Alumni"}</span>
-                <div className="action-group" style={{ display: 'flex', gap: '10px' }}>
-                    {user._id === notice.postedBy?._id && (
-                    <button className="delete-btn-small" onClick={() => handleDelete(notice._id)}>
-                        🗑️
-                    </button>
-                    )}
-                <button className="connect-btn" onClick={() => handleConnect(notice)}>
+            <div className="notice-details">
+              <p className="details-text">{notice.details}</p>
+              <p className="deadline-text">
+                ⏳ Deadline: {new Date(notice.deadline).toLocaleDateString()}
+              </p>
+            </div>
+
+            <div className="notice-footer">
+              <span className="posted-by">
+                By: {notice.postedBy?.name || "Alumni"}
+              </span>
+              <div className="action-group" style={{ display: 'flex', gap: '10px' }}>
+                {user._id === notice.postedBy?._id && (
+                  <button
+                    className="delete-btn-small"
+                    onClick={() => handleDelete(notice._id)}
+                  >
+                    🗑️
+                  </button>
+                )}
+                <button
+                  className="connect-btn"
+                  onClick={() => handleConnect(notice)}
+                >
                   Connect via {notice.contactMethod}
                 </button>
               </div>
-              </div>
             </div>
-          ))}
+          </div>
+        ))}
+
+        {filteredNotices.length === 0 && (
+          <p
+            style={{
+              gridColumn: '1 / -1',
+              textAlign: 'center',
+              padding: '40px',
+              color: '#888',
+            }}
+          >
+            No opportunities found.
+          </p>
+        )}
       </div>
     </div>
   );

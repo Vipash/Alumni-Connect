@@ -698,13 +698,15 @@
 
 /* Notice Board Container */
 .announcement-container {
-  max-width: 900px;
-  margin: 0 auto;
+  width: 100%;        /* Use full width of the right partition */
+  max-width: none;    /* Remove 900px cap so it can hit the edge */
+  margin: 0;          /* Remove centering; align to far left */
   padding-bottom: 40px;
 }
 
 .section-header-inline {
   display: flex;
+  justify-content: flex-start; /* Ensure title starts at the very left */
   align-items: center;
   gap: 15px;
   margin-bottom: 25px;
@@ -733,13 +735,14 @@
   border: 1px solid #e0e0e0;
   border-left: 5px solid var(--mbm-blue); /* Strong brand accent */
   border-radius: 8px;
-  transition: all 0.3s ease;
+  /* transition: all 0.3s ease;  Optional: keep only if you want smooth shadow */
   overflow: hidden;
+  width: 100%; /* Ensure consistent width, no horizontal growth */
 }
 
 .announcement-card:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transform: translateX(5px);
+  transform: none; /* Stop shifting horizontally on hover */
 }
 
 .announcement-card.expanded {
@@ -749,7 +752,8 @@
 /* Header Spacing Fix */
 .announcement-header {
   display: grid;
-  grid-template-columns: 80px 1fr auto auto; /* Explicit columns to prevent squishing */
+  /* Date (80px), Title (flex), Subject (fixed), Icon (fixed) */
+  grid-template-columns: 80px 1fr 180px 40px;
   align-items: center;
   padding: 18px 25px;
   cursor: pointer;
@@ -779,6 +783,9 @@
   font-size: 1.1rem;
   color: #2c3e50;
   font-weight: 600;
+  white-space: nowrap;      /* Standardize row height */
+  overflow: hidden;
+  text-overflow: ellipsis;  /* Dots for long titles */
 }
 
 .ann-subject {
@@ -798,8 +805,8 @@
 
 /* Body Content */
 .announcement-body {
-  padding: 0 25px 20px 95px; /* Aligned with the title, not the date */
-  animation: fadeIn 0.4s ease;
+  padding: 0 25px 20px 25px; /* Align with header text, not date */
+  animation: none;           /* Remove floating/fade movement */
 }
 
 .content-divider {
@@ -837,33 +844,35 @@
 }
 
 .unread-status-blue {
-    background: #f0f7ff; /* Very light blue tint */
-    border-left: 4px solid #3498db;
+  background: #f0f7ff; /* Very light blue tint */
+  border-left: 4px solid #3498db;
 }
 
 .alert-dot-blue {
-    width: 10px;
-    height: 10px;
-    background-color: #3498db; /* Bright Blue */
-    border-radius: 50%;
-    margin-right: 15px;
-    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+  width: 10px;
+  height: 10px;
+  background-color: #3498db; /* Bright Blue */
+  border-radius: 50%;
+  margin-right: 15px;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
 }
 
 /* Read State */
 .read-status-grey {
-    background: #ffffff;
-    border-left: 4px solid #bdc3c7;
+  background: #ffffff;
+  border-left: 4px solid #bdc3c7;
 }
 
 .alert-dot-grey {
-    width: 10px;
-    height: 10px;
-    background-color: #bdc3c7; /* Soft Grey */
-    border-radius: 50%;
-    margin-right: 15px;
+  width: 10px;
+  height: 10px;
+  background-color: #bdc3c7; /* Soft Grey */
+  border-radius: 50%;
+  margin-right: 15px;
 }
 
+/* Optional debug helper while tuning layout */
+/* .announcement-container { border: 2px solid red !important; } */
 /* Registration Form UI Overhaul */
 .registration-form {
     display: flex;
