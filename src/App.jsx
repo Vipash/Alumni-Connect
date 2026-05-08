@@ -362,13 +362,17 @@ const downloadMagazine = () => {
 };
 
   const handleInboxClick = () => {
-    setActiveTab('inbox');
-    setSidebarContent(null);
-    if (!loggedInUser?._id) return;
-    fetch(`/api/notifications/${loggedInUser._id}/mark-all-read`, {
-      method: 'PATCH',
-    }).then(() => setUnreadCount(0));
-  };
+  setActiveTab('inbox');
+  setSidebarContent(null);
+  
+  if (!loggedInUser?._id) return;
+
+  fetch(`/api/notifications/${loggedInUser._id}/mark-all-read`, {
+    method: 'PATCH',
+  }).then(() => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  });
+};
 
   // --- EFFECTS ---
 
@@ -392,20 +396,23 @@ const downloadMagazine = () => {
   }, [activeTab, isMapOpen]);
 
   useEffect(() => {
-    if (loggedInUser?._id) {
-      const fetchUnread = () => {
-        fetch(`/api/notifications/${loggedInUser._id}`)
-          .then((res) => res.json())
-          .then((data) => {
-            const unread = data.filter((n) => !n.read).length;
-            setUnreadCount(unread);
-          });
-      };
-      fetchUnread();
-      const interval = setInterval(fetchUnread, 60000);
-      return () => clearInterval(interval);
-    }
-  }, [loggedInUser, activeTab]);
+  if (loggedInUser?._id) {
+    const fetchNotifications = () => {
+      fetch(`/api/notifications/${loggedInUser._id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          // Store the full array. 
+          setNotifications(data); 
+        })
+        .catch(err => console.error("Notification fetch failed:", err));
+    };
+
+    fetchNotifications();
+    // Poll every minute for new messages
+    const interval = setInterval(fetchNotifications, 60000);
+    return () => clearInterval(interval);
+  }
+}, [loggedInUser, activeTab]);
 
   const handleNext = () => {
     setCurrentGalleryIndex((prev) => (prev === galleryItems.length - 1 ? 0 : prev + 1));
