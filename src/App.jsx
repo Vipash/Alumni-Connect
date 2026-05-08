@@ -117,7 +117,6 @@ function App() {
   const [isSupportOpen, setIsSupportOpen] = useState(false);
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [isMapOpen, setIsMapOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [hubSearch, setHubSearch] = useState('');
   const [hubCategory, setHubCategory] = useState('All');
   const [announcementSearch, setAnnouncementSearch] = useState('');
@@ -126,6 +125,7 @@ function App() {
   const [currentMagPage, setCurrentMagPage] = useState(0); // 0: cover, 1: p1, 2: p2 [cite: 290]
   const [newsData, setNewsData] = useState([]); 
   const [selectedNews, setSelectedNews] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // Optional: these are not used in App itself; safe to remove if unused
@@ -371,6 +371,15 @@ const downloadMagazine = () => {
   };
 
   // --- EFFECTS ---
+
+  useEffect(() => {
+  if (loggedInUser?._id) {
+    fetch(`/api/notifications/${loggedInUser._id}`)
+      .then(res => res.json())
+      .then(setNotifications);
+  }
+}, [loggedInUser]);
+
   useEffect(() => {
     if (activeTab === 'map' || isMapOpen) {
       const intervals = [50, 200, 500].map((delay) =>
@@ -595,7 +604,7 @@ const downloadMagazine = () => {
                 >
                   Inbox{' '}
                   {unreadCount > 0 && (
-                    <span className="unread-badge">{unreadCount}</span>
+                    <span className="unread-badge">{unreadCount}</span>   
                   )}
                 </button>
               <button
