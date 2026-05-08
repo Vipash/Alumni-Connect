@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
+import './MapSearch.css';
 
 // Utility for Zooming
 function FlyToMarker({ position }) {
@@ -8,7 +9,6 @@ function FlyToMarker({ position }) {
   useEffect(() => { 
     if (position) {
       map.flyTo(position, 13);
-      // Force an internal invalidateSize when flying to a marker
       setTimeout(() => map.invalidateSize(), 100);
     } 
   }, [position, map]);
@@ -19,8 +19,6 @@ function FlyToMarker({ position }) {
 function MapResizeHandler() {
   const map = useMap();
   useEffect(() => {
-    // This ensures that as soon as the map component mounts, 
-    // it recalculates its own bounds.
     setTimeout(() => {
       map.invalidateSize();
     }, 400);
@@ -59,8 +57,10 @@ function MapSearchSection({ setSidebarContent }) {
   const [bookmarkedAlumni, setBookmarkedAlumni] = useState([]);
   const [visibleContactId, setVisibleContactId] = useState(null);
 
-  // Trigger a global resize event when this component mounts 
-  // to help the App.jsx layout settle.
+  // NEW: scroll hint + ref
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const resultsRef = useRef(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
@@ -84,10 +84,26 @@ function MapSearchSection({ setSidebarContent }) {
       .filter(a => a.location?.coordinates)
       .map(a => ({
         ...a,
-        dist: getDistance(lat, lng, a.location.coordinates[1], a.location.coordinates[0])
+        dist: getDistance(
+          lat,
+          lng,
+          a.location.coordinates[1],
+          a.location.coordinates[0]
+        )
       }))
       .sort((a, b) => a.dist - b.dist);
+
     setClosest(withDistances.slice(0, 3));
+
+    if (withDistances.length > 0) {
+      setShowScrollHint(true);
+      setTimeout(() => setShowScrollHint(false), 6000);
+    }
+  };
+
+  const scrollToResults = () => {
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setShowScrollHint(false);
   };
 
   const useCurrentLocation = () => {
@@ -103,10 +119,17 @@ function MapSearchSection({ setSidebarContent }) {
   };
 
   const handleCompanySearch = () => {
-    const matches = alumni.filter(a => a.company?.toLowerCase().includes(companySearch.toLowerCase()));
-    if (matches.length > 0) {
-      const coords = [matches[0].location.coordinates[1], matches[0].location.coordinates[0]];
+    const matches = alumni.filter(a =>
+      a.company?.toLowerCase().includes(companySearch.toLowerCase())
+    );
+    if (matches.length > 0 && matches[0].location?.coordinates) {
+      const coords = [
+        matches[0].location.coordinates[1],
+        matches[0].location.coordinates[0]
+      ];
       setSearchPos(coords);
+      // Optional: also compute closest from this position
+      findClosest(coords[0], coords[1]);
     }
   };
 
@@ -116,7 +139,9 @@ function MapSearchSection({ setSidebarContent }) {
       setSuggestions([]);
       return;
     }
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${q}`
+    );
     setSuggestions(await res.json());
   };
 
@@ -167,8 +192,8 @@ function MapSearchSection({ setSidebarContent }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: user.bookmarks })
       })
-      .then(res => res.json())
-      .then(setBookmarkedAlumni);
+        .then(res => res.json())
+        .then(setBookmarkedAlumni);
     }
   }, [showBookmarks, user.bookmarks]);
 
@@ -179,29 +204,56 @@ function MapSearchSection({ setSidebarContent }) {
         <h3 style={{ color: 'var(--mbm-blue)', marginBottom: '20px' }}>Alumni Explorer</h3>
         <div style={{ marginBottom: '25px' }}>
           <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Company</label>
-          <input className="partition-input" placeholder="Search Company..." value={companySearch} onChange={e => setCompanySearch(e.target.value)} />
-          <button className="nav-btn" style={{ width: '100%', marginTop: '10px' }} onClick={handleCompanySearch}>Search Company</button>
+          <input
+            className="partition-input"
+            placeholder="Search Company..."
+            value={companySearch}
+            onChange={e => setCompanySearch(e.target.value)}
+          />
+          <button
+            className="nav-btn"
+            style={{ width: '100%', marginTop: '10px' }}
+            onClick={handleCompanySearch}
+          >
+            Search Company
+          </button>
         </div>
         <div className="location-search-container">
           <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Location</label>
-          <input className="partition-input" value={cityQuery} placeholder="Search City..." onChange={(e) => fetchSuggestions(e.target.value)} />
+          <input
+            className="partition-input"
+            value={cityQuery}
+            placeholder="Search City..."
+            onChange={(e) => fetchSuggestions(e.target.value)}
+          />
           {suggestions.length > 0 && (
             <ul className="suggestions-list">
               {suggestions.map(s => (
-                <li key={s.place_id} onClick={() => { 
-                  const lat = parseFloat(s.lat);
-                  const lon = parseFloat(s.lon);
-                  setSearchPos([lat, lon]); 
-                  findClosest(lat, lon); 
-                  setSuggestions([]); 
-                  setCityQuery(s.display_name);
-                }}>{s.display_name}</li>
+                <li
+                  key={s.place_id}
+                  onClick={() => {
+                    const lat = parseFloat(s.lat);
+                    const lon = parseFloat(s.lon);
+                    setSearchPos([lat, lon]);
+                    findClosest(lat, lon);
+                    setSuggestions([]);
+                    setCityQuery(s.display_name);
+                  }}
+                >
+                  {s.display_name}
+                </li>
               ))}
             </ul>
           )}
           <div style={{ display: 'flex', gap: '5px', marginTop: '10px' }}>
-            <button className="nav-btn" style={{ flex: 1 }} onClick={useCurrentLocation}>📍 Current</button>
-            <button className={isPicking ? 'admin-btn' : 'nav-btn'} style={{ flex: 1 }} onClick={() => setIsPicking(!isPicking)}>
+            <button className="nav-btn" style={{ flex: 1 }} onClick={useCurrentLocation}>
+              📍 Current
+            </button>
+            <button
+              className={isPicking ? 'admin-btn' : 'nav-btn'}
+              style={{ flex: 1 }}
+              onClick={() => setIsPicking(!isPicking)}
+            >
               {isPicking ? 'Cancel' : '📍 Pick'}
             </button>
           </div>
@@ -212,66 +264,134 @@ function MapSearchSection({ setSidebarContent }) {
 
   return (
     <div className="map-page-wrapper">
-      <button className="bookmark-toggle-btn" onClick={() => setShowBookmarks(!showBookmarks)}>
+      {/* 1. The Marker/Notification Pop-up */}
+      {showScrollHint && (
+        <div className="results-notifier" onClick={scrollToResults}>
+          <span>⬇</span> View Nearby Alumni Found
+        </div>
+      )}
+
+      <button
+        className="bookmark-toggle-btn"
+        onClick={() => setShowBookmarks(!showBookmarks)}
+      >
         🔖 {user.bookmarks?.length || 0} Saved
       </button>
 
       <div className={`bookmark-sidebar ${showBookmarks ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h3>My Bookmarks</h3>
-          <button className="close-sidebar" onClick={() => setShowBookmarks(false)}>×</button>
+          <button
+            className="close-sidebar"
+            onClick={() => setShowBookmarks(false)}
+          >
+            ×
+          </button>
         </div>
         <div className="sidebar-content">
           {bookmarkedAlumni.length > 0 ? (
             bookmarkedAlumni.map(alumnus => (
-              <div key={alumnus._id} className="bookmark-item" onClick={() => {
-                setSearchPos([alumnus.location.coordinates[1], alumnus.location.coordinates[0]]);
-                setShowBookmarks(false);
-              }}>
+              <div
+                key={alumnus._id}
+                className="bookmark-item"
+                onClick={() => {
+                  setSearchPos([
+                    alumnus.location.coordinates[1],
+                    alumnus.location.coordinates[0]
+                  ]);
+                  setShowBookmarks(false);
+                }}
+              >
                 <strong>{alumnus.name}</strong>
                 <p>{alumnus.company}</p>
-                <button className="delete-bookmark-small" onClick={(e) => { e.stopPropagation(); toggleBookmark(alumnus._id); }}>×</button>
+                <button
+                  className="delete-bookmark-small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleBookmark(alumnus._id);
+                  }}
+                >
+                  ×
+                </button>
               </div>
             ))
-          ) : <p className="empty-msg">No bookmarks yet!</p>}
+          ) : (
+            <p className="empty-msg">No bookmarks yet!</p>
+          )}
         </div>
       </div>
 
       {/* Main Map Container with Forced Height and Width */}
       <div className="map-fancy-container" style={{ height: '500px', flexShrink: 0 }}>
-        <MapContainer 
-          center={[26.2389, 73.0243]} 
-          zoom={5} 
+        <MapContainer
+          center={[26.2389, 73.0243]}
+          zoom={5}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <MapResizeHandler />
           {searchPos && <FlyToMarker position={searchPos} />}
-          <MapClickHandler isPicking={isPicking} onPick={(ll) => {
-            setSearchPos([ll.lat, ll.lng]);
-            findClosest(ll.lat, ll.lng);
-            setIsPicking(false);
-          }} />
-          
-          {searchPos && <Marker position={searchPos} icon={searchIcon}><Popup>Search Point</Popup></Marker>}
-          
+          <MapClickHandler
+            isPicking={isPicking}
+            onPick={(ll) => {
+              setSearchPos([ll.lat, ll.lng]);
+              findClosest(ll.lat, ll.lng);
+              setIsPicking(false);
+            }}
+          />
+
+          {searchPos && (
+            <Marker position={searchPos} icon={searchIcon}>
+              <Popup>Search Point</Popup>
+            </Marker>
+          )}
+
           {alumni.map(item => (
-            <Marker key={item._id} position={[item.location.coordinates[1], item.location.coordinates[0]]}>
+            <Marker
+              key={item._id}
+              position={[item.location.coordinates[1], item.location.coordinates[0]]}
+            >
               <Popup maxWidth={300} minWidth={250}>
                 <div style={{ textAlign: 'center', padding: '5px' }}>
-                  <img src={item.photo || '/default-avatar.png'} alt="Profile" style={{ width: '50px', height: '50px', borderRadius: '50%', marginBottom: '5px' }} />
+                  <img
+                    src={item.photo || '/default-avatar.png'}
+                    alt="Profile"
+                    style={{
+                      width: '50px',
+                      height: '50px',
+                      borderRadius: '50%',
+                      marginBottom: '5px'
+                    }}
+                  />
                   <h3 style={{ margin: '0' }}>{item.name}</h3>
                   <p style={{ margin: '5px 0', color: '#666' }}>{item.company}</p>
-                  
+
                   {visibleContactId === item._id ? (
-                    <div style={{ padding: '8px', background: '#e8f5e9', borderRadius: '4px', fontSize: '0.8rem' }}>
+                    <div
+                      style={{
+                        padding: '8px',
+                        background: '#e8f5e9',
+                        borderRadius: '4px',
+                        fontSize: '0.8rem'
+                      }}
+                    >
                       <p>📧 {item.email}</p>
                       <p>📞 {item.mobile || 'N/A'}</p>
                     </div>
                   ) : (
-                    <button className="nav-btn" style={{ fontSize: '0.75rem', width: '100%' }} onClick={() => handleViewContact(item)}>🔓 View Contact</button>
+                    <button
+                      className="nav-btn"
+                      style={{ fontSize: '0.75rem', width: '100%' }}
+                      onClick={() => handleViewContact(item)}
+                    >
+                      🔓 View Contact
+                    </button>
                   )}
-                  <button className="admin-btn" style={{ fontSize: '0.75rem', width: '100%', marginTop: '5px' }} onClick={() => toggleBookmark(item._id)}>
+                  <button
+                    className="admin-btn"
+                    style={{ fontSize: '0.75rem', width: '100%', marginTop: '5px' }}
+                    onClick={() => toggleBookmark(item._id)}
+                  >
                     {user.bookmarks?.includes(item._id) ? '🔖 Saved' : '🔖 Bookmark'}
                   </button>
                 </div>
@@ -281,9 +401,23 @@ function MapSearchSection({ setSidebarContent }) {
         </MapContainer>
       </div>
 
+      {/* 2. The Results Section with Ref and ID */}
       {closest && (
-        <div className="alumni-results-section" style={{ marginTop: '20px' }}>
-          <h4>Nearby Alumni</h4>
+        <div
+          ref={resultsRef}
+          id="nearby-results"
+          className="alumni-results-section"
+          style={{ marginTop: '20px', paddingBottom: '40px' }}
+        >
+          <h4
+            style={{
+              color: 'var(--mbm-blue)',
+              borderLeft: '4px solid var(--mbm-gold)',
+              paddingLeft: '10px'
+            }}
+          >
+            Nearby Alumni
+          </h4>
           <div className="table-wrapper">
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -301,7 +435,18 @@ function MapSearchSection({ setSidebarContent }) {
                     <td style={{ padding: '10px' }}>{item.company}</td>
                     <td style={{ padding: '10px' }}>{item.dist.toFixed(1)} km</td>
                     <td style={{ padding: '10px' }}>
-                      <button className="nav-btn" style={{ padding: '4px 8px', fontSize: '0.7rem' }} onClick={() => setSearchPos([item.location.coordinates[1], item.location.coordinates[0]])}>Locate</button>
+                      <button
+                        className="nav-btn"
+                        style={{ padding: '4px 8px', fontSize: '0.7rem' }}
+                        onClick={() =>
+                          setSearchPos([
+                            item.location.coordinates[1],
+                            item.location.coordinates[0]
+                          ])
+                        }
+                      >
+                        Locate
+                      </button>
                     </td>
                   </tr>
                 ))}

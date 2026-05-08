@@ -1,0 +1,96 @@
+/* --- Suggestions Dropdown --- */
+.suggestions-list {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: var(--shadow);
+}
+
+.suggestions-list li {
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer; /* Changes cursor to pointer */
+    transition: background 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestions-list li:hover {
+    background-color: #f0f4ff; /* Highlight color */
+    color: var(--mbm-blue);
+}
+
+/* --- Results Notification Marker --- */
+.results-notifier {
+    position: fixed;
+    bottom: 30px;
+    left: 55%; /* Centered relative to the map partition */
+    transform: translateX(-50%);
+    background: var(--mbm-gold);
+    color: #1a0f2e;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 2000;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+    40% {transform: translateX(-50%) translateY(-10px);}
+    60% {transform: translateX(-50%) translateY(-5px);}
+}
+
+.results-notifier span {
+    font-size: 1.2rem;
+}
+
+/* Ensure the table wrapper handles scrolling better */
+.table-wrapper {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+/* 1. Defend the Suggestion List from global padding/margins */
+.suggestions-list {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+/* 2. Fix the "Text Cursor" issue globally for this section */
+.suggestions-list li, 
+.results-notifier, 
+.leaflet-marker-icon {
+    cursor: pointer !important;
+}
+
+/* 3. Ensure the map doesn't inherit global 'border-radius' from card styles */
+.map-fancy-container {
+    border-radius: 12px !important;
+    overflow: hidden;
+    border: 1px solid var(--mbm-blue);
+}
+
+/* 4. Override global button behavior for the small 'Locate' buttons */
+.alumni-results-section .nav-btn {
+    width: auto !important;
+    margin-top: 0 !important;
+    transform: none !important; /* Prevents the 'bounce' on hover inside the table */
+}
