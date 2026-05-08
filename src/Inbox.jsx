@@ -4,7 +4,8 @@ import './Inbox.css'
 // Added onNavigateToNotice to props
 function Inbox({ user, setUser, searchQuery, onNavigateToNotice }) {
   const [activeTab, setActiveTab] = useState('alerts');
-  const [digestSubTab, setDigestSubTab] = useState('daily'); // NEW: sub-tab for digest
+  const [digestSubTab, setDigestSubTab] = useState('daily'); // sub-tab for digest
+  const [digestDayOffset, setDigestDayOffset] = useState(0); // 0 = Today, 1 = Yesterday, etc.
   const [notifications, setNotifications] = useState([]);
   const [recentMatches, setRecentMatches] = useState([]);
   const [notices, setNotices] = useState([]);
@@ -111,10 +112,22 @@ function Inbox({ user, setUser, searchQuery, onNavigateToNotice }) {
     setIsSaving(false);
   };
 
-  // Digest filter helper
-  const filterNotices = (days) => {
-    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-    return notices.filter(n => new Date(n.createdAt) > cutoff);
+  // NEW: precise digest helper
+  const getDigestData = (mode) => {
+    const now = new Date();
+    if (mode === 'daily') {
+      // Window for a specific 24-hour period
+      const start = new Date(now.getTime() - (digestDayOffset * 24 * 60 * 60 * 1000));
+      const end = new Date(now.getTime() - ((digestDayOffset + 1) * 24 * 60 * 60 * 1000));
+      return notices.filter(n => {
+        const postDate = new Date(n.createdAt);
+        return postDate <= start && postDate > end;
+      });
+    } else {
+      // Weekly: last 7 days
+      const weekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+      return notices.filter(n => new Date(n.createdAt) > weekAgo);
+    }
   };
 
   return (
@@ -215,12 +228,15 @@ function Inbox({ user, setUser, searchQuery, onNavigateToNotice }) {
         {/* DIGEST TAB */}
         {activeTab === 'digest' && (
           <div className="digest-view">
-            <div className="digest-subtabs">
+            <div className="digest-main-tabs">
               <button
                 className={digestSubTab === 'daily' ? 'sub-active' : ''}
-                onClick={() => setDigestSubTab('daily')}
+                onClick={() => {
+                  setDigestSubTab('daily');
+                  setDigestDayOffset(0);
+                }}
               >
-                Last 3 Days
+                Recent Activity
               </button>
               <button
                 className={digestSubTab === 'weekly' ? 'sub-active' : ''}
@@ -230,23 +246,57 @@ function Inbox({ user, setUser, searchQuery, onNavigateToNotice }) {
               </button>
             </div>
 
-            <div className="digest-list">
-              {filterNotices(digestSubTab === 'daily' ? 3 : 7).map(n => (
-                <div
-                  key={n._id}
-                  className="digest-card-detailed"
-                  onClick={() => handleItemClick(n, false)}
-                  style={{ cursor: 'pointer' }}
+            {digestSubTab === 'daily' && (
+              <div className="day-selector">
+                <button
+                  className={digestDayOffset === 0 ? 'day-btn active' : 'day-btn'}
+                  onClick={() => setDigestDayOffset(0)}
                 >
-                  <span className={`type-tag ${n.opportunityType.toLowerCase()}`}>
-                    {n.opportunityType}
-                  </span>
-                  <strong>{n.title}</strong>
-                  <p>
-                    {n.company} • {new Date(n.createdAt).toLocaleDateString()}
-                  </p>
+                  Last 24h
+                </button>
+                <button
+                  className={digestDayOffset === 1 ? 'day-btn active' : 'day-btn'}
+                  onClick={() => setDigestDayOffset(1)}
+                >
+                  Yesterday
+                </button>
+                <button
+                  className={digestDayOffset === 2 ? 'day-btn active' : 'day-btn'}
+                  onClick={() => setDigestDayOffset(2)}
+                >
+                  {new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', {
+                    weekday: 'long'
+                  })}
+                </button>
+              </div>
+            )}
+
+            <div className="digest-list">
+              {getDigestData(digestSubTab).length > 0 ? (
+                getDigestData(digestSubTab).map(n => (
+                  <div
+                    key={n._id}
+                    className="digest-card-detailed"
+                    onClick={() => handleItemClick(n, false)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="digest-card-left">
+                      <span className={`type-tag ${n.opportunityType.toLowerCase().replace(' ', '-')}`}>
+                        {n.opportunityType}
+                      </span>
+                      <strong>{n.title}</strong>
+                      <p>{n.company} • {n.branch || "All Branches"}</p>
+                    </div>
+                    <div className="digest-card-right">
+                      <span>{new Date(n.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state-muted" style={{ padding: '40px' }}>
+                  <p>No activity recorded for this period.</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}

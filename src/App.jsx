@@ -422,6 +422,25 @@ const downloadMagazine = () => {
     setCurrentGalleryIndex((prev) => (prev === 0 ? galleryItems.length - 1 : prev - 1));
   };
 
+  const markAllNotificationsAsRead = async () => {
+  // Check if we have a user and if there are actually unread notifications
+  if (!loggedInUser?._id || unreadCount === 0) return;
+
+  try {
+    const res = await fetch(`/api/notifications/${loggedInUser._id}/mark-all-read`, {
+      method: 'PATCH',
+    });
+    
+    if (res.ok) {
+      // Update the global notifications array state
+      // This automatically sets unreadCount to 0 and updates the UI
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    }
+  } catch (err) {
+    console.error("Error marking all notifications as read:", err);
+  }
+};
+
   // --- DYNAMIC RENDERING LOGIC ---
   const renderLeftPartition = () => {
     if (sidebarContent) return sidebarContent;
@@ -430,42 +449,42 @@ const downloadMagazine = () => {
       case 'connect':
         return null;
       case 'inbox':
-        return (
-          <div className="alerts-controls">
-            <div className="partition-header">
-              <h2>My Alerts</h2>
-              <span
-                className="badge-pill"
-                style={{
-                  background: unreadCount > 0 ? '#ff3f52' : '#eee',
-                  color: unreadCount > 0 ? 'white' : '#666',
-                  padding: '4px 10px',
-                  borderRadius: '12px',
-                  fontSize: '0.8rem',
-                }}
-              >
-                {unreadCount} New
-              </span>
-            </div>
-            <p
-              style={{
-                fontSize: '0.85rem',
-                color: '#666',
-                marginTop: '15px',
-              }}
-            >
-              Stay updated with messages and portal notifications.
-            </p>
-            <button
-              className="apply-filter-btn"
-              style={{ width: '100%', marginTop: '20px' }}
-              onClick={handleInboxClick}
-              disabled={unreadCount === 0}
-            >
-              Mark All as Read
-            </button>
-          </div>
-        );
+  return (
+    <div className="alerts-controls">
+      <div className="partition-header">
+        <h2>My Alerts</h2>
+        <span
+          className="badge-pill"
+          style={{
+            background: unreadCount > 0 ? '#ff3f52' : '#eee',
+            color: unreadCount > 0 ? 'white' : '#666',
+            padding: '4px 10px',
+            borderRadius: '12px',
+            fontSize: '0.8rem',
+          }}
+        >
+          {unreadCount} New
+        </span>
+      </div>
+      <p
+        style={{
+          fontSize: '0.85rem',
+          color: '#666',
+          marginTop: '15px',
+        }}
+      >
+        Stay updated with messages and portal notifications.
+      </p>
+      <button
+        className="apply-filter-btn"
+        style={{ width: '100%', marginTop: '20px' }}
+        onClick={markAllNotificationsAsRead} // <--- UPDATED THIS LINE
+        disabled={unreadCount === 0}
+      >
+        Mark All as Read
+      </button>
+    </div>
+  );
 
       case 'announcements':
         return (
