@@ -126,6 +126,7 @@ function App() {
   const [currentMagPage, setCurrentMagPage] = useState(0); // 0: cover, 1: p1, 2: p2 [cite: 290]
   const [newsData, setNewsData] = useState([]); 
   const [selectedNews, setSelectedNews] = useState(null);
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   // Optional: these are not used in App itself; safe to remove if unused
   const [tickers, setTickers] = useState([]);
@@ -589,14 +590,14 @@ const downloadMagazine = () => {
                 Connect Hub
               </button>
               <button
-                className={activeTab === 'inbox' ? 'active' : ''}
-                onClick={handleInboxClick}
-              >
-                Inbox{' '}
-                {unreadCount > 0 && (
-                  <span className="unread-badge">{unreadCount}</span>
-                )}
-              </button>
+                  className={activeTab === 'inbox' ? 'active' : ''}
+                  onClick={handleInboxClick}
+                >
+                  Inbox{' '}
+                  {unreadCount > 0 && (
+                    <span className="unread-badge">{unreadCount}</span>
+                  )}
+                </button>
               <button
                 className={activeTab === 'announcements' ? 'active' : ''}
                 onClick={() => {

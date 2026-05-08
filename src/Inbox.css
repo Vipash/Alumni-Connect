@@ -1,0 +1,47 @@
+/* Color Coding for Read/Unread */
+.alert-card-soft.status-unread {
+    background: #f0f7ff; /* Light Blue background for unread */
+    border-left: 4px solid var(--mbm-blue);
+}
+
+.alert-card-soft.status-read {
+    background: #ffffff; /* Plain white for read */
+    border-left: 4px solid #e2e8f0;
+    opacity: 0.8;
+}
+
+.dot-unread { width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; }
+.dot-read { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e0; }
+
+/* Digest Sub-tabs */
+.digest-subtabs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.sub-active {
+    color: var(--mbm-blue);
+    font-weight: bold;
+    border-bottom: 2px solid var(--mbm-gold);
+    background: none;
+    border-top: none; border-left: none; border-right: none;
+    cursor: pointer;
+}
+
+.mark-all-btn {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mark-all-btn:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: var(--mbm-blue);
+}

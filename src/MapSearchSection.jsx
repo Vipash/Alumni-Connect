@@ -61,6 +61,9 @@ function MapSearchSection({ setSidebarContent }) {
   const [showScrollHint, setShowScrollHint] = useState(false);
   const resultsRef = useRef(null);
 
+  // NEW: company suggestions
+  const [companySuggestions, setCompanySuggestions] = useState([]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
@@ -128,9 +131,23 @@ function MapSearchSection({ setSidebarContent }) {
         matches[0].location.coordinates[0]
       ];
       setSearchPos(coords);
-      // Optional: also compute closest from this position
       findClosest(coords[0], coords[1]);
     }
+  };
+
+  // NEW: handle company input + local suggestions
+  const handleCompanyInputChange = (q) => {
+    setCompanySearch(q);
+    if (q.length < 2) {
+      setCompanySuggestions([]);
+      return;
+    }
+
+    const uniqueCompanies = [...new Set(alumni.map(a => a.company))].filter(Boolean);
+    const matches = uniqueCompanies.filter(c =>
+      c.toLowerCase().includes(q.toLowerCase())
+    );
+    setCompanySuggestions(matches);
   };
 
   const fetchSuggestions = async (q) => {
@@ -202,14 +219,32 @@ function MapSearchSection({ setSidebarContent }) {
     setSidebarContent(
       <div className="search-sidebar-container" style={{ padding: '20px' }}>
         <h3 style={{ color: 'var(--mbm-blue)', marginBottom: '20px' }}>Alumni Explorer</h3>
-        <div style={{ marginBottom: '25px' }}>
+
+        {/* --- Company Search (with suggestions) --- */}
+        <div style={{ marginBottom: '25px', position: 'relative' }}>
           <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Company</label>
           <input
             className="partition-input"
             placeholder="Search Company..."
             value={companySearch}
-            onChange={e => setCompanySearch(e.target.value)}
+            onChange={e => handleCompanyInputChange(e.target.value)}
           />
+          {companySuggestions.length > 0 && (
+            <ul className="suggestions-list">
+              {companySuggestions.map((comp, idx) => (
+                <li
+                  key={idx}
+                  onClick={() => {
+                    setCompanySearch(comp);
+                    setCompanySuggestions([]);
+                    handleCompanySearch();
+                  }}
+                >
+                  {comp}
+                </li>
+              ))}
+            </ul>
+          )}
           <button
             className="nav-btn"
             style={{ width: '100%', marginTop: '10px' }}
@@ -218,7 +253,9 @@ function MapSearchSection({ setSidebarContent }) {
             Search Company
           </button>
         </div>
-        <div className="location-search-container">
+
+        {/* --- Location Search (unchanged, but with position:relative) --- */}
+        <div className="location-search-container" style={{ position: 'relative' }}>
           <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Location</label>
           <input
             className="partition-input"
@@ -260,7 +297,14 @@ function MapSearchSection({ setSidebarContent }) {
         </div>
       </div>
     );
-  }, [companySearch, cityQuery, suggestions, isPicking, setSidebarContent]);
+  }, [
+    companySearch,
+    companySuggestions,
+    cityQuery,
+    suggestions,
+    isPicking,
+    setSidebarContent
+  ]);
 
   return (
     <div className="map-page-wrapper">
@@ -321,7 +365,7 @@ function MapSearchSection({ setSidebarContent }) {
         </div>
       </div>
 
-      {/* Main Map Container with Forced Height and Width */}
+      {/* Main Map Container */}
       <div className="map-fancy-container" style={{ height: '500px', flexShrink: 0 }}>
         <MapContainer
           center={[26.2389, 73.0243]}
