@@ -127,6 +127,7 @@ function App() {
   const [selectedNews, setSelectedNews] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const unreadCount = notifications.filter(n => !n.read).length;
+  const [suggestions, setSuggestions] = useState([]);
 
   // Optional: these are not used in App itself; safe to remove if unused
   const [tickers, setTickers] = useState([]);
@@ -295,6 +296,19 @@ useEffect(() => {
       alert('Error: ' + errorText);
     }
   };
+
+useEffect(() => {
+  if (mapSearchQuery.length < 3) {
+    setSuggestions([]);
+    return;
+  }
+  const delay = setTimeout(async () => {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${mapSearchQuery}&limit=5`);
+    const data = await res.json();
+    setSuggestions(data);
+  }, 500); // Debounce to save API hits
+  return () => clearTimeout(delay);
+}, [mapSearchQuery]);
 
 const [galleryItems, setGalleryItems] = useState([
   { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
@@ -1506,7 +1520,7 @@ const downloadMagazine = () => {
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       <LocationPicker
                         setCoords={setSelectedCoords}
-                        externalCoords={selectedCoords}
+                        externalCoords={selectedCoords} // This prop name must match the one in LocationPicker.jsx
                       />
                     </MapContainer>
                   </div>
