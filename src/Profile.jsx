@@ -152,36 +152,50 @@ function Profile({ user, setUser, setSidebarContent }) {
     }
 
     try {
-      const res = await fetch('/api/profile/complete', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user._id,
-          ...onboardData,
-          hobbiesTechnical: onboardData.hobbiesTechnical
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
-          hobbiesPersonal: onboardData.hobbiesPersonal
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
-        }),
-      });
+  // Construct the payload first for cleaner code
+  const payload = {
+    userId: user._id,
+    ...onboardData,
+    isProfileComplete: true, // Explicitly tell the DB onboarding is done
+    hobbiesTechnical: onboardData.hobbiesTechnical
+      ? onboardData.hobbiesTechnical.split(',').map(s => s.trim()).filter(Boolean)
+      : [],
+    hobbiesPersonal: onboardData.hobbiesPersonal
+      ? onboardData.hobbiesPersonal.split(',').map(s => s.trim()).filter(Boolean)
+      : []
+  };
 
-      if (res.ok) {
-        const updatedUser = await res.json();
-        setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setIsOnboarding(false);
-        setIsEditing(false);
-        alert('Profile updated!');
-      } else {
-        alert('Error saving profile.');
-      }
-    } catch (err) {
-      alert('Error saving profile.');
-    }
+  const res = await fetch('/api/profile/complete', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json(); // Parse this first to check for backend errors
+
+  if (res.ok) {
+    // Ensure the data returned from backend is the FULL user object
+    const updatedUser = data; 
+    
+    // Update Global State
+    setUser(updatedUser);
+    
+    // Sync LocalStorage
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    
+    // Close Onboarding View
+    setIsOnboarding(false);
+    setIsEditing(false);
+    
+    alert('Profile Verified & Saved!');
+  } else {
+    // Show the actual error from the backend if available
+    alert(`Error: ${data.message || 'Error saving profile.'}`);
+  }
+} catch (err) {
+  console.error("Submission Error:", err);
+  alert('Network error. Please check if the server is running.');
+}
   };
 
   if (!user) return <div className="profile-container">Loading...</div>;
@@ -196,7 +210,7 @@ function Profile({ user, setUser, setSidebarContent }) {
             <p>Please provide the following details to finish your onboarding.</p>
           </div>
 
-          <form className="onboarding-form" onSubmit={handleOnboardingSubmit}>
+          <form className="onboarding-form" ref={formRef} onSubmit={handleOnboardingSubmit}>
             <div className="form-grid">
               <div className="form-group">
                 <label>Father&apos;s Name</label>
