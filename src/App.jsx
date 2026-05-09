@@ -1537,7 +1537,7 @@ const downloadMagazine = () => {
                       type="text"
                       className="partition-input"
                       style={{ flex: 1, margin: 0 }}
-                      placeholder="Search for your city..."
+                      placeholder="Search for your city....."
                       value={mapSearchQuery}
                       onChange={(e) => setMapSearchQuery(e.target.value)}
                     />
