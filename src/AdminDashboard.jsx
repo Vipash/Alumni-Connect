@@ -1571,8 +1571,12 @@ const deleteNewsItem = async (id) => {
     </div>
 
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <label style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+      <label 
+  htmlFor={`fullWidth-${index}`} // Link to input ID
+  style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
+>
   <input
+    id={`fullWidth-${index}`} // Add ID
     type="checkbox"
     checked={item.isFullWidth || false}
     onChange={(e) => {
