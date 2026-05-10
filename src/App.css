@@ -1164,26 +1164,31 @@ input:focus,
   margin: 0 auto;
 }
 
+/* 1. Base Card - Dark Blue Theme */
 .news-card-refined {
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: #25286e; /* Dark blue card background */
   border-radius: 12px;
   overflow: hidden;
-  /* MAXIMUM VERTICAL HEIGHT LIMIT */
-  max-height: 500px; 
+  max-height: 500px; /* Maximum vertical height limit */
   cursor: pointer;
-  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+  /* Smooth transition for the glow and rise effect */
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
 }
 
 /* Short news takes 1 column, Long news takes the whole row */
 .compact-news {
   grid-column: span 1; /* Takes half width */
 }
+
 .full-news {
   grid-column: span 2; /* Takes full width */
-  flex-direction: row; /* Optional: Image on left, text on right for big cards */
+  flex-direction: row; /* Image on left, text on right for big cards (optional) */
 }
+
 @media (max-width: 900px) {
   .compact-news,
   .full-news {
@@ -1191,13 +1196,21 @@ input:focus,
   }
 }
 
+/* 3. Glow & Rise Effect on Hover */
 .news-card-refined:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-5px);
-  border-color: #d4af37;
+  transform: translateY(-8px); /* The "Rise" */
+  background: #2c3080; /* Slightly lighter on hover */
+  /* Soft gold glow + shadow */
+  box-shadow:
+    0 15px 30px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.4);
 }
 
+/* 4. Image wrapper and zoom */
 .news-img-wrapper-refined {
+  position: relative;
+  overflow: hidden;
   height: 220px; /* Fixed height for image area */
   width: 100%;
   flex-shrink: 0;
@@ -1208,22 +1221,20 @@ input:focus,
   height: auto;
   min-height: 300px;
 }
+
 .news-img-wrapper-refined img {
   width: 100%;
   height: 100%;
   object-fit: cover; /* Crops image to fit the box perfectly */
-}
-.news-img-wrapper-refined img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   transition: transform 0.5s ease;
 }
 
+/* Slight zoom on image when card is hovered */
 .news-card-refined:hover .news-img-wrapper-refined img {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
+/* Date tag on image */
 .news-date-tag {
   position: absolute;
   top: 10px;
@@ -1237,32 +1248,37 @@ input:focus,
   border-radius: 4px;
 }
 
+/* Text container */
 .news-info-refined {
   padding: 20px;
-  overflow-y: hidden; /* Hide overflow to keep height strict */
+  overflow-y: hidden; /* Keep height strict */
   display: flex;
   flex-direction: column;
 }
 
+/* Headline and excerpt with light text */
 .news-headline-refined {
-  color: #fff;
+  color: #ffffff;
   font-size: 1.25rem;
   margin-bottom: 12px;
   line-height: 1.3;
 }
 
 .news-excerpt-refined {
-  /* Ensure text doesn't push the card taller */
+  color: #d1d5db; /* Light grayish blue */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+/* Read-more link with gold accent */
 .read-more-refined {
   color: #d4af37;
   font-weight: 600;
   font-size: 0.9rem;
+  margin-top: auto;
+  padding-top: 15px;
 }
 
 .read-more-refined span {
