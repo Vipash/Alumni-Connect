@@ -19,9 +19,7 @@ const User = require('./alumni');
 const Support = require('./Support');
 const mediaRoutes = require('./mediaRoutes');
 const Ticker = require('./Ticker');
-
-// NEW: centralized email service for verification
-const { sendVerificationEmail } = require('./services/emailService');
+const { sendVerificationEmail } = require('./emailservice');
 
 const app = express();
 
