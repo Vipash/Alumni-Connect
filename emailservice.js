@@ -6,9 +6,9 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     // Uses the values from your .env file
-    user: process.env.GMAIL_USER, 
-    pass: process.env.GMAIL_PASS
-  }
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
 });
 
 /**
@@ -17,11 +17,24 @@ const transporter = nodemailer.createTransport({
  * @param {string} userName - The name of the user
  */
 const sendVerificationEmail = async (userEmail, userName) => {
-    console.log(`DEBUG: Attempting to send mail to ${userEmail} for user ${userName}`);
-    if (!userEmail || !userEmail.includes('@')) {
-   console.log("Invalid email address provided. Skipping email.");
-   return { success: false, error: "Invalid Email" };
-}
+  console.log('>>> 1. Inside sendVerificationEmail function');
+  console.log(
+    `DEBUG: Attempting to send mail to ${userEmail} for user ${userName}`
+  );
+
+  // Basic email sanity check
+  if (!userEmail || !userEmail.includes('@')) {
+    console.log('>>> ERROR: Invalid email address provided. Skipping email.');
+    return { success: false, error: 'Invalid Email' };
+  }
+
+  // Check env vars explicitly
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+    console.log(
+      '>>> ERROR: Environment variables are MISSING in emailservice.js'
+    );
+    return { success: false, error: 'Missing Gmail env vars' };
+  }
 
   const mailOptions = {
     // Using the GMAIL_USER variable here keeps it consistent
@@ -45,15 +58,16 @@ const sendVerificationEmail = async (userEmail, userName) => {
           <p><strong>MBM University Alumni Association</strong></p>
         </div>
       </div>
-    `
+    `,
   };
 
   try {
+    console.log('>>> 2. Attempting transporter.sendMail...');
     const info = await transporter.sendMail(mailOptions);
-    console.log('Verification email sent: %s', info.messageId);
+    console.log('>>> 3. Success! ID:', info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Email Error:', error);
+    console.log('>>> 4. Nodemailer Catch Block:', error.message);
     return { success: false, error: error.message };
   }
 };
