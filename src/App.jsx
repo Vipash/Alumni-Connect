@@ -1134,12 +1134,19 @@ const downloadMagazine = () => {
 </section>
 
           {/* --- STANDARDIZED FOOTER --- */}
+{/* --- STANDARDIZED FOOTER --- */}
 <footer className="landing-footer-refined">
   <div className="footer-content-container">
     
     {/* Column 1: Brand Identity */}
     <div className="footer-column brand-col">
-      <img src="/MBM_Logo.png" alt="MBM Logo" className="footer-mini-logo" />
+      {/* Removed any greyscale classes, added inline style as fallback */}
+      <img 
+        src="/MBM_Logo.png" 
+        alt="MBM Logo" 
+        className="footer-mini-logo" 
+        style={{ filter: 'none', opacity: 1 }} 
+      />
       <h4>MBM ALUMNI CONNECT</h4>
       <p>Bridging Generations of Excellence since 1951. Stay connected with your alma mater and fellow alumni.</p>
     </div>
@@ -1148,10 +1155,11 @@ const downloadMagazine = () => {
     <div className="footer-column link-col">
       <h5>Quick Links</h5>
       <ul>
+        {/* These IDs must match your <section id="..."> tags */}
         <li><a href="#gallery">Campus Gallery</a></li>
         <li><a href="#magazine">E-Magazine</a></li>
         <li><a href="#news">Latest News</a></li>
-        <li><a href="#events">Upcoming Events</a></li>
+        <li><a href="#about">About Us</a></li>
       </ul>
     </div>
 
@@ -1166,8 +1174,12 @@ const downloadMagazine = () => {
         Support & Feedback
       </button>
       <div className="footer-socials">
-        {/* Placeholder for social icons */}
-        <span>LinkedIn</span> • <span>Facebook</span> • <span>Twitter</span>
+        {/* Replace '#' with your actual URLs when ready */}
+        <a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <span className="footer-sep">•</span>
+        <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <span className="footer-sep">•</span>
+        <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
       </div>
     </div>
 
