@@ -1073,7 +1073,31 @@ const downloadMagazine = () => {
       }`}
       onClick={() => setSelectedNews(item)}
     >
-      {/* ... rest of your card code ... */}
+      {/* 1. Image Wrapper */}
+      <div className="news-img-wrapper-refined">
+        <img 
+          src={item.imageUrl} 
+          alt={item.headline} 
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        <div className="news-date-tag">News</div>
+      </div>
+
+      {/* 2. Content Wrapper */}
+      <div className="news-info-refined">
+        <h4 className="news-headline-refined">
+          {item.headline}
+        </h4>
+        <p className="news-excerpt-refined">
+          {/* Safety check for content length */}
+          {item.content && item.content.length > 120 
+            ? `${item.content.substring(0, 120)}...` 
+            : item.content}
+        </p>
+        <span className="read-more-refined">
+          Read Full Story <span>→</span>
+        </span>
+      </div>
     </div>
   ))}
 </div>
