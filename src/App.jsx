@@ -1065,36 +1065,18 @@ const downloadMagazine = () => {
     </div>
 
     <div className="news-grid-container">
-      {newsData.map((item) => {
-        const isShort = item.content.length < 150;
-
-        return (
-          <div
-            key={item._id}
-            className={`news-card-refined ${
-              isShort ? 'compact-news' : 'full-news'
-            }`}
-            onClick={() => setSelectedNews(item)}
-          >
-            <div className="news-img-wrapper-refined">
-              <img src={item.imageUrl} alt={item.headline} />
-              <div className="news-date-tag">News</div>
-            </div>
-            <div className="news-info-refined">
-              <h4 className="news-headline-refined">
-                {item.headline}
-              </h4>
-              <p className="news-excerpt-refined">
-                {item.content.substring(0, 120)}...
-              </p>
-              <span className="read-more-refined">
-                Read Full Story <span>→</span>
-              </span>
-            </div>
-          </div>
-        );
-      })}
+  {newsData.map((item) => (
+    <div
+      key={item._id}
+      className={`news-card-refined ${
+        item.isFullWidth ? 'full-news' : 'compact-news'
+      }`}
+      onClick={() => setSelectedNews(item)}
+    >
+      {/* ... rest of your card code ... */}
     </div>
+  ))}
+</div>
 
     {/* Modal logic unchanged, just uses refined classes */}
     {selectedNews && (

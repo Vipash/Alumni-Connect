@@ -1158,29 +1158,32 @@ input:focus,
 /* Intelligent Grid Layout */
 .news-grid-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr); /* Two equal columns */
   gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .news-card-refined {
   display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-direction: column;
+  background: #fff;
   border-radius: 12px;
   overflow: hidden;
+  /* MAXIMUM VERTICAL HEIGHT LIMIT */
+  max-height: 500px; 
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-height: 200px;
+  transition: transform 0.3s ease;
 }
 
 /* Short news takes 1 column, Long news takes the whole row */
 .compact-news {
-  grid-column: span 1;
+  grid-column: span 1; /* Takes half width */
 }
 .full-news {
-  grid-column: span 2;
+  grid-column: span 2; /* Takes full width */
+  flex-direction: row; /* Optional: Image on left, text on right for big cards */
 }
-
 @media (max-width: 900px) {
   .compact-news,
   .full-news {
@@ -1195,11 +1198,21 @@ input:focus,
 }
 
 .news-img-wrapper-refined {
-  width: 35%;
-  position: relative;
-  overflow: hidden;
+  height: 220px; /* Fixed height for image area */
+  width: 100%;
+  flex-shrink: 0;
 }
 
+.full-news .news-img-wrapper-refined {
+  width: 40%; /* If using row layout for full news */
+  height: auto;
+  min-height: 300px;
+}
+.news-img-wrapper-refined img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Crops image to fit the box perfectly */
+}
 .news-img-wrapper-refined img {
   width: 100%;
   height: 100%;
@@ -1225,11 +1238,10 @@ input:focus,
 }
 
 .news-info-refined {
-  padding: 25px;
-  width: 65%;
+  padding: 20px;
+  overflow-y: hidden; /* Hide overflow to keep height strict */
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .news-headline-refined {
@@ -1240,10 +1252,11 @@ input:focus,
 }
 
 .news-excerpt-refined {
-  color: #ccc;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 15px;
+  /* Ensure text doesn't push the card taller */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .read-more-refined {

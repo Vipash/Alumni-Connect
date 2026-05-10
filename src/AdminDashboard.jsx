@@ -1495,6 +1495,14 @@ const deleteNewsItem = async (id) => {
               ? 'Image Selected'
               : 'Select Banner Image'}
           </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={newsUpload.isFullWidth || false}
+              onChange={(e) => setNewsUpload({ ...newsUpload, isFullWidth: e.target.checked })}
+            />
+            Display as Full-Width Card (Featured)
+          </label>
           <button
             className="mbm-btn-primary"
             onClick={handleNewsSubmit}
@@ -1563,6 +1571,18 @@ const deleteNewsItem = async (id) => {
     </div>
 
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <label style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+  <input
+    type="checkbox"
+    checked={item.isFullWidth || false}
+    onChange={(e) => {
+      const updated = [...editableNews];
+      updated[index].isFullWidth = e.target.checked;
+      setEditableNews(updated);
+    }}
+  />
+  Full Width
+</label>
       <input
         type="text"
         className="grid-input"

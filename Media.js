@@ -22,7 +22,8 @@ const NewsSchema = new mongoose.Schema({
   headline: String,
   content: String,
   date: { type: Date, default: Date.now },
-  order: { type: Number, default: 0 }
+  order: { type: Number, default: 0 },
+  isFullWidth: { type: Boolean, default: false } 
 });
 
 const Gallery = mongoose.model('Gallery', GallerySchema);
