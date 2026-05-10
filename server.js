@@ -18,7 +18,10 @@ const Admin = require('./Admin');
 const User = require('./alumni');
 const Support = require('./Support');
 const mediaRoutes = require('./mediaRoutes');
+const Ticker = require('./Ticker');
 
+// NEW: centralized email service for verification
+const { sendVerificationEmail } = require('./services/emailService');
 
 const app = express();
 
@@ -72,9 +75,9 @@ const isAdmin = async (req, res, next) => {
   try {
     const admin = await Admin.findById(adminId);
     if (!admin) return res.status(403).send('Invalid Admin Session');
-    
+
     // Attach admin info to the request for use in later routes
-    req.admin = admin; 
+    req.admin = admin;
     next();
   } catch (err) {
     res.status(500).send('Security check failed');
@@ -105,7 +108,7 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-// Update Create Admin Route
+// Create Admin
 app.post('/api/admin/create-new', async (req, res) => {
   try {
     const { username, password, role, permissions, creatorRole } = req.body;
@@ -115,13 +118,13 @@ app.post('/api/admin/create-new', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newAdmin = new Admin({ 
-      username, 
-      password: hashedPassword, 
-      role, 
-      permissions // Save the array of checked tabs
+    const newAdmin = new Admin({
+      username,
+      password: hashedPassword,
+      role,
+      permissions, // Save the array of checked tabs
     });
-    
+
     await newAdmin.save();
     res.status(201).json({ message: 'New admin created successfully' });
   } catch (err) {
@@ -160,7 +163,7 @@ app.delete('/api/admin/announcement/:id', async (req, res) => {
 
 // ---------- AUTH / USERS ----------
 
-// Registration
+// Registration (enhanced with verification email)
 app.post('/api/register', async (req, res) => {
   try {
     const { password, ...userData } = req.body;
@@ -177,10 +180,27 @@ app.post('/api/register', async (req, res) => {
     });
 
     await newUser.save();
-    res.status(201).send('Registered successfully!');
+
+    // Trigger verification email (best-effort, does not fail registration)
+    try {
+      const firstName =
+        userData.displayName ||
+        userData.name ||
+        userData.fullName ||
+        'Alumni';
+      await sendVerificationEmail(newUser.email, firstName);
+    } catch (emailErr) {
+      console.error('Verification email error:', emailErr);
+    }
+
+    res.status(201).json({
+      message: 'Application submitted. Verification email sent.',
+    });
   } catch (error) {
     console.error('Registration Error:', error);
-    res.status(400).send('Registration failed: ' + error.message);
+    res
+      .status(400)
+      .json({ error: 'Registration failed: ' + error.message });
   }
 });
 
@@ -385,7 +405,7 @@ app.patch('/api/verify-user/:id', async (req, res) => {
     );
 
     const mailOptions = {
-      from: '"MBM Alumni Connect" <your-email@gmail.com>',
+      from: '"MBM Alumni Connect" <mrb0tman69420@gmail.com>',
       to: user.email,
       subject: 'Registration Approved! 🎓',
       html: `
@@ -395,7 +415,7 @@ app.patch('/api/verify-user/:id', async (req, res) => {
            Email: ${user.email}<br>
            Password: [The password you set during registration]</p>
         <p>Please log in and complete your profile to access all features.</p>
-        <a href="https://your-site-link.com">Login Now</a>
+        <a href="https://alumni-connect-fegi.onrender.com">Login Now</a>
       `,
     };
 
@@ -474,7 +494,7 @@ app.post('/api/support', async (req, res) => {
   }
 });
 
-// GET: For Admin Dashboard (AdminDashboard.jsx uses /api/admin/support-tickets)
+// GET: For Admin Dashboard
 app.get('/api/admin/support-tickets', async (req, res) => {
   try {
     const tickets = await Support.find().sort({ createdAt: -1 });
@@ -485,19 +505,21 @@ app.get('/api/admin/support-tickets', async (req, res) => {
   }
 });
 
-const Ticker = require('./Ticker');
+// ---------- TICKERS ----------
 
 // GET all tickers (Public - for the landing page)
 app.get('/api/tickers', async (req, res) => {
   try {
-    const tickers = await Ticker.find({ isActive: true }).sort({ priority: -1 });
+    const tickers = await Ticker.find({ isActive: true }).sort({
+      priority: -1,
+    });
     res.json(tickers);
   } catch (err) {
     res.status(500).send(err.message);
   }
 });
 
-// Add this to your server.js
+// Update ticker
 app.put('/api/admin/tickers/:id', isAdmin, async (req, res) => {
   try {
     const { text, isActive, priority } = req.body;
@@ -506,10 +528,10 @@ app.put('/api/admin/tickers/:id', isAdmin, async (req, res) => {
       { text, isActive, priority },
       { new: true }
     );
-    if (!updatedTicker) return res.status(404).send("Ticker not found");
+    if (!updatedTicker) return res.status(404).send('Ticker not found');
     res.json(updatedTicker);
   } catch (err) {
-    console.error("Update error:", err);
+    console.error('Update error:', err);
     res.status(500).send(err.message);
   }
 });
@@ -530,7 +552,7 @@ app.post('/api/admin/tickers', isAdmin, async (req, res) => {
       const newTicker = new Ticker({ text, isActive, priority });
       await newTicker.save();
     }
-    res.status(200).send("Success");
+    res.status(200).send('Success');
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -539,7 +561,7 @@ app.post('/api/admin/tickers', isAdmin, async (req, res) => {
 // ADMIN: Delete Ticker
 app.delete('/api/admin/tickers/:id', isAdmin, async (req, res) => {
   await Ticker.findByIdAndDelete(req.params.id);
-  res.send("Deleted");
+  res.send('Deleted');
 });
 
 // ---------- SECURITY LOGS ----------
@@ -586,25 +608,25 @@ app.get('/api/admin/logs', isAdmin, async (req, res) => {
   }
 });
 
-  // Get list of all admins (GodMode Only)
-  app.get('/api/admin/list', isAdmin, async (req, res) => {
-    try {
-      const admins = await Admin.find({}, '-password'); // Never send passwords
-      res.json(admins);
-    } catch (err) {
-      res.status(500).send(err.message);
-    }
-  });
+// Get list of all admins (GodMode Only)
+app.get('/api/admin/list', isAdmin, async (req, res) => {
+  try {
+    const admins = await Admin.find({}, '-password'); // Never send passwords
+    res.json(admins);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
-  // Delete an admin
-  app.delete('/api/admin/delete/:id', isAdmin, async (req, res) => {
-    try {
-      await Admin.findByIdAndDelete(req.params.id);
-      res.send('Admin removed');
-    } catch (err) {
-      res.status(500).send(err.message);
-    }
-  });
+// Delete an admin
+app.delete('/api/admin/delete/:id', isAdmin, async (req, res) => {
+  try {
+    await Admin.findByIdAndDelete(req.params.id);
+    res.send('Admin removed');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 // ---------- PRODUCTION SERVING ----------
 

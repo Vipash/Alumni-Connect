@@ -10,7 +10,6 @@ const AboutUs = ({ setView }) => {
           <img src="/MBM_Logo.png" alt="MBM Logo" className="about-main-logo" />
           <h1>MBM University & Alumni Association</h1>
           <p className="legacy-tag">Legacy of Excellence Since 1951</p>
-          <button className="back-btn-gold" onClick={() => setView('landing')}>← Return to Portal</button>
         </div>
       </header>
 

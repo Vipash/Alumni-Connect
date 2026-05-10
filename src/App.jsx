@@ -1161,8 +1161,6 @@ const downloadMagazine = () => {
     <li><a href="#gallery">Campus Gallery</a></li>
     <li><a href="#magazine">E-Magazine</a></li>
     <li><a href="#news">Latest News</a></li>
-    {/* This takes them to the separate About page */}
-    <li><a href="/about">About Us</a></li>
   </ul>
 </div>
 

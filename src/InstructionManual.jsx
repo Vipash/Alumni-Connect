@@ -21,9 +21,6 @@ const InstructionManual = ({ setView }) => {
             <a href="#media">Media & Publications</a>
             <a href="#privacy">Data Governance</a>
           </nav>
-          <button className="back-to-portal" onClick={() => setView('landing')}>
-             ← Back to Landing
-          </button>
         </aside>
 
         {/* MAIN CONTENT AREA */}

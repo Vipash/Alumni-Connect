@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import './MapSearch.css';
 
 // Utility for Zooming
@@ -368,81 +369,99 @@ function MapSearchSection({ setSidebarContent }) {
       {/* Main Map Container */}
       <div className="map-fancy-container" style={{ height: '500px', flexShrink: 0 }}>
         <MapContainer
-          center={[26.2389, 73.0243]}
-          zoom={5}
-          style={{ height: '100%', width: '100%' }}
-        >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <MapResizeHandler />
-          {searchPos && <FlyToMarker position={searchPos} />}
-          <MapClickHandler
-            isPicking={isPicking}
-            onPick={(ll) => {
-              setSearchPos([ll.lat, ll.lng]);
-              findClosest(ll.lat, ll.lng);
-              setIsPicking(false);
-            }}
-          />
+  center={[26.2389, 73.0243]}
+  zoom={5}
+  style={{ height: '100%', width: '100%' }}
+>
+  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+  <MapResizeHandler />
+  {searchPos && <FlyToMarker position={searchPos} />}
+  <MapClickHandler
+    isPicking={isPicking}
+    onPick={(ll) => {
+      setSearchPos([ll.lat, ll.lng]);
+      findClosest(ll.lat, ll.lng);
+      setIsPicking(false);
+    }}
+  />
 
-          {searchPos && (
-            <Marker position={searchPos} icon={searchIcon}>
-              <Popup>Search Point</Popup>
-            </Marker>
-          )}
+  {/* Search point marker (not clustered) */}
+  {searchPos && (
+    <Marker position={searchPos} icon={searchIcon}>
+      <Popup>Search Point</Popup>
+    </Marker>
+  )}
 
-          {alumni.map(item => (
-            <Marker
-              key={item._id}
-              position={[item.location.coordinates[1], item.location.coordinates[0]]}
+  {/* Alumni markers clustered together */}
+  <MarkerClusterGroup
+    chunkedLoading
+    showCoverageOnHover={false}
+    spiderfyOnMaxZoom={true}
+  >
+    {alumni.map((item) => (
+      <Marker
+        key={item._id}
+        position={[
+          item.location.coordinates[1],
+          item.location.coordinates[0],
+        ]}
+      >
+        <Popup maxWidth={300} minWidth={250}>
+          <div style={{ textAlign: 'center', padding: '5px' }}>
+            <img
+              src={item.photo || '/default-avatar.png'}
+              alt="Profile"
+              style={{
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                marginBottom: '5px',
+              }}
+            />
+            <h3 style={{ margin: '0' }}>{item.name}</h3>
+            <p style={{ margin: '5px 0', color: '#666' }}>{item.company}</p>
+
+            {visibleContactId === item._id ? (
+              <div
+                style={{
+                  padding: '8px',
+                  background: '#e8f5e9',
+                  borderRadius: '4px',
+                  fontSize: '0.8rem',
+                }}
+              >
+                <p>📧 {item.email}</p>
+                <p>📞 {item.mobile || 'N/A'}</p>
+              </div>
+            ) : (
+              <button
+                className="nav-btn"
+                style={{ fontSize: '0.75rem', width: '100%' }}
+                onClick={() => handleViewContact(item)}
+              >
+                🔓 View Contact
+              </button>
+            )}
+
+            <button
+              className="admin-btn"
+              style={{
+                fontSize: '0.75rem',
+                width: '100%',
+                marginTop: '5px',
+              }}
+              onClick={() => toggleBookmark(item._id)}
             >
-              <Popup maxWidth={300} minWidth={250}>
-                <div style={{ textAlign: 'center', padding: '5px' }}>
-                  <img
-                    src={item.photo || '/default-avatar.png'}
-                    alt="Profile"
-                    style={{
-                      width: '50px',
-                      height: '50px',
-                      borderRadius: '50%',
-                      marginBottom: '5px'
-                    }}
-                  />
-                  <h3 style={{ margin: '0' }}>{item.name}</h3>
-                  <p style={{ margin: '5px 0', color: '#666' }}>{item.company}</p>
-
-                  {visibleContactId === item._id ? (
-                    <div
-                      style={{
-                        padding: '8px',
-                        background: '#e8f5e9',
-                        borderRadius: '4px',
-                        fontSize: '0.8rem'
-                      }}
-                    >
-                      <p>📧 {item.email}</p>
-                      <p>📞 {item.mobile || 'N/A'}</p>
-                    </div>
-                  ) : (
-                    <button
-                      className="nav-btn"
-                      style={{ fontSize: '0.75rem', width: '100%' }}
-                      onClick={() => handleViewContact(item)}
-                    >
-                      🔓 View Contact
-                    </button>
-                  )}
-                  <button
-                    className="admin-btn"
-                    style={{ fontSize: '0.75rem', width: '100%', marginTop: '5px' }}
-                    onClick={() => toggleBookmark(item._id)}
-                  >
-                    {user.bookmarks?.includes(item._id) ? '🔖 Saved' : '🔖 Bookmark'}
-                  </button>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+              {user.bookmarks?.includes(item._id)
+                ? '🔖 Saved'
+                : '🔖 Bookmark'}
+            </button>
+          </div>
+        </Popup>
+      </Marker>
+    ))}
+  </MarkerClusterGroup>
+</MapContainer>
       </div>
 
       {/* 2. The Results Section with Ref and ID */}
