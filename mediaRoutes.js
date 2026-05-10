@@ -1,13 +1,13 @@
 // mediaRoutes.js
 const express = require('express');
 const router = express.Router();
-const { Gallery, Magazine, News } = require('./Media'); 
+const { Gallery, Magazine, News } = require('./Media');
 
 // Revised gallery route in mediaRoutes.js
 router.post('/gallery-update', async (req, res) => {
   try {
-    // AdminDashboard sends { imageUrl, title, desc } in the body 
-    const newItem = new Gallery(req.body); 
+    // AdminDashboard sends { imageUrl, title, desc } in the body
+    const newItem = new Gallery(req.body);
     await newItem.save();
     res.status(200).json({ message: 'Gallery updated!', item: newItem });
   } catch (err) {
@@ -19,12 +19,12 @@ router.post('/gallery-update', async (req, res) => {
 router.post('/gallery/reorder', async (req, res) => {
   try {
     const { items } = req.body; // Expecting an array of { _id, order, title, desc }
-    
-    const updatePromises = items.map(item => 
-      Gallery.findByIdAndUpdate(item._id, { 
+
+    const updatePromises = items.map((item) =>
+      Gallery.findByIdAndUpdate(item._id, {
         order: item.order,
         title: item.title,
-        desc: item.desc
+        desc: item.desc,
       })
     );
 
@@ -35,7 +35,7 @@ router.post('/gallery/reorder', async (req, res) => {
   }
 });
 
-// Update the GET route to sort by order first
+// === SINGLE HOME-DATA ROUTE (keep this, delete other copies) ===
 router.get('/home-data', async (req, res) => {
   try {
     const gallery = await Gallery.find().sort({ order: 1 });
@@ -61,7 +61,7 @@ router.post('/magazine-update', async (req, res) => {
   }
 });
 
-// DELETE: Magazine Issue (MISSING ROUTE ADDED HERE)
+// DELETE: Magazine Issue
 router.delete('/magazine-delete', async (req, res) => {
   try {
     await Magazine.deleteMany({}); // Clears the magazine record
@@ -69,18 +69,6 @@ router.delete('/magazine-delete', async (req, res) => {
   } catch (err) {
     console.error('Magazine Delete Error:', err);
     res.status(500).json({ message: 'Error deleting magazine', error: err.message });
-  }
-});
-
-// GET: Home Data
-router.get('/home-data', async (req, res) => {
-  try {
-    const gallery = await Gallery.find().sort({ createdAt: -1 });
-    const magazine = await Magazine.findOne();
-    res.json({ gallery, magazine });
-  } catch (err) {
-    console.error('Home Data Route Error:', err);
-    res.status(500).json({ message: 'Error fetching data', error: err.message });
   }
 });
 
@@ -115,32 +103,21 @@ router.post('/news-update', async (req, res) => {
   }
 });
 
-// POST: Bulk Reorder News
+// POST: Bulk Reorder News (updated to save isFullWidth)
 router.post('/news/reorder', async (req, res) => {
   try {
     const { items } = req.body;
-    const promises = items.map(item => 
-      News.findByIdAndUpdate(item._id, { 
-        order: item.order, 
-        headline: item.headline, 
+    const promises = items.map((item) =>
+      News.findByIdAndUpdate(item._id, {
+        order: item.order,
+        headline: item.headline,
         content: item.content,
-        imageUrl: item.imageUrl
+        imageUrl: item.imageUrl,
+        isFullWidth: item.isFullWidth, // save the toggle
       })
     );
     await Promise.all(promises);
     res.status(200).json({ message: 'News sequence and details updated' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Update the GET home-data to include news
-router.get('/home-data', async (req, res) => {
-  try {
-    const gallery = await Gallery.find().sort({ order: 1 });
-    const magazine = await Magazine.findOne();
-    const news = await News.find().sort({ order: 1, date: -1 }); // Get News
-    res.json({ gallery, magazine, news });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
