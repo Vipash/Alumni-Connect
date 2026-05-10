@@ -185,7 +185,7 @@ app.post('/api/register', async (req, res) => {
     // Trigger verification email in the background (non-blocking)
     const firstName = userData.name ? userData.name.split(' ')[0] : 'Alumni';
 
-    sendVerificationEmail(newUser.email, firstName).catch((err) => {
+    await sendVerificationEmail(newUser.email, firstName).catch((err) => {
       console.error('Background Email Error:', err);
     });
 
@@ -381,6 +381,8 @@ app.get('/api/get-alumni', async (req, res) => {
 
 // ---------- EMAIL / VERIFICATION ----------
 
+// Note: local transporter kept only if you still use it elsewhere;
+// for verification we now use the central emailservice.
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -397,22 +399,13 @@ app.patch('/api/verify-user/:id', async (req, res) => {
       { new: true }
     );
 
-    const mailOptions = {
-      from: '"MBM Alumni Connect" <mrb0tman69420@gmail.com>',
-      to: user.email,
-      subject: 'Registration Approved! 🎓',
-      html: `
-        <h3>Welcome, ${user.name}!</h3>
-        <p>Your registration for the MBM Alumni Connect portal has been approved by the Admin.</p>
-        <p><strong>Login Details:</strong><br>
-           Email: ${user.email}<br>
-           Password: [The password you set during registration]</p>
-        <p>Please log in and complete your profile to access all features.</p>
-        <a href="https://alumni-connect-fegi.onrender.com">Login Now</a>
-      `,
-    };
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
 
-    transporter.sendMail(mailOptions);
+    // Use central email service instead of local transporter
+    await sendVerificationEmail(user.email, user.name);
+
     res.send('User Verified and Email Sent!');
   } catch (err) {
     console.error('Verify user error:', err);
