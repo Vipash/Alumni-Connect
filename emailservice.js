@@ -17,6 +17,7 @@ const transporter = nodemailer.createTransport({
  * @param {string} userName - The name of the user
  */
 const sendVerificationEmail = async (userEmail, userName) => {
+    console.log(`DEBUG: Attempting to send mail to ${userEmail} for user ${userName}`);
     if (!userEmail || !userEmail.includes('@')) {
    console.log("Invalid email address provided. Skipping email.");
    return { success: false, error: "Invalid Email" };
