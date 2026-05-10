@@ -161,8 +161,11 @@ app.delete('/api/admin/announcement/:id', async (req, res) => {
 
 // ---------- AUTH / USERS ----------
 
-// Registration (enhanced with verification email)
+// Registration (enhanced with verification email + debug logs)
 app.post('/api/register', async (req, res) => {
+  console.log('--- New Registration Attempt ---');
+  console.log('Payload Received:', req.body); // spy on the incoming data
+
   try {
     const { password, ...userData } = req.body;
     const existingUser = await User.findOne({ email: userData.email });
@@ -179,26 +182,18 @@ app.post('/api/register', async (req, res) => {
 
     await newUser.save();
 
-    // Trigger verification email (best-effort, does not fail registration)
-    try {
-      const firstName =
-        userData.displayName ||
-        userData.name ||
-        userData.fullName ||
-        'Alumni';
-      await sendVerificationEmail(newUser.email, firstName);
-    } catch (emailErr) {
-      console.error('Verification email error:', emailErr);
-    }
+    // Trigger verification email in the background (non-blocking)
+    const firstName = userData.name ? userData.name.split(' ')[0] : 'Alumni';
 
-    res.status(201).json({
-      message: 'Application submitted. Verification email sent.',
+    sendVerificationEmail(newUser.email, firstName).catch((err) => {
+      console.error('Background Email Error:', err);
     });
+
+    // Immediately respond to the user
+    res.status(201).json({ message: 'Registration successful' });
   } catch (error) {
-    console.error('Registration Error:', error);
-    res
-      .status(400)
-      .json({ error: 'Registration failed: ' + error.message });
+    console.error('DETAILED ERROR:', error); // exact failing field / validation
+    res.status(400).json({ error: error.message });
   }
 });
 

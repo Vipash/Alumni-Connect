@@ -17,6 +17,11 @@ const transporter = nodemailer.createTransport({
  * @param {string} userName - The name of the user
  */
 const sendVerificationEmail = async (userEmail, userName) => {
+    if (!userEmail || !userEmail.includes('@')) {
+   console.log("Invalid email address provided. Skipping email.");
+   return { success: false, error: "Invalid Email" };
+}
+
   const mailOptions = {
     // Using the GMAIL_USER variable here keeps it consistent
     from: `"MBM Alumni Connect" <${process.env.GMAIL_USER}>`,
