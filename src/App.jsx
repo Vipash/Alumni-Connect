@@ -796,7 +796,7 @@ const downloadMagazine = () => {
         <section className={`portal-info-section ${hasPopped ? 'content-pop' : ''}`}>
 
 {/* --- STRIP 1: CAMPUS GALLERY (Fixed Left Anchor) --- */}
-<section className="campus-hero-full-width compact-strip">
+<section id="gallery" className="campus-hero-full-width compact-strip">
   {galleryItems.length > 0 ? (
     <div className="campus-hero-stack-container gallery-fixed-layout">
       
@@ -909,6 +909,7 @@ const downloadMagazine = () => {
 
 {/* --- STRIP 2: ALUMNI MAGAZINE (Side Navigation + Compact Strip) --- */}
 <section
+  id="magazine"
   className="campus-hero-full-width magazine-strip"
   /* padding compacted via CSS (.magazine-strip) */
 >
@@ -1045,6 +1046,7 @@ const downloadMagazine = () => {
 
 {/* --- STRIP 3: CAMPUS NEWS (New Polished Strip) --- */}
 <section
+  id="news" 
   className="news-strip-wrapper"
   style={{ backgroundColor: '#1a1c4d', padding: '80px 0' }}
 >
@@ -1152,36 +1154,38 @@ const downloadMagazine = () => {
     </div>
 
     {/* Column 2: Quick Navigation */}
-    <div className="footer-column link-col">
-      <h5>Quick Links</h5>
-      <ul>
-        {/* These IDs must match your <section id="..."> tags */}
-        <li><a href="#gallery">Campus Gallery</a></li>
-        <li><a href="#magazine">E-Magazine</a></li>
-        <li><a href="#news">Latest News</a></li>
-        <li><a href="#about">About Us</a></li>
-      </ul>
-    </div>
+<div className="footer-column link-col">
+  <h5>Quick Links</h5>
+  <ul>
+    {/* These slide the user up the current page */}
+    <li><a href="#gallery">Campus Gallery</a></li>
+    <li><a href="#magazine">E-Magazine</a></li>
+    <li><a href="#news">Latest News</a></li>
+    {/* This takes them to the separate About page */}
+    <li><a href="/about">About Us</a></li>
+  </ul>
+</div>
 
-    {/* Column 3: Support & Contact */}
-    <div className="footer-column contact-col">
-      <h5>Get In Touch</h5>
-      <p>Questions about the portal?</p>
-      <button 
-        className="footer-support-btn"
-        onClick={() => setIsSupportOpen(true)}
-      >
-        Support & Feedback
-      </button>
-      <div className="footer-socials">
-        {/* Replace '#' with your actual URLs when ready */}
-        <a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <span className="footer-sep">•</span>
-        <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
-        <span className="footer-sep">•</span>
-        <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
-      </div>
-    </div>
+{/* Column 3: Support & Contact */}
+<div className="footer-column contact-col">
+  <h5>Get In Touch</h5>
+  <p>Questions about the portal?</p>
+  <button 
+    className="footer-support-btn"
+    onClick={() => setIsSupportOpen(true)}
+  >
+    Support & Feedback
+  </button>
+  
+  <div className="footer-socials">
+    {/* Just replace the '#' with your link (e.g., 'https://linkedin.com/school/mbm') */}
+    <a href="#" target="_blank" rel="noopener noreferrer" className="social-link">LinkedIn</a>
+    <span className="footer-sep">•</span>
+    <a href="#" target="_blank" rel="noopener noreferrer" className="social-link">Facebook</a>
+    <span className="footer-sep">•</span>
+    <a href="#" target="_blank" rel="noopener noreferrer" className="social-link">Twitter</a>
+  </div>
+</div>
 
   </div>
 

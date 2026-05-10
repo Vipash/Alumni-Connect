@@ -1419,6 +1419,57 @@ html {
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Social Media Link Styling */
+.footer-socials {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.social-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.social-link:hover {
+  color: #d4af37; /* Gold hover color */
+  transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Adds a small underline effect on hover */
+.social-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: #d4af37;
+  transition: width 0.3s ease;
+}
+
+.social-link:hover::after {
+  width: 100%;
+}
+
+.footer-sep {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.8rem;
+}
+
+section {
+  scroll-margin-top: 80px; /* Adjust this value to match your header height */
+}
+
 /* Typography */
 h1,
 h2 {
