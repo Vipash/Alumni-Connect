@@ -1,43 +1,37 @@
 const nodemailer = require('nodemailer');
-// Ensure dotenv is loaded so process.env works
-require('dotenv').config();
+const path = require('path');
+
+// 1. Better Env Loading: Ensure it looks in the correct directory
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // Use SSL for port 465
   auth: {
-    // Uses the values from your .env file
     user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
+    pass: process.env.GMAIL_PASS, // Ensure spaces are included in Render dashboard
   },
+  // Increased timeouts for slower cloud-to-google handshakes
+  connectionTimeout: 10000, 
+  greetingTimeout: 10000,
 });
 
-/**
- * Sends a verification email to the user.
- * @param {string} userEmail - Recipient email address
- * @param {string} userName - The name of the user
- */
 const sendVerificationEmail = async (userEmail, userName) => {
   console.log('>>> 1. Inside sendVerificationEmail function');
-  console.log(
-    `DEBUG: Attempting to send mail to ${userEmail} for user ${userName}`
-  );
+  console.log(`DEBUG: Attempting to send mail to ${userEmail} for user ${userName}`);
 
-  // Basic email sanity check
   if (!userEmail || !userEmail.includes('@')) {
-    console.log('>>> ERROR: Invalid email address provided. Skipping email.');
+    console.log('>>> ERROR: Invalid email address.');
     return { success: false, error: 'Invalid Email' };
   }
 
-  // Check env vars explicitly
   if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-    console.log(
-      '>>> ERROR: Environment variables are MISSING in emailservice.js'
-    );
-    return { success: false, error: 'Missing Gmail env vars' };
+    console.log('>>> ERROR: Missing Environment Variables');
+    return { success: false, error: 'Missing Credentials' };
   }
 
   const mailOptions = {
-    // Using the GMAIL_USER variable here keeps it consistent
     from: `"MBM Alumni Connect" <${process.env.GMAIL_USER}>`,
     to: userEmail,
     subject: 'Action Required: Verify Your Alumni Account',
@@ -50,9 +44,7 @@ const sendVerificationEmail = async (userEmail, userName) => {
           <h2>Hello, ${userName}!</h2>
           <p>Thank you for registering with the <strong>MBM Alumni Connect</strong> portal.</p>
           <p>Our administrators are currently reviewing your details. This process typically takes 24-48 hours. Once verified, you will receive a confirmation email and will have full access to the portal features.</p>
-          <p>If you have any questions, feel free to reply to this email or contact support.</p>
         </div>
-        <br />
         <div style="border-top: 1px solid #eeeeee; padding-top: 10px; font-size: 0.9em;">
           <p>Best Regards,</p>
           <p><strong>MBM University Alumni Association</strong></p>
@@ -61,15 +53,20 @@ const sendVerificationEmail = async (userEmail, userName) => {
     `,
   };
 
-  try {
+  // 2. The Promise Wrapper: This is the critical fix for Render execution
+  return new Promise((resolve) => {
     console.log('>>> 2. Attempting transporter.sendMail...');
-    const info = await transporter.sendMail(mailOptions);
-    console.log('>>> 3. Success! ID:', info.messageId);
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.log('>>> 4. Nodemailer Catch Block:', error.message);
-    return { success: false, error: error.message };
-  }
+    
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('>>> 4. FINAL NODEMAILER ERROR:', error.message);
+        resolve({ success: false, error: error.message });
+      } else {
+        console.log('>>> 3. FINAL SUCCESS! ID:', info.messageId);
+        resolve({ success: true, messageId: info.messageId });
+      }
+    });
+  });
 };
 
 module.exports = { sendVerificationEmail };
