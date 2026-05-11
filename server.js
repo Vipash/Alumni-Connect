@@ -19,11 +19,7 @@ const User = require('./alumni');
 const Support = require('./Support');
 const mediaRoutes = require('./mediaRoutes');
 const Ticker = require('./Ticker');
-// This will run once when the server starts/restarts
 const { sendVerificationEmail } = require('./emailservice');
-sendVerificationEmail('mrb0tman69420@gmail.com', 'Server Start Test')
-  .then(() => console.log("STARTUP TEST: Attempted to send startup email. Check logs."));
-
 const app = express();
 
 app.use(cors());
@@ -188,8 +184,8 @@ app.post('/api/register', async (req, res) => {
     // Trigger verification email in the background (non-blocking)
     const firstName = userData.name ? userData.name.split(' ')[0] : 'Alumni';
 
-    await sendVerificationEmail(newUser.email, firstName).catch((err) => {
-      console.error('Background Email Error:', err);
+    await sendVerificationEmail(newUser.email, firstName, 'registration').catch((err) => {
+    console.error('Background Email Error:', err);
     });
 
     // Immediately respond to the user
@@ -407,7 +403,8 @@ app.patch('/api/verify-user/:id', async (req, res) => {
     }
 
     // Use central email service instead of local transporter
-    await sendVerificationEmail(user.email, user.name);
+    const firstName = user.name ? user.name.split(' ')[0] : 'Alumnus';
+    await sendVerificationEmail(user.email, user.name, 'approval');
 
     res.send('User Verified and Email Sent!');
   } catch (err) {
