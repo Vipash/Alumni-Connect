@@ -8,15 +8,23 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // Must be false for 587
   auth: {
-    // Force direct access to environment variables
     user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS, // Ensure spaces are present in Render Dashboard
+    pass: process.env.GMAIL_PASS,
   },
-  // This is vital for cloud environments to prevent the 'hang'
+  tls: {
+    // This prevents the connection from hanging if the server 
+    // has trouble with the SSL certificate chain
+    rejectUnauthorized: false,
+    minVersion: "TLSv1.2"
+  },
+  connectionTimeout: 20000, // 20 seconds
+  greetingTimeout: 20000,
   debug: true,
-  logger: true,
+  logger: true 
 });
 
 /**
@@ -77,5 +85,6 @@ const sendVerificationEmail = async (userEmail, userName) => {
     });
   });
 };
+
 
 module.exports = { sendVerificationEmail };
