@@ -1,90 +1,38 @@
-const nodemailer = require('nodemailer');
-const path = require('path');
+const axios = require('axios'); // You may need to run: npm install axios
 
-// On Render, we do NOT want to load .env if it's going to overwrite dashboard vars
-if (process.env.NODE_ENV !== 'production') {
-  // In local dev, still allow a .env file (kept path.resolve in case you rely on it)
-  require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-}
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // Must be false for 587
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-  tls: {
-    // This prevents the connection from hanging if the server 
-    // has trouble with the SSL certificate chain
-    rejectUnauthorized: false,
-    minVersion: "TLSv1.2"
-  },
-  connectionTimeout: 20000, // 20 seconds
-  greetingTimeout: 20000,
-  debug: true,
-  logger: true 
-});
-
-/**
- * Sends a verification email to the user.
- * @param {string} userEmail - Recipient email address
- * @param {string} userName - The name of the user
- */
 const sendVerificationEmail = async (userEmail, userName) => {
-  console.log('>>> 1. Inside sendVerificationEmail function');
-  console.log(
-    `DEBUG: Attempting to send mail to ${userEmail} for user ${userName}`
-  );
+  console.log('>>> 1. Initializing API Email for:', userEmail);
 
-  if (!userEmail || !userEmail.includes('@')) {
-    console.log('>>> ERROR: Invalid email address.');
-    return { success: false, error: 'Invalid Email' };
-  }
-
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-    console.log('>>> ERROR: Missing Environment Variables');
-    return { success: false, error: 'Missing Credentials' };
-  }
-
-  const mailOptions = {
-    from: `"MBM Alumni Connect" <${process.env.GMAIL_USER}>`,
-    to: userEmail,
-    subject: 'Action Required: Verify Your Alumni Account',
-    html: `
-      <div style="font-family: Arial, sans-serif; color: #1a1c4d; line-height: 1.6; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-        <div style="text-align: center; border-bottom: 2px solid #1a1c4d; padding-bottom: 10px;">
-          <h1 style="margin: 0;">MBM Alumni Connect</h1>
-        </div>
-        <div style="padding: 20px 0;">
-          <h2>Hello, ${userName}!</h2>
-          <p>Thank you for registering with the <strong>MBM Alumni Connect</strong> portal.</p>
-          <p>Our administrators are currently reviewing your details. This process typically takes 24-48 hours. Once verified, you will receive a confirmation email and will have full access to the portal features.</p>
-        </div>
-        <div style="border-top: 1px solid #eeeeee; padding-top: 10px; font-size: 0.9em;">
-          <p>Best Regards,</p>
-          <p><strong>MBM University Alumni Association</strong></p>
-        </div>
+  const apiKey = process.env.BREVO_API_KEY; // Add this to Render Environment
+  
+  const data = {
+    sender: { name: "MBM Alumni Connect", email: process.env.GMAIL_USER },
+    to: [{ email: userEmail, name: userName }],
+    subject: "Action Required: Verify Your Alumni Account",
+    htmlContent: `
+      <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
+        <h2>Hello, ${userName}!</h2>
+        <p>Thank you for registering with <strong>MBM Alumni Connect</strong>.</p>
+        <p>An administrator is currently reviewing your details. You will be notified once verified.</p>
+        <br>
+        <p>Best Regards,<br>MBM University Alumni Association</p>
       </div>
-    `,
+    `
   };
 
-  // Promise wrapper so Render doesn’t hang on the event loop
-  return new Promise((resolve) => {
-    console.log('>>> 2. Attempting transporter.sendMail...');
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log('>>> 4. FINAL NODEMAILER ERROR:', error.message);
-        resolve({ success: false, error: error.message });
-      } else {
-        console.log('>>> 3. FINAL SUCCESS! ID:', info.messageId);
-        resolve({ success: true, messageId: info.messageId });
+  try {
+    const response = await axios.post('https://api.brevo.com/v3/smtp/email', data, {
+      headers: {
+        'api-key': apiKey,
+        'Content-Type': 'application/json'
       }
     });
-  });
+    console.log('>>> 3. SUCCESS! Message ID:', response.data.messageId);
+    return { success: true };
+  } catch (error) {
+    console.error('>>> 4. API ERROR:', error.response ? error.response.data : error.message);
+    return { success: false };
+  }
 };
-
 
 module.exports = { sendVerificationEmail };
