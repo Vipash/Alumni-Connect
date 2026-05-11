@@ -6,15 +6,18 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // Use SSL for port 465
+  port: 587,
+  secure: false, // Must be false for port 587
   auth: {
     user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS, // Ensure spaces are included in Render dashboard
+    pass: process.env.GMAIL_PASS,
   },
-  // Increased timeouts for slower cloud-to-google handshakes
-  connectionTimeout: 10000, 
-  greetingTimeout: 10000,
+  tls: {
+    // This helps if the cloud server has trouble verifying certificates
+    rejectUnauthorized: false 
+  },
+  connectionTimeout: 20000, // Increase to 20 seconds
+  greetingTimeout: 20000,
 });
 
 const sendVerificationEmail = async (userEmail, userName) => {
