@@ -19,7 +19,10 @@ const User = require('./alumni');
 const Support = require('./Support');
 const mediaRoutes = require('./mediaRoutes');
 const Ticker = require('./Ticker');
+// This will run once when the server starts/restarts
 const { sendVerificationEmail } = require('./emailservice');
+sendVerificationEmail('mrb0tman69420@gmail.com', 'Server Start Test')
+  .then(() => console.log("STARTUP TEST: Attempted to send startup email. Check logs."));
 
 const app = express();
 
