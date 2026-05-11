@@ -1,24 +1,34 @@
 const nodemailer = require('nodemailer');
 const path = require('path');
 
-// 1. Better Env Loading: Ensure it looks in the correct directory
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+// On Render, we do NOT want to load .env if it's going to overwrite dashboard vars
+if (process.env.NODE_ENV !== 'production') {
+  // In local dev, still allow a .env file (kept path.resolve in case you rely on it)
+  require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+}
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
+    // Force direct access to environment variables
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_PASS, // Ensure spaces are present in Render Dashboard
   },
-  // Adding these helps handle slow handshakes on cloud networks
-  pool: true,
-  maxConnections: 1,
-  rateLimit: 1
+  // This is vital for cloud environments to prevent the 'hang'
+  debug: true,
+  logger: true,
 });
 
+/**
+ * Sends a verification email to the user.
+ * @param {string} userEmail - Recipient email address
+ * @param {string} userName - The name of the user
+ */
 const sendVerificationEmail = async (userEmail, userName) => {
   console.log('>>> 1. Inside sendVerificationEmail function');
-  console.log(`DEBUG: Attempting to send mail to ${userEmail} for user ${userName}`);
+  console.log(
+    `DEBUG: Attempting to send mail to ${userEmail} for user ${userName}`
+  );
 
   if (!userEmail || !userEmail.includes('@')) {
     console.log('>>> ERROR: Invalid email address.');
@@ -52,10 +62,10 @@ const sendVerificationEmail = async (userEmail, userName) => {
     `,
   };
 
-  // 2. The Promise Wrapper: This is the critical fix for Render execution
+  // Promise wrapper so Render doesn’t hang on the event loop
   return new Promise((resolve) => {
     console.log('>>> 2. Attempting transporter.sendMail...');
-    
+
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log('>>> 4. FINAL NODEMAILER ERROR:', error.message);
