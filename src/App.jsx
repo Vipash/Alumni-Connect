@@ -821,18 +821,16 @@ const downloadMagazine = () => {
         <section className={`portal-info-section ${hasPopped ? 'content-pop' : ''}`}>
 
 {/* --- STRIP 1: CAMPUS GALLERY (Fixed Left Anchor) --- */}
-<div style={{ textAlign: 'center', padding: '40px 0 0 0', backgroundColor: '#F2F2F2' }}>
-  <h2 className="section-title-main" style={{ 
-      fontSize: '3.5rem', 
-      color: '#231773', 
-      borderBottom: '5px solid #F2AC29', 
-      display: 'inline-block',
-      letterSpacing: '4px'
-  }}>
-    GALLERY
-  </h2>
-</div>
+
 <section id="gallery" className="campus-hero-full-width compact-strip">
+  <div className="section-header-centered">
+      <h3
+        className="section-subtitle"
+        style={{ color: '#d4af37', textAlign: 'center' }}
+      >
+        GALLERY
+      </h3>
+</div>
   {galleryItems.length > 0 ? (
     <div className="campus-hero-stack-container gallery-fixed-layout">
       
@@ -982,7 +980,7 @@ const downloadMagazine = () => {
   ALUMNI PUBLICATIONS
 </h3>
 <h2 style={{ 
-    color: '#231773', 
+    color: '#F2AC29', 
     margin: '10px 0', 
     fontSize: '3rem', 
     fontWeight: '800' 
