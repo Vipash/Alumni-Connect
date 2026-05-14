@@ -130,7 +130,8 @@ function App() {
   const [notifications, setNotifications] = useState([]);
   const unreadCount = notifications.filter(n => !n.read).length;
   const [suggestions, setSuggestions] = useState([]);
-
+  const [galleryItems] = useState(galleryData); 
+ 
   // Optional: these are not used in App itself; safe to remove if unused
   const [tickers, setTickers] = useState([]);
   const [editingTicker, setEditingTicker] = useState(null);
@@ -150,6 +151,13 @@ function App() {
 
   const [scrollOpacity, setScrollOpacity] = useState(1);
 const [hasPopped, setHasPopped] = useState(false);
+
+const galleryData = [
+  { imageUrl: '/gallery1.jpg', title: 'Main Campus', desc: 'The historic front gate of MBM University.' },
+  { imageUrl: '/gallery2.jpg', title: 'IT Block', desc: 'State-of-the-art labs and research facilities.' },
+  { imageUrl: '/gallery3.jpg', title: 'Alumni Meet', desc: 'Connecting generations of MBM graduates.' },
+  { imageUrl: '/gallery4.jpg', title: 'Central Library', desc: 'A vast collection of engineering and tech resources.' }
+];
 
 useEffect(() => {
   const handleScroll = () => {
@@ -777,10 +785,10 @@ const downloadMagazine = () => {
       className="floating-logo"
       style={{ margin: '0 auto 20px auto', display: 'block' }}
     />
-    <h1 className="hero-title" style={{ color: '#08056d', margin: 0 }}>
+    <h1 className="hero-title" style={{ color: '#231773', margin: 0 }}>
       MBM ALUMNI CONNECT
     </h1>
-    <p className="hero-subtitle" style={{ color: '#F2E205', fontWeight: '500' }}>
+    <p className="hero-subtitle" style={{ color: '#F2AC29', fontWeight: '500' }}>
       Bridging Generations of Excellence
     </p>
   </div>
@@ -802,6 +810,17 @@ const downloadMagazine = () => {
         <section className={`portal-info-section ${hasPopped ? 'content-pop' : ''}`}>
 
 {/* --- STRIP 1: CAMPUS GALLERY (Fixed Left Anchor) --- */}
+<div style={{ textAlign: 'center', padding: '40px 0 0 0', backgroundColor: '#F2F2F2' }}>
+  <h2 className="section-title-main" style={{ 
+      fontSize: '3.5rem', 
+      color: '#231773', 
+      borderBottom: '5px solid #F2AC29', 
+      display: 'inline-block',
+      letterSpacing: '4px'
+  }}>
+    GALLERY
+  </h2>
+</div>
 <section id="gallery" className="campus-hero-full-width compact-strip">
   {galleryItems.length > 0 ? (
     <div className="campus-hero-stack-container gallery-fixed-layout">
@@ -900,14 +919,18 @@ const downloadMagazine = () => {
         </button>
         <h2>Campus Gallery</h2>
         <div className="gallery-grid-full">
-          {galleryData.map((item, index) => (
-            <img
-              key={index}
-              src={item.imageUrl}
-              alt={item.title}
-            />
-          ))}
-        </div>
+  {galleryData.map((item, index) => (
+    <div key={index} className="gallery-modal-item">
+      <img
+        src={item.imageUrl}
+        alt={item.title}
+        className="glass-panel" 
+        style={{ borderRadius: '10px', width: '100%' }}
+      />
+      <p style={{ color: '#231773', textAlign: 'center', marginTop: '10px' }}>{item.title}</p>
+    </div>
+  ))}
+</div>
       </div>
     </div>
   )}
@@ -923,12 +946,17 @@ const downloadMagazine = () => {
     {/* Text Area */}
     <div className="stack-text-side">
       <div className="text-content-wrapper">
-        <h3
-          className="section-subtitle"
-          style={{ color: '#d4af37' }}
-        >
-          E-MAGAZINE
+        <h3 className="section-subtitle" style={{ color: '#D91480', fontSize: '1.4rem' }}>
+          ALUMNI PUBLICATIONS
         </h3>
+        <h2 style={{ 
+            color: '#231773', 
+            margin: '10px 0', 
+            fontSize: '3rem', 
+            fontWeight: '800' 
+        }}>
+          E-MAGAZINE
+        </h2>
         <h2 style={{ color: '#fff', margin: '10px 0' }}>
           The Alumni Connect
         </h2>
@@ -939,37 +967,17 @@ const downloadMagazine = () => {
           Explore the latest breakthroughs in research, campus life,
           and student achievements in our monthly digital edition.
         </p>
-        <div
-          style={{
-            marginTop: '30px',
-            display: 'flex',
-            gap: '12px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <button
-            className="view-gallery-btn"
-            style={{
-              background: '#d4af37',
-              color: '#1a1a1a',
-              border: 'none',
-            }}
-            onClick={() => setIsMagOpen(true)}
-          >
-            View Online
-          </button>
-          <button
-            className="view-gallery-btn"
-            style={{
-              background: '#ffffff',
-              color: '#3d2069',
-              border: 'none',
-            }}
-            onClick={downloadMagazine}
-          >
-            Download PDF
-          </button>
-        </div>
+        <h3 className="section-subtitle" style={{ color: '#D91480', fontSize: '1.4rem' }}>
+  ALUMNI PUBLICATIONS
+</h3>
+<h2 style={{ 
+    color: '#231773', 
+    margin: '10px 0', 
+    fontSize: '3rem', 
+    fontWeight: '800' 
+}}>
+  E-MAGAZINE
+</h2>
       </div>
     </div>
 
