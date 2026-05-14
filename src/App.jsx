@@ -130,7 +130,6 @@ function App() {
   const [notifications, setNotifications] = useState([]);
   const unreadCount = notifications.filter(n => !n.read).length;
   const [suggestions, setSuggestions] = useState([]);
-  const [galleryItems] = useState(galleryData); 
  
   // Optional: these are not used in App itself; safe to remove if unused
   const [tickers, setTickers] = useState([]);
@@ -151,13 +150,6 @@ function App() {
 
   const [scrollOpacity, setScrollOpacity] = useState(1);
 const [hasPopped, setHasPopped] = useState(false);
-
-const galleryData = [
-  { imageUrl: '/gallery1.jpg', title: 'Main Campus', desc: 'The historic front gate of MBM University.' },
-  { imageUrl: '/gallery2.jpg', title: 'IT Block', desc: 'State-of-the-art labs and research facilities.' },
-  { imageUrl: '/gallery3.jpg', title: 'Alumni Meet', desc: 'Connecting generations of MBM graduates.' },
-  { imageUrl: '/gallery4.jpg', title: 'Central Library', desc: 'A vast collection of engineering and tech resources.' }
-];
 
 useEffect(() => {
   const handleScroll = () => {
@@ -321,10 +313,29 @@ useEffect(() => {
 }, [mapSearchQuery]);
 
 const [galleryItems, setGalleryItems] = useState([
-  { img: "/assets/campus1.jpg", text: "Welcome to the Historic MBM University Campus." },
-  { img: "/assets/event1.jpg", text: "Connecting generations: Highlights from our last Alumni Meet." },
-  { img: "/assets/lab1.jpg", text: "Our newly renovated digital library and research wing." }
+  { 
+    img: "/assets/campus1.jpg", 
+    imageUrl: "/assets/campus1.jpg", 
+    title: "Main Campus", 
+    text: "Welcome to the Historic MBM University Campus.",
+    desc: "Welcome to the Historic MBM University Campus." 
+  },
+  { 
+    img: "/assets/event1.jpg", 
+    imageUrl: "/assets/event1.jpg", 
+    title: "Alumni Meet", 
+    text: "Connecting generations: Highlights from our last Alumni Meet.",
+    desc: "Connecting generations: Highlights from our last Alumni Meet."
+  },
+  { 
+    img: "/assets/lab1.jpg", 
+    imageUrl: "/assets/lab1.jpg", 
+    title: "Research Labs", 
+    text: "Where innovation meets engineering excellence.",
+    desc: "Where innovation meets engineering excellence."
+  }
 ]);
+
 const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
 const [magazineData, setMagazineData] = useState(null); // To store DB magazine URLs
 
