@@ -1,2 +1,12 @@
 @import "./Variables.css";
+
+/* 2. FOUNDATION: Global resets and base element styles (h1, buttons, etc.) */
 @import "./Base.css";
+
+/* 3. UTILITIES: Fades, slides, and shared helper classes */
+@import "./Animations.css";
+@import "./GlobalHelpers.css";
+
+/* 4. LAYOUT: Styles for the permanent shell of the app */
+@import "./AppShell.css";
+@import "./Modals.css";
