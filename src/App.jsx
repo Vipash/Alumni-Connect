@@ -823,14 +823,6 @@ const downloadMagazine = () => {
 {/* --- STRIP 1: CAMPUS GALLERY (Fixed Left Anchor) --- */}
 
 <section id="gallery" className="campus-hero-full-width compact-strip">
-  <div className="section-header-centered">
-      <h3
-        className="section-subtitle"
-        style={{ color: '#d4af37', textAlign: 'center' }}
-      >
-        GALLERY
-      </h3>
-</div>
   {galleryItems.length > 0 ? (
     <div className="campus-hero-stack-container gallery-fixed-layout">
       
@@ -892,6 +884,14 @@ const downloadMagazine = () => {
       {/* 3. EXPANDED TEXT AREA: independent, fills remaining space */}
       <div className="gallery-text-container">
         <div className="text-content-wrapper">
+          <div className="section-header-centered">
+                <h3
+                  className="section-subtitle"
+                  style={{ color: '#F2AC29', textAlign: 'center' }}
+                >
+                  GALLERY
+                </h3>
+          </div>
           <h3 className="section-subtitle">
             {galleryItems[currentGalleryIndex]?.title || 'Highlights'}
           </h3>
