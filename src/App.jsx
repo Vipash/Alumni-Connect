@@ -1328,7 +1328,7 @@ const downloadMagazine = () => {
                       <div className="form-group">
                         <label>Full Name</label>
                         <input
-                          placeholder="e.g. John Doe"
+                          placeholder="e.g. Vipss"
                           value={formData.name}
                           required
                           onChange={(e) =>
@@ -1364,7 +1364,7 @@ const downloadMagazine = () => {
                             type="number"
                             min="1950"
                             max="2100"
-                            placeholder="YYYY"
+                            placeholder="2026"
                             value={formData.passoutYear}
                             required
                             onChange={(e) =>
@@ -1381,7 +1381,7 @@ const downloadMagazine = () => {
                         <div className="form-group">
                           <label>Roll Number</label>
                           <input
-                            placeholder="e.g. 21BECEC001"
+                            placeholder="e.g. 23UCSE4050"
                             value={formData.rollNumber}
                             required
                             onChange={(e) =>
@@ -1399,7 +1399,7 @@ const downloadMagazine = () => {
                           <div className="form-group">
                             <label>Current Company</label>
                             <input
-                              placeholder="e.g. Google, TCS"
+                              placeholder="e.g. Bhandara Association"
                               value={formData.company}
                               required
                               onChange={(e) =>
@@ -1441,7 +1441,7 @@ const downloadMagazine = () => {
                         <label>Email Address</label>
                         <input
                           type="email"
-                          placeholder="email@example.com"
+                          placeholder="vipashmeena@gmail.com"
                           value={formData.email}
                           required
                           onChange={(e) =>
@@ -1458,7 +1458,7 @@ const downloadMagazine = () => {
                         <input
                           type="tel"
                           pattern="[0-9]{10}"
-                          placeholder="10-digit mobile number"
+                          placeholder="8824299517"
                           value={formData.mobile}
                           required
                           onChange={(e) =>
@@ -1480,7 +1480,7 @@ const downloadMagazine = () => {
                       <div className="form-group">
                         <label>Username</label>
                         <input
-                          placeholder="Choose a display name"
+                          placeholder="Vipss"
                           value={formData.displayName}
                           required
                           onChange={(e) =>
@@ -1496,7 +1496,7 @@ const downloadMagazine = () => {
                         <label>Password</label>
                         <input
                           type="password"
-                          placeholder="••••••••"
+                          placeholder="OstensibleSentinel_1"
                           value={formData.password}
                           required
                           onChange={(e) =>
@@ -1575,7 +1575,7 @@ const downloadMagazine = () => {
                       type="text"
                       className="partition-input"
                       style={{ flex: 1, margin: 0 }}
-                      placeholder="Search for your city....."
+                      placeholder="Search for your city..... (e.g. GGC)"
                       value={mapSearchQuery}
                       onChange={(e) => setMapSearchQuery(e.target.value)}
                     />

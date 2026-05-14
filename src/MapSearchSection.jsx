@@ -226,7 +226,7 @@ function MapSearchSection({ setSidebarContent }) {
           <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Company</label>
           <input
             className="partition-input"
-            placeholder="Search Company..."
+            placeholder="Search Your Homies..."
             value={companySearch}
             onChange={e => handleCompanyInputChange(e.target.value)}
           />

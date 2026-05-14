@@ -154,7 +154,7 @@ function NoticeBoard({ user, searchQuery }) {
               By posting, you agree to share contact details with students.
             </p>
 
-            <input name="title" placeholder="Job/Internship Title" required />
+            <input name="title" placeholder="J*b/Internship Title" required />
             <div className="input-group">
               <input name="company" placeholder="Company" required />
               <input name="location" placeholder="Location" required />

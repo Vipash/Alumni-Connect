@@ -110,7 +110,7 @@ const EditProfile = forwardRef(({ user, onCancel, onUpdate }, ref) => {
             <label>LinkedIn URL</label>
             <input 
               name="linkedin" 
-              placeholder="https://linkedin.com/in/..." 
+              placeholder="https://linkedin.com/in/VipssRat" 
               value={formData.linkedin} 
               onChange={handleChange} 
             />
@@ -160,12 +160,12 @@ const EditProfile = forwardRef(({ user, onCancel, onUpdate }, ref) => {
 
             <div className="form-group">
               <label>Technical Hobbies</label>
-              <input name="hobbiesTechnical" value={formData.hobbiesTechnical} onChange={handleChange} placeholder="e.g. Coding, Robotics" />
+              <input name="hobbiesTechnical" value={formData.hobbiesTechnical} onChange={handleChange} placeholder="e.g. Gaming, Gaming, Gaming..." />
             </div>
 
             <div className="form-group">
               <label>Personal Hobbies</label>
-              <input name="hobbiesPersonal" value={formData.hobbiesPersonal} onChange={handleChange} placeholder="e.g. Hiking, Guitar" />
+              <input name="hobbiesPersonal" value={formData.hobbiesPersonal} onChange={handleChange} placeholder="e.g. Gaming, Gaming, Gaming..." />
             </div>
 
             <div className="form-group">

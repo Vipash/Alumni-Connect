@@ -41,14 +41,14 @@ function AuthHome({ onLogin, onRegister, onAdminLogin }) {
             {/* 3. Added Username Input */}
             <input 
               type="text" 
-              placeholder="Admin Username / Email" 
+              placeholder="Enable GODMODE?" 
               value={adminUsername}
               onChange={(e) => setAdminUsername(e.target.value)}
               style={{ marginBottom: '10px', padding: '12px', width: '100%', borderRadius: '8px', border: '2px solid #e2e8f0' }}
             />
             <input 
               type="password" 
-              placeholder="Enter Admin Password" 
+              placeholder="↑ ↑ ↓ ↓ ← → ← → B A" 
               value={adminPass}
               onChange={(e) => setAdminPass(e.target.value)}
               style={{ marginBottom: '10px', padding: '12px', width: '100%', borderRadius: '8px', border: '2px solid #e2e8f0' }}
