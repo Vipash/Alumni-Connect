@@ -1,0 +1,151 @@
+
+@import "./Variables.css";
+
+.connect-hub-container {
+  display: flex; flex-direction: column;
+  height: 100%; width: 100% !important;
+  gap: 20px;
+  max-width: 100% !important;
+  overflow: hidden; overflow-x: hidden !important;
+  box-sizing: border-box;
+}
+.hub-header {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start !important;
+  background: white;
+  border-bottom: 1px solid #eee;
+  padding: 15px 20px !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  width: 100%;
+  box-sizing: border-box;
+}
+.hub-tabs { display: flex; gap: 10px; }
+.hub-tabs button {
+  width: auto !important; margin: 0 !important;
+  background: transparent;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 10px 20px;
+  position: relative;
+}
+.hub-tabs button.active {
+  color: var(--mbm-blue);
+  border-bottom: 3px solid var(--mbm-gold);
+  background: rgba(35, 23, 115, 0.05);
+}
+.hub-tabs button:hover { transform: none; background: rgba(35, 23, 115, 0.02); }
+
+.hub-content-body {
+  width: 100%; max-width: 100%;
+  margin-left: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 0 10px;
+}
+
+.history-section {
+  background: white; padding: 20px; border-radius: 12px;
+  min-width: 0 !important; width: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  overflow-x: auto;
+}
+.badge-pill {
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 0.8rem; font-weight: bold;
+  background: #e1f5fe; color: #01579b;
+  text-transform: uppercase;
+}
+
+.search-bar-container {
+  display: flex; gap: 15px;
+  margin-bottom: 25px;
+  background: white; padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  width: 100%; box-sizing: border-box;
+}
+.hub-search-input {
+  flex: 3; margin-bottom: 0 !important;
+  padding: 12px 15px !important;
+  border: 2px solid #eee !important;
+}
+.hub-filter-select {
+  flex: 1; margin-bottom: 0 !important;
+  padding: 12px !important;
+  border: 2px solid #eee !important;
+  background-color: #f9f9f9;
+}
+.hub-search-input:focus,
+.hub-filter-select:focus { border-color: var(--mbm-blue) !important; outline: none; }
+
+.deadline-badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+.deadline-badge.active  { background: #e3f2fd; color: #1976d2; }
+.deadline-badge.urgent  { background: #fff3e0; color: #e65100; border: 1px solid #ffb74d; animation: pulse 2s infinite; }
+.deadline-badge.expired { background: #f5f5f5; color: #757575; }
+.contacted-tag { font-size: 0.75rem; color: #2ecc71; font-weight: bold; margin-left: auto; }
+
+.card-top-row     { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.card-footer-tags { display: flex; align-items: center; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px; }
+
+.partition-input {
+  width: 100%; padding: 10px;
+  border: 1px solid #ccc; border-radius: 6px; font-size: 14px;
+}
+.apply-filter-btn {
+  margin-top: 10px;
+  background-color: var(--mbm-blue);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.apply-filter-btn:hover { background-color: var(--mbm-pink); }
+
+/* Mini profile card (popup) */
+.mini-profile-box { max-width: 350px !important; }
+.avatar-placeholder {
+  width: 70px; height: 70px;
+  background: var(--mbm-blue);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 15px;
+  font-weight: bold;
+}
+.profile-header-mini h3 { margin: 5px 0; }
+.branch-text { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
+.profile-details-mini { text-align: left; padding: 10px 0; }
+.profile-details-mini p { margin: 8px 0; font-size: 0.95rem; }
+.profile-avatar-mini {
+  width: 80px; height: 80px;
+  border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--mbm-gold);
+  margin-bottom: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.alumni-mini-card {
+  background: #f1f4f9;
+  padding: 15px; border-radius: 10px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 15px;
+}
+
+.myposts-list { display: flex; flex-direction: column; gap: 10px; }
+.mypost-item {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #fdfdfd; padding: 15px;
+  border: 1px solid #eee; border-radius: 8px;
+}
+.mypost-item .delete-btn-small {
+  width: auto !important;
+  background: var(--mbm-pink) !important;
+  color: white !important;
+}

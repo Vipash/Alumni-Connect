@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './Announcements.css';
 
 function AnnouncementsSection({ searchQuery }) { // Receive searchQuery as prop
   const [list, setList] = useState([]);

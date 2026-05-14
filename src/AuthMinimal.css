@@ -1,0 +1,163 @@
+
+@import "./Variables.css";
+
+/* Full-page background variant (used when login is its own page) */
+.auth-page-wrapper {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(26, 30, 77, 0.8), rgba(38, 42, 107, 0.8)),
+    url('/university-background.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  z-index: 1;
+}
+
+/* Centered radial-gradient auth landing */
+.landing-auth-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top right, var(--mbm-blue), #1a1e4d);
+}
+
+.minimal-auth-card {
+  background: white;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.portal-logo {
+  font-size: 2rem;
+  color: var(--mbm-blue);
+  margin-bottom: 5px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.portal-subtitle {
+  color: #64748b;
+  margin-bottom: 35px;
+  font-size: 0.9rem;
+}
+
+.minimal-select {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mbm-blue);
+  cursor: pointer;
+  appearance: none;
+  background: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23262a6b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")
+    no-repeat right 15px center/15px;
+}
+
+.modal-box.minimalist-auth {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.minimalist-auth h1 {
+  color: var(--mbm-blue);
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.role-dropdown {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mbm-blue);
+  margin-bottom: 20px;
+  background-color: #f8fafc;
+}
+.role-dropdown:focus {
+  border-color: var(--mbm-gold);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.primary-btn {
+  flex: 1;
+  background: linear-gradient(135deg, var(--mbm-gold) 0%, #b8962e 100%);
+  color: var(--mbm-blue);
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.secondary-btn {
+  flex: 1;
+  background-color: var(--mbm-blue);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.auth-action-row,
+.auth-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.primary-auth-btn {
+  flex: 1;
+  padding: 15px;
+  background: var(--mbm-gold);
+  color: var(--mbm-blue);
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.primary-auth-btn:hover {
+  transform: translateY(-2px);
+  background: #c29d2f;
+}
+.secondary-auth-btn {
+  flex: 1;
+  padding: 15px;
+  background: #f1f5f9;
+  color: var(--mbm-blue);
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.full-width { width: 100%; flex: none; }
+.subtitle {
+  color: #64748b;
+  margin-bottom: 25px;
+  font-size: 0.9rem;
+}

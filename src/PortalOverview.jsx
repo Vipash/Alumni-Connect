@@ -1,6 +1,6 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import './PortalOverview.css'
+import './PortalLayout.css'
 
 const PortalOverview = ({ stats }) => {
   // Mock data for the trend graph - this represents "Net Traffic" and "New Users"

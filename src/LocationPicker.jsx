@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMap, useMapEvents, Marker } from 'react-leaflet';
+import './RegistrationForm.css';
 
 function LocationPicker({ setCoords, externalCoords }) {
   // Initialize position with externalCoords if they exist

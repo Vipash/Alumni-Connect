@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './ConnectHub.css';
 
 function ConnectHub({ user, setSidebarContent, searchQuery, setSearchQuery, filterType, setFilterType }) {
   const [activeSubTab, setActiveSubTab] = useState('bulletin');

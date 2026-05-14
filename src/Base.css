@@ -1,0 +1,84 @@
+@import "./Variables.css";
+@import "./Animations.css";
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-main);
+  background-color: var(--bg-light);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--mbm-white);
+  color: var(--mbm-blue);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+#root { width: 100%; margin: 0; }
+
+h1, h2, h3, h4, h5, h6 { color: var(--mbm-blue); }
+h1 { font-size: 3.2em; line-height: 1.1; }
+
+a {
+  font-weight: 500;
+  color: var(--mbm-blue);
+  text-decoration: inherit;
+  transition: var(--transition);
+}
+a:hover { color: var(--mbm-pink); }
+
+/* ----- Standardized MBM Button ----- */
+.btn-primary {
+  background-color: var(--mbm-blue);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-primary:hover {
+  background-color: var(--mbm-pink);
+  transform: translateY(-2px);
+}
+
+.btn-cta {
+  background-color: var(--mbm-gold);
+  color: #1a0f2e;
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-cta:hover { background-color: var(--mbm-yellow); }
+
+button:focus, button:focus-visible {
+  outline: 3px solid var(--mbm-gold);
+  outline-offset: 2px;
+}
+
+/* ----- Glassmorphism utility (Login / Register containers) ----- */
+.glass-container {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid var(--mbm-pink);  /* University identity strip */
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}

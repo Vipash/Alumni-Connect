@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './AuthMinimal.css';
 
 function AuthHome({ onLogin, onRegister, onAdminLogin }) {
   const [selectedRole, setSelectedRole] = useState('student');

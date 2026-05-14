@@ -1,114 +1,237 @@
-/* Ensure the parent of the dropdown is relative */
+@import "./Variables.css";
+
+/* Suggestions dropdown */
 .location-search-container,
 .search-sidebar-container > div {
-    position: relative;
-    width: 100%;
+  position: relative;
+  width: 100%;
 }
-
-/* --- Suggestions Dropdown --- */
 .suggestions-list {
-    position: absolute;
-    top: 100%;              /* Sits exactly below the input */
-    left: 0;
-    width: 100%;            /* Match parent/input width */
-    background: white;
-    border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    z-index: 9999;          /* Above map controls */
-    max-height: 180px;
-    overflow-y: auto;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    margin: 0 !important;   /* Defend from globals */
-    padding: 0 !important;
-    list-style: none;
+  position: absolute;
+  top: 100%; left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  z-index: 9999;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
 }
-
-/* Scrollbar for suggestions */
-.suggestions-list::-webkit-scrollbar {
-    width: 6px;
-}
-.suggestions-list::-webkit-scrollbar-thumb {
-    background: #cbd5e0;
-    border-radius: 10px;
-}
-
+.suggestions-list::-webkit-scrollbar { width: 6px; }
+.suggestions-list::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
 .suggestions-list li {
-    padding: 12px 15px;
-    cursor: pointer !important;   /* Fix text-cursor issue */
-    font-size: 0.85rem;
-    color: #444;
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #f8f9fa;
+  padding: 12px 15px;
+  cursor: pointer !important;
+  font-size: 0.85rem;
+  color: #444;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f8f9fa;
 }
-
 .suggestions-list li:hover {
-    background-color: #f1f5f9;
-    color: var(--mbm-blue);
-    padding-left: 20px;           /* Subtle slide effect */
+  background-color: #f1f5f9;
+  color: var(--mbm-blue);
+  padding-left: 20px;
 }
 
-
-/* --- Results Notification Marker --- */
+/* Results notifier */
 .results-notifier {
-    position: fixed;
-    bottom: 30px;
-    left: 55%; /* Centered relative to the map partition */
-    transform: translateX(-50%);
-    background: var(--mbm-gold);
-    color: #1a0f2e;
-    padding: 12px 20px;
-    border-radius: 50px;
-    font-weight: 800;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer !important;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    z-index: 2000;
-    animation: bounce 2s infinite;
+  position: fixed;
+  bottom: 30px;
+  left: 55%;
+  transform: translateX(-50%);
+  background: var(--mbm-gold);
+  color: #1a0f2e;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer !important;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 2000;
+  animation: bounce 2s infinite;
 }
+.results-notifier span { font-size: 1.2rem; }
 
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-    40% { transform: translateX(-50%) translateY(-10px); }
-    60% { transform: translateX(-50%) translateY(-5px); }
-}
-
-.results-notifier span {
-    font-size: 1.2rem;
-}
-
-
-/* Ensure the table wrapper handles scrolling better */
-.table-wrapper {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #eee;
-}
-
-
-/* 2. Fix the "Text Cursor" issue globally for this section */
 .suggestions-list li,
 .results-notifier,
-.leaflet-marker-icon {
-    cursor: pointer !important;
-}
+.leaflet-marker-icon { cursor: pointer !important; }
 
-
-/* 3. Ensure the map doesn't inherit global 'border-radius' from card styles */
+/* Map containers */
 .map-fancy-container {
-    border-radius: 12px !important;
-    overflow: hidden;
-    border: 1px solid var(--mbm-blue);
+  height: 500px;
+  flex-shrink: 0;
+  border: 3px solid var(--mbm-blue) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  position: relative;
+  margin-bottom: 25px;
+}
+.map-page-wrapper {
+  display: flex; flex-direction: column;
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  padding: 20px;
+  max-width: 1200px !important;
+  margin: 0 auto;
+  height: auto !important;
+}
+.map-fancy-container .leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  flex: 1;
+}
+.partition-right .leaflet-container {
+  flex: 1;
+  height: 450px !important;
+  width: 100% !important;
+  z-index: 1;
+}
+.map-container-wrapper,
+.leaflet-container { height: 100% !important; width: 100% !important; display: block; }
+
+.map-layer {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1; opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.map-layer.active { opacity: 1; z-index: 2; }
+.loading { animation: pulse 1.5s infinite; }
+
+/* Bookmark + popup */
+.bookmark-toggle-btn {
+  position: absolute;
+  top: 35px; right: 35px;
+  z-index: 1100;
+  background: white;
+  border: 2px solid var(--mbm-gold);
+  color: var(--mbm-blue);
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+  width: auto !important;
+  margin: 0;
+}
+.bookmark-toggle-btn:hover { transform: scale(1.05); }
+.leaflet-popup-content-wrapper { border-radius: 12px; padding: 5px; }
+.popup-btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.popup-btn-group button { padding: 8px; font-size: 0.8rem; margin: 0; }
+
+.bookmark-sidebar {
+  position: absolute;
+  top: 85px; right: 35px;
+  width: 300px;
+  max-height: 450px;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 1200;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  opacity: 0; visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(35, 23, 115, 0.1);
+}
+.bookmark-sidebar.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.sidebar-header {
+  padding: 12px 15px;
+  background: var(--mbm-blue);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sidebar-header h3 { margin: 0; color: white; font-size: 1rem; }
+.sidebar-scrollable-area { flex: 1; overflow-y: auto; max-height: 70vh; }
+.close-sidebar { background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
+.sidebar-content { padding: 5px 0; overflow-y: auto; flex-grow: 1; }
+.bookmark-item {
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer; background: white; transition: background 0.2s;
+}
+.bookmark-item:hover { background: #f1f4f9; }
+.bookmark-item strong { display: block; color: var(--mbm-blue); }
+.bookmark-item p { margin: 2px 0 0 0; font-size: 0.85rem; color: #666; }
+.empty-msg { padding: 40px 20px; text-align: center; color: #888; font-style: italic; }
+.delete-bookmark-small {
+  position: absolute; top: 12px; right: 10px;
+  width: 24px !important; height: 24px;
+  padding: 0 !important; line-height: 20px;
+  background: var(--mbm-pink);
+  color: white;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.6;
+}
+.delete-bookmark-small:hover {
+  opacity: 1;
+  background: var(--mbm-pink);
+  filter: brightness(0.85);
+  transform: scale(1.1);
 }
 
+.sidebar-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.sidebar-table th { text-align: left; padding: 8px; background: #f8f9fa; border-bottom: 2px solid #eee; }
+.sidebar-table td { padding: 8px; border-bottom: 1px solid #eee; }
+.sidebar-table tr:hover { background: #f1f4f9; cursor: pointer; }
 
-/* 4. Override global button behavior for the small 'Locate' buttons */
+.alumni-results-section { margin-top: 20px; flex-shrink: 0; }
 .alumni-results-section .nav-btn {
-    width: auto !important;
-    margin-top: 0 !important;
-    transform: none !important; /* Prevents the 'bounce' on hover inside the table */
+  width: auto !important;
+  margin-top: 0 !important;
+  transform: none !important;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  margin-bottom: 60px;
+}
+
+/* Search panel inside left partition */
+.search-panel {
+  display: flex; flex-direction: column; gap: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e1e1e1;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.company-search-container { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.location-search-container { display: flex; flex-direction: column; gap: 10px; }
+.input-group { display: flex; gap: 10px; align-items: center; width: 100%; }
+.input-group button { margin: 0; width: auto; flex-shrink: 0; }
+.button-row { display: flex; gap: 10px; width: 100%; }
+.button-row button { flex: 1; margin: 0; }
+
+.alumni-detail-window {
+  border-top: 5px solid var(--mbm-gold);
+  padding: 25px;
+  background: #ffffff;
+}
+.security-notice {
+  font-size: 0.75rem;
+  color: var(--mbm-pink);
+  background: #fff5f5;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+  border: 1px solid #fab1a0;
 }

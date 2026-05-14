@@ -1,0 +1,23 @@
+:root {
+  /* University Official Palette */
+  --mbm-pink:   #D91480;   /* Hero color / accents / hover pop */
+  --mbm-blue:   #231773;   /* Primary headers / nav / body text */
+  --mbm-yellow: #F2E205;   /* Highlights / warnings */
+  --mbm-gold:   #F2AC29;   /* CTA / icons / underlines */
+  --mbm-white:  #F2F2F2;   /* Page background */
+  --mbm-violet:       #2e238d;
+  --mbm-violet-dark:  #201c5a;
+
+  /* Semantic aliases */
+  --text-main:  var(--mbm-blue);
+  --bg-light:   var(--mbm-white);
+  --card-bg:    rgba(255, 255, 255, 0.8);
+  --shadow:     0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:  0 10px 30px rgba(0,0,0,0.12);
+
+  /* Sizing tokens */
+  --radius-sm:  4px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --transition: all 0.3s ease;
+}

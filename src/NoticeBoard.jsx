@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './NoticeBoard.css';
 
 function NoticeBoard({ user, searchQuery }) {
   const [notices, setNotices] = useState([]);

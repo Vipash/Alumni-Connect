@@ -1,6 +1,8 @@
 // AdminDashboard.jsx
 import { useState, useEffect } from 'react';
 import PortalOverview from './PortalOverview';
+import './AdminDashboard.css';
+import './AdminMedia.css';
 
 function AdminDashboard({ admin, setView, onLogout }) {
   // 1. STATE
