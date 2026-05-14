@@ -4,8 +4,6 @@ import LocationPicker from './LocationPicker';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
-import './App.css';
-import './Portal.css';
 import './FeatureStrip.css';
 import './Manual.css';
 import './AboutUs.css';
