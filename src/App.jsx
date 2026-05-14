@@ -928,18 +928,13 @@ const downloadMagazine = () => {
         </button>
         <h2>Campus Gallery</h2>
         <div className="gallery-grid-full">
-  {galleryData.map((item, index) => (
-    <div key={index} className="gallery-modal-item">
-      <img
-        src={item.imageUrl}
-        alt={item.title}
-        className="glass-panel" 
-        style={{ borderRadius: '10px', width: '100%' }}
-      />
-      <p style={{ color: '#231773', textAlign: 'center', marginTop: '10px' }}>{item.title}</p>
-    </div>
-  ))}
-</div>
+          {galleryItems.map((item, index) => ( // ✅ Now it uses the variable that is defined
+            <div key={index} className="gallery-modal-item">
+              <img src={item.imageUrl || item.img} alt={item.title || "Campus"} />
+              <p style={{ color: 'var(--mbm-blue)', marginTop: '10px' }}>{item.title}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )}
@@ -959,7 +954,7 @@ const downloadMagazine = () => {
           ALUMNI PUBLICATIONS
         </h3>
         <h2 style={{ 
-            color: '#231773', 
+            color: '#F2AC29', 
             margin: '10px 0', 
             fontSize: '3rem', 
             fontWeight: '800' 
