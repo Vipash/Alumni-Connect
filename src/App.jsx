@@ -780,10 +780,14 @@ const downloadMagazine = () => {
     <h1 className="hero-title" style={{ color: '#08056d', margin: 0 }}>
       MBM ALUMNI CONNECT
     </h1>
-    <p className="hero-subtitle" style={{ color: '#333', fontWeight: '500' }}>
+    <p className="hero-subtitle" style={{ color: '#F2E205', fontWeight: '500' }}>
       Bridging Generations of Excellence
     </p>
   </div>
+  <div className="explore-hint">
+  <span>Explore</span>
+  <div className="scroll-arrow"></div>
+</div>
 </header>
 
       {/* EVERYTHING that scrolls goes inside this wrapper */}

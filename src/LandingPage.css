@@ -570,6 +570,33 @@ button:hover {
   color: #666;
 }
 
+.explore-hint {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--mbm-gold); /* Using your gold palette */
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  cursor: default;
+}
+
+.scroll-arrow {
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid var(--mbm-gold);
+  border-bottom: 2px solid var(--mbm-gold);
+  transform: rotate(45deg);
+  margin-top: 8px;
+  animation: bounce 2s infinite;
+}
+
 @media (max-width: 900px) {
   .footer-content-container {
     grid-template-columns: 1fr;

@@ -6,6 +6,8 @@
 
 /* Hero Section */
 .about-hero-strip {
+  position: relative;
+  min-height: 100vh;
   background: linear-gradient(
       rgba(35, 23, 115, 0.92),
       rgba(35, 23, 115, 0.55)
