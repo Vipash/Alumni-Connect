@@ -352,7 +352,8 @@ const InstructionManual = ({ setView }) => {
           <footer className="manual-footer-note">
             <p>
               For technical or verification support, contact 
-              <strong> admin.portal@mbm.ac.in</strong>
+              <strong> vipashmeena@gmail.com</strong>
+              (I might not reply but still... make me feel loved)
             </p>
             <p>Designed for the MBM Alumni Relations Cell © 2026</p>
           </footer>
