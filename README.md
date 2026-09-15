@@ -1,7 +1,7 @@
-```markdown
 # 🎓 University & Alumni Management Portal
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build & Test CI](https://github.com/Vipash/Alumni-Connect/actions/workflows/ci.yml/badge.svg)](https://github.com/Vipash/Alumni-Connect/actions)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Vite](https://img.shields.io/badge/vite-%5E5.0.0-646CFF.svg)](https://vitejs.dev/)
 [![React Version](https://img.shields.io/badge/react-%5E18.0.0-blue.svg)](https://reactjs.org/)
@@ -26,6 +26,15 @@ The platform provides a centralized hub to streamline institutional activities:
 * **URL:** [alumni-connect-fegi.onrender.com](https://alumni-connect-fegi.onrender.com)
 
 > **Note:** Because this app is hosted on Render's free tier, the backend server may take 30–50 seconds to spin up on the first request if it has been inactive.
+
+---
+
+
+## 🔄 Continuous Integration (CI)
+
+This repository uses **GitHub Actions** for automated build checks and quality assurance:
+* **Automated Builds**: Validates that Vite builds the frontend application cleanly on Node.js v18 and v20.
+* **Lint Checks**: Executes ESLint rules automatically on every Push and Pull Request targeting `main`.
 
 ---
 
