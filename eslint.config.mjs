@@ -7,10 +7,26 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 export default [
   { ignores: ['dist', 'node_modules'] },
 
-  // 1. Backend / Node.js Configuration (CommonJS)
+  // 1. Root Config Files (vite.config.js, eslint.config.mjs)
   {
-    files: ['**/*.js'],
-    ignores: ['src/**'],
+    files: ['*.config.js', '*.config.mjs', 'vite.config.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    },
+  },
+
+  // 2. Backend / Node.js Server Files (CommonJS)
+  {
+    files: ['*.js', 'server/**/*.js'],
+    ignores: ['src/**', '*.config.js', 'vite.config.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'commonjs',
@@ -26,7 +42,7 @@ export default [
     },
   },
 
-  // 2. Frontend / React Configuration
+  // 3. Frontend / React Configuration
   {
     files: ['src/**/*.{js,jsx}'],
     plugins: {
@@ -47,14 +63,11 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      // Downgrade new strict React rules from errors to warnings
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-      'react-hooks/set-state-in-effect': 'warn',
-      'react-hooks/purity': 'warn',
-      'react-hooks/immutability': 'warn',
     },
   },
 ];
