@@ -29,9 +29,11 @@ app.use('/api/connections', connectionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/media', mediaRoutes);
 
-const MONGO_URI =
-  process.env.MONGO_URI ||
-  'mongodb+srv://AlumniAdmin:12345@cluster0.ajb1ovb.mongodb.net/alumni_db?appName=Cluster0';
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI missing in environment variables!');
+  process.exit(1);
+}
 
 mongoose
   .connect(MONGO_URI)
