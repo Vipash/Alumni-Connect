@@ -19,6 +19,16 @@ The platform provides a centralized hub to streamline institutional activities:
 
 ---
 
+## 🌐 Live Demo
+
+[![Deployed on Render](https://img.shields.io/badge/Render-Live_App-000000?style=for-the-badge&logo=render&logoColor=white)](https://alumni-connect-fegi.onrender.com)
+
+* **URL:** [alumni-connect-fegi.onrender.com](https://alumni-connect-fegi.onrender.com)
+
+> **Note:** Because this app is hosted on Render's free tier, the backend server may take 30–50 seconds to spin up on the first request if it has been inactive.
+
+---
+
 ## 🛠 Tech Stack
 
 ### **Frontend**
