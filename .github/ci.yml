@@ -32,3 +32,8 @@ jobs:
 
       - name: Build Vite Frontend
         run: npm run build
+
+        - name: Build Vite Frontend
+        run: npm run build
+        env:
+          VITE_API_URL: "https://alumni-connect-fegi.onrender.com"
