@@ -7,42 +7,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 export default [
   { ignores: ['dist', 'node_modules'] },
 
-  // 1. Root Config Files (vite.config.js, eslint.config.mjs)
-  {
-    files: ['*.config.js', '*.config.mjs', 'vite.config.js'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        ...globals.node,
-      },
-    },
-    rules: {
-      ...js.configs.recommended.rules,
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-    },
-  },
-
-  // 2. Backend / Node.js Server Files (CommonJS)
-  {
-    files: ['*.js', 'server/**/*.js'],
-    ignores: ['src/**', '*.config.js', 'vite.config.js'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'commonjs',
-      globals: {
-        ...globals.node,
-        ...globals.commonjs,
-      },
-    },
-    rules: {
-      ...js.configs.recommended.rules,
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-      'no-undef': 'error',
-    },
-  },
-
-  // 3. Frontend / React Configuration
+  // Configuration for React frontend
   {
     files: ['src/**/*.{js,jsx}'],
     plugins: {
@@ -63,9 +28,9 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // Standard hooks rules only
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
     },

@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import EditProfile from './EditProfile';
 import './Profile.css';
 
 const ensureAbsoluteUrl = (url) => {
