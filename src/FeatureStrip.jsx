@@ -16,7 +16,7 @@ const FeatureStrip = () => {
       handleNext();
     }, 5000);
     return () => clearInterval(timer);
-  }, [currentIndex]);
+  }, []); // Empty dependency array prevents resetting interval on index change
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === galleryData.length - 1 ? 0 : prev + 1));
@@ -27,39 +27,39 @@ const FeatureStrip = () => {
   };
 
   return (
-  <div className="campus-hero-strip">
-  <div className="campus-hero-main">
-    
-    {/* Image Frame */}
-    <div className="campus-hero-image-frame" style={{ width: '250px', height: '180px' }}>
-      <img 
-        src={galleryItems[currentGalleryIndex].img} 
-        alt="Campus" 
-        className="hero-img-transition" 
-        key={currentGalleryIndex}
-        /* INLINE STYLE OVERRIDE: Forces the image to behave */
-        style={{ width: '250px', height: '180px', objectFit: 'cover' }} 
-      />
-    </div>
+    <div className="campus-hero-strip">
+      <div className="campus-hero-main">
 
-    {/* Text Area */}
-    <div className="campus-hero-text-area">
-      <p>{galleryItems[currentGalleryIndex].text}</p>
-      
-      <div className="campus-hero-nav">
-        <button onClick={handlePrev}>❮</button>
-        <button onClick={handleNext}>❯</button>
+        {/* Image Frame */}
+        <div className="campus-hero-image-frame" style={{ width: '250px', height: '180px' }}>
+          <img 
+            src={galleryData[currentIndex].img} 
+            alt="Campus" 
+            className="hero-img-transition" 
+            key={currentIndex}
+            style={{ width: '250px', height: '180px', objectFit: 'cover' }} 
+          />
+        </div>
+
+        {/* Text Area */}
+        <div className="campus-hero-text-area">
+          <p>{galleryData[currentIndex].text}</p>
+
+          <div className="campus-hero-nav">
+            <button onClick={handlePrev}>❮</button>
+            <button onClick={handleNext}>❯</button>
+          </div>
+        </div>
+
+      </div>
+      {/* Visual Progress Bar at the bottom of the strip */}
+      <div 
+        className="campus-hero-progress-bar" 
+        style={{ width: `${((currentIndex + 1) / galleryData.length) * 100}%` }}
+      >
       </div>
     </div>
-
-  </div>
-  {/* Visual Progress Bar at the bottom of the strip */}
-    <div className="campus-hero-progress-bar" 
-         style={{ width: `${((currentIndex + 1) / galleryData.length) * 100}%` }}>
-    </div>
-</div>
-
-);
+  );
 };
 
 export default FeatureStrip;

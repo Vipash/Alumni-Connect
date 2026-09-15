@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 function ConnectionHistory({ user }) {
   const [history, setHistory] = useState([]);
 
